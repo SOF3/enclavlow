@@ -1,18 +1,39 @@
 package io.github.sof3.enclavlow
 
-import soot.toolkits.scalar.ArraySparseSet
+typealias Contract = DirGraph<PublicNode>
+typealias MutableContract = MutableDirGraph<PublicNode>
+typealias FlowSet = MutableDirGraph<Node>
 
-typealias SenFlowSet = ArraySparseSet<Flow>
+fun makeContract(
+    paramCount: Int,
+    extraNodes: Collection<PublicNode> = emptyList(),
+    fn: MakeContractContext<PublicNode>.() -> Unit = {},
+): MutableContract {
+    val nodes = indexedSetOf<PublicNode>(ThisScope, StaticScope, ReturnScope, ThrowScope)
+    nodes.addAll((0 until paramCount).map { ParamSource(it) })
+    nodes.addAll(extraNodes)
 
-sealed class Flow {
-    abstract val sources: Set<Source>
+    val graph = newDirGraph(nodes)
+    fn(MakeContractContext(graph))
+    return graph
 }
 
-class VariableFlow(val name: String, override val sources: Set<Source>) : Flow()
+fun makeFlowSet(
+    paramCount: Int,
+    extraNodes: Collection<Node> = emptyList(),
+    fn: MakeContractContext<Node>.() -> Unit = {},
+): FlowSet {
+    val nodes = indexedSetOf(ThisScope, StaticScope, ReturnScope, ThrowScope, ControlFlow)
+    nodes.addAll((0 until paramCount).map { ParamSource(it) })
+    nodes.addAll(extraNodes)
 
-class ExitFlow(override val sources: Set<Source>, val exitType: ExitType) : Flow()
+    val graph = newDirGraph(nodes)
+    fn(MakeContractContext(graph))
+    return graph
+}
 
-enum class ExitType {
-    RETURN,
-    THROW,
+class MakeContractContext<T : Any>(private val graph: MutableDirGraph<T>) {
+    infix fun T.into(other: T) {
+        graph.touch(this, other)
+    }
 }

@@ -4,92 +4,167 @@ import org.slf4j.LoggerFactory
 import soot.Body
 import soot.BodyTransformer
 import soot.Local
+import soot.PackManager
+import soot.Transform
 import soot.Value
+import soot.jimple.BinopExpr
 import soot.jimple.DefinitionStmt
+import soot.jimple.IfStmt
 import soot.jimple.InstanceFieldRef
 import soot.jimple.ParameterRef
 import soot.jimple.ReturnStmt
 import soot.jimple.ReturnVoidStmt
+import soot.jimple.StaticFieldRef
 import soot.jimple.ThisRef
 import soot.jimple.ThrowStmt
 import soot.toolkits.graph.DirectedGraph
 import soot.toolkits.graph.ExceptionalUnitGraph
 import soot.toolkits.scalar.ForwardFlowAnalysis
-import java.io.File
 
 private val LOGGER = LoggerFactory.getLogger(SenFlow::class.java)
 
 object SenTransformer : BodyTransformer() {
+    val contracts = hashMapOf<String, Contract>()
+
+    init {
+        PackManager.v().getPack("jtp").add(Transform("jtp.sen", this))
+    }
+
     override fun internalTransform(body: Body, phaseName: String, options: MutableMap<String, String>) {
-        val flow = SenFlow(ExceptionalUnitGraph(body))
+        val flow = SenFlow(ExceptionalUnitGraph(body), body.method.parameterCount)
+        println(body)
         flow.doAnalysis()
+        contracts[body.method.name] = flow.outputContract
+        println("Contract: ${flow.outputContract}")
     }
 }
 
-class SenFlow(graph: DirectedGraph<soot.Unit>) : ForwardFlowAnalysis<soot.Unit, SenFlowSet>(graph) {
-    override fun newInitialFlow() = SenFlowSet()
-    override fun merge(in1: SenFlowSet, in2: SenFlowSet, out: SenFlowSet) = in1.union(in2, out)
-    override fun copy(source: SenFlowSet, dest: SenFlowSet) = source.copy(dest)
+class SenFlow(graph: DirectedGraph<soot.Unit>, private val paramCount: Int) : ForwardFlowAnalysis<soot.Unit, FlowSet>(graph) {
+    val outputContract: MutableContract = makeContract(paramCount)
+
+    override fun newInitialFlow() = makeFlowSet(paramCount)
+    override fun merge(in1: FlowSet, in2: FlowSet, out: FlowSet) {
+        println("Merging $in1 and $in2")
+        in1.merge(in2) { a, b ->
+            // TODO handle ControlFlow
+            // if flow is detected from either side
+            a || b
+        }.copyTo(out)
+    }
+
+    override fun copy(source: FlowSet, dest: FlowSet) = source.copyTo(dest)
 
     public override fun doAnalysis() = super.doAnalysis()
 
-    override fun flowThrough(input: SenFlowSet, node: soot.Unit, output: SenFlowSet) {
+    override fun flowThrough(input: FlowSet, node: soot.Unit, output: FlowSet) {
+        println("${node.javaClass.simpleName}: $node")
+        println("Input: {$input}")
         when (node) {
             is ReturnStmt -> {
-                val sources = findSources(input, node.op)
-                output.add(ExitFlow(sources, ExitType.RETURN))
+                val sources = findSourcesForValue(input, node.op)
+                for (source in sources) {
+                    outputContract.touch(source, ReturnScope)
+                }
+                writeGlobalOutput(input)
             }
             is ReturnVoidStmt -> {
-                /* no-op */
+                writeGlobalOutput(input)
             }
             is ThrowStmt -> {
-                val sources = findSources(input, node.op)
-                output.add(ExitFlow(sources, ExitType.THROW))
+                val sources = findSourcesForValue(input, node.op)
+                for (source in sources) {
+                    outputContract.touch(source, ThrowScope)
+                }
+                writeGlobalOutput(input)
             }
             is DefinitionStmt -> {
                 val left = node.leftOp
                 val right = node.rightOp
 
-                input.copy(output)
+                input.copyTo(output)
                 removeValue(output, left)
 
-                val sources = findSources(input, right)
+                val sources = findSourcesForValue(input, right) + input.findSources(ControlFlow, canBeSelf = false).subtype<Node, PublicNode>()!!
                 if (sources.isNotEmpty()) {
-                    output.add(createFlowFromValue(left, sources))
+                    addNodesToValue(output, left, sources)
                 }
+            }
+            is IfStmt -> {
+                input.copyTo(output)
+                for (source in findSourcesForValue(input, node.condition)) output.touch(source, ControlFlow)
             }
             else -> {
                 LOGGER.warn("Unhandled passthru node ${node.javaClass}: $node")
-                input.copy(output)
+                input.copyTo(output)
             }
+        }
+        println("Output: {$output}")
+    }
+
+    private fun writeGlobalOutput(flow: FlowSet) {
+        println("Writing global output")
+        for (source in flow.findSources(ThisScope, canBeSelf = false)) {
+            println("Append outputContract: $source -> <this>")
+            outputContract.touch(source as PublicNode, ThisScope)
+        }
+        for (source in flow.findSources(StaticScope, canBeSelf = false)) {
+            println("Append outputContract: $source -> <static>")
+            outputContract.touch(source as PublicNode, StaticScope)
         }
     }
 }
 
-private fun findSources(flowSet: SenFlowSet, value: Value): Set<Source> = when (value) {
+/**
+ * Returns the set of ultimate sources affecting a value
+ */
+private fun findSourcesForValue(flowSet: FlowSet, value: Value): Set<PublicNode> = when (value) {
     is ParameterRef -> setOf(ParamSource(value.index))
-    is ThisRef -> setOf(ThisSource)
+    is ThisRef -> setOf(ThisScope)
     is Local -> {
-        flowSet.firstOrNull { it is VariableFlow && it.name == value.name }?.sources ?: emptySet()
+        val variable = flowSet.nodes.firstOrNull { it is VariableNode && it.name == value.name }
+        if (variable != null) {
+            flowSet.findSources(variable).subtype() ?: throw NullPointerException("$")
+        } else {
+            emptySet()
+        }
     }
+    is InstanceFieldRef -> findSourcesForValue(flowSet, value.base)
+    is BinopExpr -> findSourcesForValue(flowSet, value.op1) + findSourcesForValue(flowSet, value.op2)
     else -> {
         LOGGER.warn("Unhandled value ${value.javaClass}: $value")
         emptySet()
     }
 }
 
-private fun removeValue(flowSet: SenFlowSet, value: Value) {
-    // remove
+private fun removeValue(flowSet: FlowSet, value: Value) {
+    // TODO remove
 }
 
-private fun createFlowFromValue(value: Value, sources: Set<Source>) = when (value) {
-    is Local -> VariableFlow(value.name, sources)
-    is InstanceFieldRef -> {
-        // case 1: secret.i = 1
-        // case 2: leak.i = 1
-        // case 3: secret.leak.i = 1
-        // case 4: leak.secret.i = 1
-        TODO("not yet implemented")
+private fun addNodesToValue(flowSet: FlowSet, dest: Value, sources: Set<PublicNode>): Unit = when (dest) {
+    is Local -> {
+        val variable = VariableNode(dest.name)
+        println(variable)
+        flowSet.addNodeIfMissing(variable)
+        for (source in sources) {
+            println("$source -> $variable")
+            flowSet.touch(source, variable)
+        }
     }
-    else -> TODO("not yet implemented")
+    is InstanceFieldRef -> {
+        // even public.secret.c = 1 is still a leak
+        // therefore, instance assignment propagate secret requirement to all sources
+        // dest.base is a reference, so we need to propagate further
+        val leftSources = findSourcesForValue(flowSet, dest.base)
+        for(left in leftSources) {
+            for(source in sources) {
+                flowSet.touch(source, left)
+            }
+        }
+    }
+    is StaticFieldRef -> {
+        for (source in sources) {
+            flowSet.touch(source, StaticScope)
+        }
+    }
+    else -> TODO("not yet implemented: ${dest.javaClass.simpleName}")
 }

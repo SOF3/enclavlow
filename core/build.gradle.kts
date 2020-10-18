@@ -11,5 +11,7 @@ dependencies {
 }
 
 tasks.test {
-    useJUnit()
+    useJUnit {
+        setForkEvery(1)
+    }
 }
