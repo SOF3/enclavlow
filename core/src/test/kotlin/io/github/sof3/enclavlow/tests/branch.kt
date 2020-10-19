@@ -17,6 +17,7 @@ class ConditionalAssignTests {
 class ConditionalThrowTests {
     @Test
     fun conditionalThrow() = run<BranchLeak>("conditionalThrow" to makeContract(2) {
+        ParamSource(0) into ReturnScope // if
         ParamSource(0) into ThrowScope
         ParamSource(1) into ThrowScope
     })
