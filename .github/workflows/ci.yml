@@ -1,0 +1,9 @@
+name: CI
+on:
+  - push
+  - pull_request
+jobs:
+  core-junit:
+    runs-on: ubuntu-latest
+    steps:
+      - run: ./gradlew core:test --info
