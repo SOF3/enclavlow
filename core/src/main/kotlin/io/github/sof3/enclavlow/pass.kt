@@ -61,20 +61,17 @@ class SenFlow(graph: DirectedGraph<soot.Unit>, private val paramCount: Int) : Fo
         println("Input: {$input}")
         when (node) {
             is ReturnStmt -> {
-                val sources = findSourcesForValue(input, node.op)
-                for (source in sources) {
-                    outputContract.touch(source, ReturnScope)
-                }
+                outputContract.touchSources(findSourcesForValue(input, node.op), ReturnScope)
+                outputContract.touchSources(input.findSources(ControlFlow, canBeSelf = false).subtype()!!, ReturnScope)
                 writeGlobalOutput(input)
             }
             is ReturnVoidStmt -> {
                 writeGlobalOutput(input)
+                outputContract.touchSources(input.findSources(ControlFlow, canBeSelf = false).subtype()!!, ReturnScope)
             }
             is ThrowStmt -> {
-                val sources = findSourcesForValue(input, node.op)
-                for (source in sources) {
-                    outputContract.touch(source, ThrowScope)
-                }
+                outputContract.touchSources(findSourcesForValue(input, node.op), ThrowScope)
+                outputContract.touchSources(input.findSources(ControlFlow, canBeSelf = false).subtype()!!, ThrowScope)
                 writeGlobalOutput(input)
             }
             is DefinitionStmt -> {
@@ -84,14 +81,14 @@ class SenFlow(graph: DirectedGraph<soot.Unit>, private val paramCount: Int) : Fo
                 input.copyTo(output)
                 removeValue(output, left)
 
-                val sources = findSourcesForValue(input, right) + input.findSources(ControlFlow, canBeSelf = false).subtype<Node, PublicNode>()!!
+                val sources = findSourcesForValue(input, right) + input.findSources(ControlFlow, canBeSelf = false).subtype()!!
                 if (sources.isNotEmpty()) {
                     addNodesToValue(output, left, sources)
                 }
             }
             is IfStmt -> {
                 input.copyTo(output)
-                for (source in findSourcesForValue(input, node.condition)) output.touch(source, ControlFlow)
+                output.touchSources(findSourcesForValue(input, node.condition), ControlFlow)
             }
             else -> {
                 LOGGER.warn("Unhandled passthru node ${node.javaClass}: $node")
@@ -123,7 +120,7 @@ private fun findSourcesForValue(flowSet: FlowSet, value: Value): Set<PublicNode>
     is Local -> {
         val variable = flowSet.nodes.firstOrNull { it is VariableNode && it.name == value.name }
         if (variable != null) {
-            flowSet.findSources(variable).subtype() ?: throw NullPointerException("$")
+            flowSet.findSources(variable).subtype() ?: throw ClassCastException("Non-PublicNode data sources found")
         } else {
             emptySet()
         }
@@ -141,6 +138,8 @@ private fun removeValue(flowSet: FlowSet, value: Value) {
 }
 
 private fun addNodesToValue(flowSet: FlowSet, dest: Value, sources: Set<PublicNode>): Unit = when (dest) {
+    // TODO verify different logic for lvalue vs rvalue
+
     is Local -> {
         val variable = VariableNode(dest.name)
         println(variable)
@@ -155,8 +154,8 @@ private fun addNodesToValue(flowSet: FlowSet, dest: Value, sources: Set<PublicNo
         // therefore, instance assignment propagate secret requirement to all sources
         // dest.base is a reference, so we need to propagate further
         val leftSources = findSourcesForValue(flowSet, dest.base)
-        for(left in leftSources) {
-            for(source in sources) {
+        for (left in leftSources) {
+            for (source in sources) {
                 flowSet.touch(source, left)
             }
         }

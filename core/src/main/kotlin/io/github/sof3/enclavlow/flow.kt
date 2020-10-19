@@ -1,8 +1,8 @@
 package io.github.sof3.enclavlow
 
-typealias Contract = DirGraph<PublicNode>
-typealias MutableContract = MutableDirGraph<PublicNode>
-typealias FlowSet = MutableDirGraph<Node>
+typealias Contract = DiGraph<PublicNode>
+typealias MutableContract = MutableDiGraph<PublicNode>
+typealias FlowSet = MutableDiGraph<Node>
 
 fun makeContract(
     paramCount: Int,
@@ -32,7 +32,7 @@ fun makeFlowSet(
     return graph
 }
 
-class MakeContractContext<T : Any>(private val graph: MutableDirGraph<T>) {
+class MakeContractContext<T : Any>(private val graph: MutableDiGraph<T>) {
     infix fun T.into(other: T) {
         graph.touch(this, other)
     }

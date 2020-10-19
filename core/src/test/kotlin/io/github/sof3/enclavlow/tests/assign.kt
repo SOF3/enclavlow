@@ -43,3 +43,10 @@ class ThisToStaticTests {
         ThisScope into StaticScope
     })
 }
+
+class ZeroizeAssignTest {
+    @Test
+    fun zeroizeAssign() = run<DirectLeak>("zeroizeAssign" to makeContract(1) {
+        // there should be nothing leaked
+    })
+}

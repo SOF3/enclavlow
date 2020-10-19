@@ -24,4 +24,10 @@ public class DirectLeak {
     public void thisToStatic() {
         a = b;
     }
+
+    public static int zeroizeAssign(int x) {
+        @SuppressWarnings({"SuspiciousNameCombination", "UnusedAssignment"}) int y = x;
+        y = 0;
+        return y;
+    }
 }

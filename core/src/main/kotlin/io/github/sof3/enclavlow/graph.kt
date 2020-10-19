@@ -2,16 +2,16 @@ package io.github.sof3.enclavlow
 
 fun <T : Any> newDirGraph(
     nodes: IndexedSet<T>,
-): MutableDirGraph<T> {
+): MutableDiGraph<T> {
     val edges = MutableList(nodes.size) { MutableList(nodes.size) { false } }
-    return MutableDirGraph(nodes, edges)
+    return MutableDiGraph(nodes, edges)
 }
 
 typealias Edge = Boolean
 
 private val findSourceStack = ThreadLocal.withInitial { mutableSetOf<Int>() }
 
-sealed class DirGraph<T : Any>(
+sealed class DiGraph<T : Any>(
     nodes: IndexedSet<T>,
     edges: MutableList<MutableList<Edge>>,
 ) {
@@ -21,7 +21,7 @@ sealed class DirGraph<T : Any>(
         protected set
 
     override fun equals(other: Any?): Boolean {
-        if (other !is DirGraph<*>) return false
+        if (other !is DiGraph<*>) return false
         if (nodes != other.nodes) {
             return false
         }
@@ -76,10 +76,10 @@ sealed class DirGraph<T : Any>(
     }
 }
 
-class MutableDirGraph<T : Any>(
+class MutableDiGraph<T : Any>(
     nodes: IndexedSet<T>,
     edges: MutableList<MutableList<Edge>>,
-) : DirGraph<T>(nodes, edges), Cloneable {
+) : DiGraph<T>(nodes, edges), Cloneable {
     override var edges: MutableList<MutableList<Edge>>
         get() = super.edges
         public set(value) {
@@ -95,21 +95,28 @@ class MutableDirGraph<T : Any>(
         }
     }
 
-    fun touch(from: T, to: T): MutableDirGraph<T> {
+    fun touch(from: T, to: T) {
         val a = nodes.find(from) ?: throw IllegalArgumentException("Nonexistent node $from")
         val b = nodes.find(to) ?: throw IllegalArgumentException("Nonexistent node $to")
         edges[a][b] = true
-        return this
     }
 
-    public override fun clone() = MutableDirGraph(nodes.clone(), MutableList(nodes.size) { edges[it].toMutableList() })
+    fun touchSources(sources: Iterable<T>, to: T) {
+        val b = nodes.find(to) ?: throw IllegalArgumentException("Nonexistent node $to")
+        for(from in sources) {
+            val a = nodes.find(from) ?: throw IllegalArgumentException("Nonexistent node $from")
+            edges[a][b] = true
+        }
+    }
 
-    fun copyTo(target: MutableDirGraph<T>) {
+    public override fun clone() = MutableDiGraph(nodes.clone(), MutableList(nodes.size) { edges[it].toMutableList() })
+
+    fun copyTo(target: MutableDiGraph<T>) {
         target.nodes = nodes.clone()
         target.edges = MutableList(nodes.size) { edges[it].toMutableList() }
     }
 
-    inline fun merge(other: MutableDirGraph<T>, biMap: (Edge, Edge) -> Edge): MutableDirGraph<T> {
+    inline fun merge(other: MutableDiGraph<T>, biMap: (Edge, Edge) -> Edge): MutableDiGraph<T> {
         // L
         val out = clone()
 
