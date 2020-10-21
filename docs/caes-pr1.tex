@@ -1,0 +1,105 @@
+\documentclass[a4paper, 12pt]{article}
+\usepackage[top=0.2in, bottom=0.5in, left=0.2in, right=0.2in]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+
+\usepackage[bookmarksopen=true, hidelinks]{hyperref}
+\usepackage{bookmark}
+\bookmarksetup{numbered}
+\hypersetup{colorlinks, linkcolor={black}}
+\usepackage{cite}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{fontspec}
+\setmainfont{TeX Gyre Termes}
+\usepackage{sourcecodepro}
+
+\title{Data flow analysis for Uranus applications}
+\author{Chan Kwan Yin (3035466978)}
+\date{28 October 2020}
+
+\lstdefinestyle{j}{
+	keywordstyle=\color{magenta},
+	basicstyle=\ttfamily\footnotesize,
+	tabsize=4,
+}
+
+\begin{document}
+\begin{titlepage}
+	\begin{center}
+		\vspace*{2em}
+		\LARGE
+		CAES9542 Progress Report 1
+
+		\vspace*{1em}
+		\Huge
+		\textbf{Data flow analysis for Uranus applications}
+
+		\Large
+		\vspace{1.5em}
+		\textbf{Chan Kwan Yin (3035466978)}
+
+		\vspace{0.5em}
+		28 October 2020
+	\end{center}
+
+	\vfill
+	\paragraph{Abstract}
+	Trusted Execution Environments (TEE) are useful for secure deployment on public clouds,
+	protecting applications from privileged attacks,
+	but defining enclave boundaries is not always a trivial task.
+	It is easy to unintentionally leak sensitive data or derivations out of the enclave
+	such that the host system is able to infer information about the sensitive data.
+	This is especially difficult to detect in languages with complex control structures
+	due to hidden control flow changes like exceptions.
+
+	This project introduces Enclavlow, an information flow analysis tool
+	for JVM-based projects using Intel SGX enclaves with the Uranus \footnote{
+		Uranus: Simple, Efficient SGX Programming and its Applications.
+		\url{https://doi.org/10.1145/3320269.3384763}
+	} framework.
+	It adopts a Dynamic Taint Analysis (DTA) approach
+	and implements a set of security policies tailored for Uranus-based applications.
+	The analysis tool is delivered as a Gradle plugin
+	to be deployed as a continuous integration tool in Gradle-based projects.
+\end{titlepage}
+
+\thispagestyle{empty}
+\tableofcontents
+\listoffigures
+\listoftables
+\lstlistoflistings
+
+\setcounter{page}0
+\newpage
+\setlength\parskip{1.5em}
+
+\section{Motivation}
+
+\section{Background}
+
+\section{Objective}
+\subsection{User interface}
+
+\subsection{Algorithm}
+
+\subsection{Security policies}
+
+\section{Prior work}
+\subsection{Glamdring}
+
+\subsection{Phosphor}
+
+\section{Methodology}
+\subsection{Language}
+
+\subsection{Flow analysis framework}
+
+\subsection{}
+
+
+\addcontentsline{toc}{section}{References}
+\bibliographystyle{acm}
+\bibliography{cite.bib}{}
+
+\end{document}

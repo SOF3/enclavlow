@@ -4,3 +4,4 @@ bin
 .gradle
 .idea
 sootOutput
+*.pdf
