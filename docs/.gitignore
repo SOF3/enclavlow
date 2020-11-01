@@ -1,0 +1,11 @@
+*.dot
+*.pdf
+*.aux
+*.bbl
+*.blg
+*.lof
+*.log
+*.lol
+*.lot
+*.toc
+!report.pdf

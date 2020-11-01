@@ -4,14 +4,5 @@ bin
 .gradle
 .idea
 sootOutput
-*.pdf
-*.aux
-*.bbl
-*.blg
-*.lof
-*.log
-*.lol
-*.lot
-*.toc
 *.jar
 *.jimple
