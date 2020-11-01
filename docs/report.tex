@@ -1,0 +1,98 @@
+\documentclass[a4paper, 12pt]{article}
+\usepackage[top=0.5in, bottom=0.6in, left=0.3in, right=0.3in]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage[document]{ragged2e}
+\usepackage{multicol}
+\usepackage{multirow}
+
+\usepackage[bookmarksopen=true]{hyperref}
+\usepackage{bookmark}
+\bookmarksetup{numbered}
+
+\usepackage{cite}
+
+\usepackage{listings}
+\lstdefinestyle{j}{
+	keywordstyle=\textbf,
+	basicstyle=\ttfamily\scriptsize,
+	tabsize=4,
+	numbers=left,
+}
+
+\usepackage{amsthm}
+\theoremstyle{definition}
+\newtheorem{defin}{Definition}
+
+\usepackage{xcolor}
+\usepackage{soul}
+
+\usepackage{fontspec}
+\setmainfont{TeX Gyre Termes}
+% \usepackage{sourcecodepro}
+
+\usepackage[pdf]{graphviz}
+
+\title{Data flow analysis for Uranus applications}
+\author{Chan Kwan Yin (3035466978)}
+\date{28 October 2020}
+
+
+\def\IncludeCode#1#2#3{
+	\begin{minipage}{\linewidth}
+		\lstinputlisting[style=j, language=java, label={#1},
+		caption={#3}]{#2}
+	\end{minipage}
+}
+
+\def\pname{\emph{enclavlow}}
+
+\definecolor{code}{rgb}{0.95, 0.95, 0.95}
+\sethlcolor{code}
+\def\code#1{\colorbox{code}{\texttt{\footnotesize #1}}}
+
+\begin{document}
+% title page
+\include{title}
+
+% abstract page
+\thispagestyle{empty}
+\include{abstract}
+\newpage
+
+% table of contents
+\thispagestyle{empty}
+\setlength\columnsep{3em}
+\begin{multicols}2
+\tableofcontents
+\listoffigures
+\listoftables
+\lstlistoflistings
+\end{multicols}
+
+% Main body
+\setcounter{page}0
+\newpage
+
+% \begin{multicols}2
+\input{abbr}
+
+\setlength\parskip{1.3em}
+
+\input{intro}
+
+\input{objective}
+
+\input{methodology}
+
+\input{discussion}
+
+\input{conclusion}
+
+\newpage
+\addcontentsline{toc}{section}{References}
+\bibliographystyle{acm}
+\bibliography{cite.bib}{}
+% \end{multicols}
+
+\end{document}

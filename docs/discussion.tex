@@ -1,0 +1,50 @@
+\section{Results and Discussion}
+\subsection{Difficulties and Limitations}
+The principles of OOP imply that a method called may be swapped with another subclass
+that performs different actions than the current one.
+Although Uranus prevents the adversary
+from passing arbitrary malicious code into the enclave memory,
+it is still possible to pass obejcts of unexpected subclass
+through the \code{@JEcall} boundary.
+Consider listing \ref{lst:oop-subst-attack} for example.
+If \code{cs} is passed with a \code{substr} implementation
+that writes its parameters to a static variable,
+the function would leak the length of the security-sensitive secret,
+which is not desirable.
+To correctly solve the vulnerability of OOP substitution,
+it is necessary to perform call graph analysis on the actual classes passed to the method,
+which involves more complex framework level work.
+
+\IncludeCode{lst:oop-subst-attack}{./OopSubstAttack.java}
+{Example attack through OOP substitution}
+
+Despite optimizations and simplifications,
+it is still not possible to perform 100\% accurate information flow analysis
+within efficient time complexity \cite{SmithGeoffrey2007PoSI}.
+For example, this project merges conditional branches together
+by taking the union of flow graphs,
+resulting in easy false positive rates.
+Listing \ref{lst:known-false-positives} enumerates a number of false positives
+incorrectly identified by \pname{},
+which are not going to be fixed because of the unlikeness of use.
+
+\IncludeCode{lst:known-false-positives}{./KnownFalsePositives.java}
+{Known false positives}
+
+It is also impossible to analyze further than the JNI level,
+since analyzing across JNI boundary implies
+the need to interact with a native analysis tool,
+which is entirely out of scope of this project.
+Since Uranus effectively denies system calls,
+a GIGO assumption can be made on JNI calls.
+
+At the technical aspect,
+multiple technical challenges were encountered when using Soot.
+Since Soot was designed to be a command line tool,
+it does not support direct calling from other environments very well.
+In particular, the entrypoint of Soot API is the \code{soot.Main.main()} method,
+which is the standard CLI interface in Java.
+As a result, extra time is spent on clearing global states used by Soot.
+Furthermore, due to restrictions in the Soot framework,
+each tested Java method must be run in a separate JVM,
+resulting in poor testing performance.

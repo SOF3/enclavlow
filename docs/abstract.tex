@@ -1,0 +1,23 @@
+\begin{abstract}
+	Trusted Execution Environments (TEE) protect applications from privileged attacks
+	running on untrusted systems such as public clouds,
+	but partitioning enclave boundaries is not always a trivial task.
+	Partitions too small would leak data to the untrusted host system,
+	while partitions too huge would result in unnecessarily large trusted computing base (TCB)
+	that increases the risk of overflowing Enclave Page Cache (EPC).
+	A passive analysis approach can be adopted where
+	users annotate data as sensitive sources or sinks,
+	and an analysis tool determines variables considered sensitive
+	and compares it with the enclave boundaries declared.
+
+	This project introduces \pname{}, an information flow analysis tool
+	for JVM-based projects using Intel SGX enclaves with the Uranus
+	\footnote{ Uranus: Simple, Efficient SGX Programming and its Applications.
+	\url{https://doi.org/10.1145/3320269.3384763}
+	} framework.
+	It implements a set of security policies tailored for Uranus-based applications,
+	and reports leaking variables or functions that could be run out of enclave.
+	The analysis tool is delivered as a Gradle plugin
+	to be deployed as a continuous integration tool in Gradle-based projects.
+	The source code for \pname{} is released on \url{https://github.com/SOF3/enclavlow}.
+\end{abstract}

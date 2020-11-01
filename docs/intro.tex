@@ -1,0 +1,95 @@
+\section{Introduction}
+\subsection{Background}
+With the rise of third-party public cloud servics
+such as AWS \cite{aws} and Microsoft Azure \cite{azure},
+there is increasing demand for trusted execution where
+applications are protected from
+attackers with privileged access to the hardware or software.
+Modern hardware offer TEE technologies,
+such as SGX in Intel CPUs,
+with which trusted execution code and sensitive data
+are processed in secure "enclaves",
+which is protected at hardware level to prevent access
+from other hardware or software layers.
+
+One significant application of TEEs is in big data processing,
+where confidential user data are processed,
+and protection from cloud providers may be necessary
+for complianc with privacy regulations such as GDPR \cite{gdpr}.
+However, a significant subset of such applications are written
+using languages that use JVM as the runtime,
+such as Hadoop \cite{apachehadoop} and Spark \cite{apachespark}
+Recently, Uranus, a system for
+writing SGX applications in Java languages, was released \cite{uranus}.
+It provides simple interface for SGX,
+where users annotate methods with \code{@JECall} and \code{@JOCall}
+to move control flow into or out of enclaves.
+It is the responsibility of the user to determine the correct positions
+for the \code{@JECall} and \code{@JOCall} annotations,
+namely the enclave boundary partitioning".
+Since JVM, compared to native applications running on the CPU,
+involves an entirely different approach
+with regard to software development and distribution,
+the tools applicable for native applications are mostly incompatible with JVM,
+introducing the corresponding new research areas.
+
+Running the whole application within an SGX enclave is undesirable for two reasons.
+First, this violates the principle of least privilege,
+where the whole application becomes possible attack surface
+for adversaries to compromise protected data \cite{glamdring}.
+Second, this implies all memory used by the application
+are placed in the enclave memory (the EPC),
+which is restricted to 100 MB before significant performance degrading
+("1,000X slowdown compared to regular OS paging") \cite{uranus}.
+On the other hand, if the enclave is smaller than necessary,
+adversaries can either obtain sensitive data directly or
+infer sensitive characteristics of them indirectly.
+
+This project presents \pname{}
+\footnote{"enclavlow" is a new term coined from the words "enclave" and "flow".},
+an information flow analysis tool
+for identifying data leak from enclaves.
+The user first annotates variables as \code{@Source} and \code{@Sink}.
+The tool performs information flow analysis from \code{@Source} variables,
+identifying the ways that data from such variables are leaked
+to the system outside the executing enclave
+without first passing through a \code{@Sink} variable.
+The tool compiles a report in HTML format that summarizes the following:
+\begin{itemize}
+	\item \textbf{Data leak}:
+		The report displays the lines of code on which sensitive data are moved
+		into areas accessible by privileged adversaries.
+		It demonstrates the path from the \code{@Source} variable to the point of leak.
+	\item \textbf{Redundant protection}:
+		The report lists the functions that could not hold any sensitive data in its local variables,
+		hence should be moved out of the enclave partition.
+\end{itemize}
+
+\pname{} is shipped as a Gradle plugin,
+providing a Gradle task that
+takes the \code{*.class} files compiled in the \code{classes} task
+and generates the report for the analysis from those classes.
+
+\subsection{Prior art}
+Information flow analysis is not a new technology in the field.
+While this project analyzes JVM code using SGX enclaves,
+prior research on \emph{native} code \emph{automatic partition} was found.
+
+Glamdring \cite{glamdring} is a C framework that
+automatically selects the minimal SGX enclave boundaries
+based on user requirements specified through C pragma directives.
+However, since the process is fully automated,
+it has a lower tolerance of false positives,
+which increases the risk of unintentional data leak.
+This project, unlike Glamdring, will only perform analysis but not automatic partitioning,
+allowing for greater false positive tolerance.
+
+Phosphor \cite{BellJonathan2014Pidd} is a DTA framework
+that modifies Java bytecode to add tags to sensitive data at runtime
+and check if such tags are leaked.
+Although dynamic taint is more accurate,
+this project prefers a static analysis approach,
+which enables developers to identify sensitive regions at compile time
+without the need to feed concrete data into methods.
+
+Civet \cite{civet}

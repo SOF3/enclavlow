@@ -1,0 +1,10 @@
+digraph local {
+rankdir = "LR";
+param0 [label = "Param \#0"];
+This -> r0 [dir = "both"];
+param0 -> i0;
+r0 -> r1 [dir = "both"];
+i0 -> r1;
+r0 -> r2 [dir = "both"];
+r2 -> Return;
+}

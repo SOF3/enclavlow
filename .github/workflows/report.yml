@@ -1,0 +1,14 @@
+name: PDF
+on:
+  - push
+jobs:
+  pdf:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: make
+        working-directory: docs
+      - uses: actions/upload-artifact@v2
+        with:
+          name: report.pdf
+          path: docs/report.pdf

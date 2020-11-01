@@ -1,0 +1,55 @@
+\section{Methodology}
+The main component of this project is the analysis framework,
+which is conducted in the form of iterations
+to fulfill security policies as specified in the integration tests.
+Other parts such as Gradle plugin interfae,
+although necessary for usage,
+are not focus areas of this project, and hence will not be discussed further.
+
+\input{methodology-design}
+
+\subsection{System Requirements}
+The logical code of this project is mostly implemented in Kotlin,
+a JVM language with more concise syntax than Java.
+However, to ensure that he behaviour analyzed
+is as explicit as possible,
+all test cases are written in Java.
+
+As Uranus was only tested against Linux systems,
+this project does not intend to support other operating systems.
+Furthermore, due to classpath detection difficulties,
+only OpenJDK Version 8 and 11 are supported currently.
+Nevertheless, since \pname{} is just a developer tool,
+its runtime is actually independent of that targeted by Uranus,
+so it is possible to test support for those frameworks in the future.
+
+\pname{} is packaged as a Gradle plugin,
+allowing developers to use it in projects with a Gradle toolchain.
+However, the \code{enclavlow-core} subproject can be reused in other contexts,
+such as Maven plugins, IDE plugins, etc.
+
+\subsection{Flow analysis framework}
+Soot \cite{sootsurvivor} was selected as the framework for conducting flow analysis.
+Although multiple existing flow analysis systems using Soot alrady exist,
+they are not designed against SGX enclave protection,
+but \pname{} adopts more strict security policies
+to prevent attacks from more privileged attackers,
+unlike traditional information flow analysis
+that mostly detects user input as the source of insecurity.
+
+Soot takes Java bytecode files (\code{*.class}) as input
+and compiles them into a 3AC language called Jimple,
+which simplifies analysis work.
+The consume-branch-merge approach mentioned in the last subsection
+was inspired by the forward flow analysis interface in Jimple.
+
+Other flow analysis frameworks were also considered,
+such as Joana \cite{joana} and JFlow \cite{jflow}.
+Soot was chosen due to its distinctively thorough documentation
+and builtin support for call graph analysis.
+
+\subsection{Testing}
+This project uses JUnit 5 and \code{kotlin.test} framework
+to conduct both unit and integration tests.
+Test case classes are compiled together in the \code{:core:testClasses} task,
+which declares compile-time dependency on the API \code{@Source} and \code{@Sink} annotations.

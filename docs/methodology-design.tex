@@ -1,0 +1,209 @@
+\subsection{Design}
+Since the adversary has arbitrary access to any untrusted memory and instruction,
+the security policies of \pname{} differ slightly from typical information flow analysis.
+For instance, the statement \code{a.b.c = d;} usually
+does not propagte the effect of \code{d} to \code{a},
+but since the adversary is capable of changing \code{b} to any memory location of its favour,
+the security of this statement depends on whether \code{a} is trusted.
+
+\pname{} adopts a flow graph approach,
+where each node represents an element that may be leaked.
+
+\begin{defin}
+	Given a flow graph $(V, E)$, for all $x, y \in V$,
+	$(x, y) \in E$ in a flow graph if and only if
+	allocating $y$ outside an enclave reduces the indistinguishability of $x$.
+\end{defin}
+
+Note that this definition ("our definition") differs slightly from
+the usual definition of flow graphs (especially in DTA),
+where an edge $(x, y)$ represents the flow of information from $x$ to $y$ \cite{YinHeng2007Pcsi}.
+In the usual definition, only adversary read access to $y$ is concerned,
+while in our definition, the adversary possesses write access to $x$.
+
+\subsubsection{Contract flow graph (CFG)}
+\pname{} adopts an approach where a CFG is constructed for each method analyzed.
+The CFG contains the following nodes:
+\begin{itemize}
+	\item "Static": Represents data located in static class fields
+	\item "This": Represents the object on which a method was invoked
+	\item "Param $x$": Each parameter is represented by a node
+	\item "Return": Represents data flow through the return path
+	\item "Throw": Represents data flow through the return path
+	\item "@Source": Represents variables in the method explicitly declared as \code{@Source}
+	\item "@Sink": Represents variables (or replaces the "Return" node)
+		in the method explicitly declared as \code{@Sink}
+	\item "Control": This is a special node representing how many times the function is called.
+	\item "This", "Param $y$", "Return", "Throw" and "Control"
+		from each function called from the current node
+\end{itemize}
+
+After all methods in a class are evaluated,
+the CFGs of child methods called from the analyzed methods
+are lazily evaluated as well.
+All CFGs are merged into an aggregate flow graph (AFG),
+joined using the function call nodes.
+
+For the case of OOP polymorphism,
+call graph analysis is performed to identify
+the exact subclasses that could be passed.
+In case multiple subclasses are possible,
+their contract graphs are merged by taking the union of all flow edges.
+
+See Figure \ref{fig:SourceSinkContract} for an example of AFG,
+with unconnected nodes omitted.
+
+\begin{figure}
+	\caption{Example CFG for listing \ref{lst:SourceSinkExample}}
+	\begin{center}
+		\digraph[scale=0.5]{contract}{
+			rankdir = "LR";
+			getSumParam0[label = "getSum\noexpand\n param \#0"];
+			parseParam0[label = "parse\noexpand\n param \#0"];
+			parseReturn[label = "parse\noexpand\n return"];
+			computeSumParam0[label = "computeSum\noexpand\n param \#0"];
+			computeSumReturn[label = "computeSum\noexpand\n return"];
+			getSumParam0 -> parseParam0;
+			parseParam0 -> parseReturn;
+			"@Source" -> parseReturn;
+			parseReturn -> computeSumParam0;
+			computeSumParam0 -> computeSumReturn;
+			computeSumReturn -> "@Sink";
+			}
+	\end{center}
+	\label{fig:SourceSinkContract}
+\end{figure}
+
+\subsubsection{Local flow graph (LFG)}
+To construct the CFG,
+a local graph is constructed.
+The analysis follows along the control flow of the program,
+performing the \emph{consume}, \emph{branch} and \emph{merge} operations.
+
+The LFG extends the CFG with the following additions:
+\begin{itemize}
+	\item Each local variable (some may exist as intermediate values in source code)
+		is allocated a node.
+	\item Each branch has its own "control" node.
+\end{itemize}
+
+The \emph{consume} operation consumes statements in form of 3AC \cite{sootsurvivor}.
+Every step adds or removes some flow edges,
+as described exhaustively in Table \ref{table:tac}.
+The relationship between the graph and the "lvalue"/"rvalue" terminology
+in Table \ref{table:tac} are explained in Table \ref{table:lrvalue}.
+
+The \emph{branch} operation performs a deep clone of the LFG
+and continues following each branch with its clone.
+
+The \emph{merge} operation pops the uppermost control flow node from the graph,
+and takes the union of all flows from each branched graph.
+
+Note that the control flow stack is always pushed from a conditional instruction
+before splitting into branches,
+which is important for attacks that count the number of times a method was called,
+hence inferring the sensitive value that determined the branch halting problem.
+
+\begin{table}
+	\caption{3AC instructions affecting LFG}
+	\centering
+	\begin{tabular}{|c|l|}
+		\hline
+		\textbf{Instruction type} & \textbf{Effects on LFG}
+		\\ \hline
+		\multirow3*{Assignment} & "Control" flows to lvalue nodes of destination. \\
+		& Erases current connections to lvalue nodes of destination. \\
+		& rvalue nodes of source flow to lvalue nodes of destination.
+		\\ \hline
+		\multirow2*{Return} & "Control" flows to "Return" node. \\
+		& rvalue nodes of returned value flow to "Return" node.
+		\\ \hline
+		\multirow2*{Throw} & "Control" flows to "Throw" node. \\
+		& rvalue nodes of thrown value leaks to "Throw" node.
+		\\ \hline
+		\multirow3*{Conditional (If/Switch)}
+		& A new "Control" node is pushed to the control stack. \\
+		& Previous "Control" flows to the new "Control". \\
+		& rvalue nodes of predicate leaks to the new "Control".
+		\\ \hline
+		Method call & Same effect as assigning call result to a sink variable.
+		\\ \hline
+	\end{tabular}
+	\label{table:tac}
+\end{table}
+
+\begin{table}
+	\caption{lvalue and rvalue nodes for expressions}
+	\centering
+	\begin{tabular}{|c|c|c|}
+		\hline
+		\textbf{Expression type} & \textbf{lvalue nodes} & \textbf{rvalue nodes}
+		\\ \hline
+		Binary operations & Unreachable & Union of rvalues from operands
+		\\ \hline
+		Array literal \code{new int[a]} & \multirow2*{Unreachable}
+		& \multirow2*{Union of rvalues from count or literal elements} \\
+		or \code{new int[]\{a\}} & &
+		\\ \hline
+		Array access \code{a[b]} & lvalues of \code a & rvalues of \code a and \code b
+		\\ \hline
+		Instance field access \code{a.b} & lvalues of \code a & rvalues of \code a
+		\\ \hline
+		Static field access \code{Class.field} & "Static" & none
+		\\ \hline
+		Parameter & the parameter node & the parameter node
+		\\ \hline
+		Local variable & its own dedicated node & its own dedicated node
+		\\ \hline
+		\code{this} & "This" & "This"
+		\\ \hline
+		Class cast and instanceof & lvalues of the underlying value & rvalues of the underlying value
+		\\ \hline
+		Method/constructor call & "Return" of the called method & "Return" of the called method
+		\\ \hline
+	\end{tabular}
+	\label{table:lrvalue}
+\end{table}
+
+In traditional information flow analysis,
+this naive approach described in the table appears to result in high false positive rate
+as it does not separate the internal structure used by instance fields and arrays.
+For example, consider Listing \ref{lst:traditional-false-positive}
+(Jimple code in Listing \ref{lst:traditional-false-positive-jimple}).
+At return point, the LFG becomes as shown in Figure \ref{fig:tfp-graph}.
+Intuitively, this appears incorrect;
+param \#0 does not flow to \code{return}
+since it is just used for \code{this.bar} but not \code{this.qux}.
+Nevertheless, in the threat model where
+the adversary has access to modify any memory allocated outside the enclave,
+assignment may not always work as intended;
+if the \code{TraditionalFalsePositive} context was allocated outside the enclave,
+\code{this.bar} might be modified by the adversary to \code{this.qux}
+(even if they belong to different classes),
+hence leaking into the return value.
+Recall the definition of an edge in the LFG used in this project,
+where $a \to b$ implies $b$ must to be protected if $a$ is protected.
+
+\begin{figure}
+	\caption{LFG of \code{TraditionalFalsePositive.foo(int)} in Listing \ref{lst:traditional-false-positive}}
+	\begin{center}
+		\digraph[scale=0.5]{local}{
+			rankdir = "LR";
+			param0 [label = "Param \#0"];
+			This -> r0 [dir = "both"];
+			param0 -> i0;
+			r0 -> r1 [dir = "both"];
+			i0 -> r1;
+			r0 -> r2 [dir = "both"];
+			r2 -> Return;
+		}
+	\end{center}
+	\label{fig:tfp-graph}
+\end{figure}
+
+\IncludeCode{lst:traditional-false-positive}{./TraditionalFalsePositive.java}
+{Traditional false positive}
+
+\IncludeCode{lst:traditional-false-positive-jimple}
+{./sootOutput/TraditionalFalsePositive.jimple}
+{Traditional false positive (Jimple output)}

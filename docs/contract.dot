@@ -1,9 +1,10 @@
 digraph contract {
-getSumParam0[label = "getSum: param \#0"];
-parseParam0[label = "parse: param \#0"];
-parseReturn[label = "parse: return"];
-computeSumParam0[label = "computeSum: param \#0"];
-computeSumReturn[label = "computeSum: return"];
+rankdir = "LR";
+getSumParam0[label = "getSum\n param \#0"];
+parseParam0[label = "parse\n param \#0"];
+parseReturn[label = "parse\n return"];
+computeSumParam0[label = "computeSum\n param \#0"];
+computeSumReturn[label = "computeSum\n return"];
 getSumParam0 -> parseParam0;
 parseParam0 -> parseReturn;
 "@Source" -> parseReturn;
