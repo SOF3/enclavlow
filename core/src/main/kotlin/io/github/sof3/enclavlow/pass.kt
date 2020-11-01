@@ -3,25 +3,24 @@ package io.github.sof3.enclavlow
 import org.slf4j.LoggerFactory
 import soot.Body
 import soot.BodyTransformer
-import soot.Local
 import soot.PackManager
 import soot.Transform
-import soot.Value
-import soot.jimple.BinopExpr
+import soot.jimple.BreakpointStmt
 import soot.jimple.DefinitionStmt
+import soot.jimple.GotoStmt
 import soot.jimple.IfStmt
-import soot.jimple.InstanceFieldRef
-import soot.jimple.ParameterRef
+import soot.jimple.MonitorStmt
+import soot.jimple.NopStmt
+import soot.jimple.PlaceholderStmt
 import soot.jimple.ReturnStmt
 import soot.jimple.ReturnVoidStmt
-import soot.jimple.StaticFieldRef
-import soot.jimple.ThisRef
+import soot.jimple.SwitchStmt
 import soot.jimple.ThrowStmt
 import soot.toolkits.graph.DirectedGraph
 import soot.toolkits.graph.ExceptionalUnitGraph
 import soot.toolkits.scalar.ForwardFlowAnalysis
 
-private val LOGGER = LoggerFactory.getLogger(SenFlow::class.java)
+val LOGGER = LoggerFactory.getLogger(SenFlow::class.java)!!
 
 object SenTransformer : BodyTransformer() {
     val contracts = hashMapOf<String, Contract>()
@@ -39,131 +38,125 @@ object SenTransformer : BodyTransformer() {
     }
 }
 
-class SenFlow(graph: DirectedGraph<soot.Unit>, private val paramCount: Int) : ForwardFlowAnalysis<soot.Unit, FlowSet>(graph) {
+fun newLocalFlow(paramCount: Int): LocalFlow {
+    val params = List(paramCount) { ParamNode(it) }
+    val control = ControlNode(null)
+    val graph = makeFlowSet(params + control)
+    return LocalFlow(graph, mutableMapOf(), params, control)
+}
+
+data class LocalFlow(
+    val graph: FlowSet,
+    var locals: MutableMap<String, VariableNode>,
+    var params: List<ParamNode>,
+    var control: ControlNode,
+) {
+    fun pushControl() {
+        val newControl = ControlNode(control)
+        graph.addNodeIfMissing(newControl)
+        control = newControl
+    }
+
+    fun copyTo(dest: LocalFlow) {
+        graph.copyTo(dest.graph)
+        dest.locals = locals
+        dest.params = params
+        dest.control = control
+    }
+}
+
+class SenFlow(
+    graph: DirectedGraph<soot.Unit>,
+    private val paramCount: Int,
+) : ForwardFlowAnalysis<soot.Unit, LocalFlow>(graph) {
     val outputContract: MutableContract = makeContract(paramCount)
 
-    override fun newInitialFlow() = makeFlowSet(paramCount)
-    override fun merge(in1: FlowSet, in2: FlowSet, out: FlowSet) {
+    override fun newInitialFlow() = newLocalFlow(paramCount)
+    override fun merge(in1: LocalFlow, in2: LocalFlow, out: LocalFlow) {
         println("Merging $in1 and $in2")
-        in1.merge(in2) { a, b ->
+
+        in1.graph.merge(in2.graph) { a, b ->
             // TODO handle ControlFlow
             // if flow is detected from either side
             a || b
-        }.copyTo(out)
+        }.copyTo(out.graph)
+
+        assert(in1.control.parent == in2.control.parent)
+        // pop control
+        out.control = in1.control.parent ?: throw AssertionError("Cannot merge flows without parent controls")
     }
 
-    override fun copy(source: FlowSet, dest: FlowSet) = source.copyTo(dest)
+    override fun copy(source: LocalFlow, dest: LocalFlow) = source.copyTo(dest)
 
     public override fun doAnalysis() = super.doAnalysis()
 
-    override fun flowThrough(input: FlowSet, node: soot.Unit, output: FlowSet) {
-        println("${node.javaClass.simpleName}: $node")
-        println("Input: {$input}")
-        when (node) {
+    override fun flowThrough(input: LocalFlow, stmt: soot.Unit, output: LocalFlow) {
+        println("${stmt.javaClass.simpleName}: $stmt")
+        println("Input: {${input}}")
+        input.copyTo(output)
+
+        when (stmt) {
             is ReturnStmt -> {
-                outputContract.touchSources(findSourcesForValue(input, node.op), ReturnScope)
-                outputContract.touchSources(input.findSources(ControlFlow, canBeSelf = false).subtype()!!, ReturnScope)
-                writeGlobalOutput(input)
+                input.graph.visitAncestors(setOf(input.control) + rvalueNodes(input, stmt.op), nodePostprocess(ReturnScope))
+                input.graph.visitAncestors(setOf(ThisScope), nodePostprocess(ThisScope))
+                input.graph.visitAncestors(setOf(StaticScope), nodePostprocess(StaticScope))
             }
             is ReturnVoidStmt -> {
-                writeGlobalOutput(input)
-                outputContract.touchSources(input.findSources(ControlFlow, canBeSelf = false).subtype()!!, ReturnScope)
+                input.graph.visitAncestors(setOf(input.control), nodePostprocess(ReturnScope))
+                input.graph.visitAncestors(setOf(ThisScope), nodePostprocess(ThisScope))
+                input.graph.visitAncestors(setOf(StaticScope), nodePostprocess(StaticScope))
             }
             is ThrowStmt -> {
-                outputContract.touchSources(findSourcesForValue(input, node.op), ThrowScope)
-                outputContract.touchSources(input.findSources(ControlFlow, canBeSelf = false).subtype()!!, ThrowScope)
-                writeGlobalOutput(input)
+                input.graph.visitAncestors(setOf(input.control) + rvalueNodes(input, stmt.op), nodePostprocess(ThrowScope))
+                input.graph.visitAncestors(setOf(ThisScope), nodePostprocess(ThisScope))
+                input.graph.visitAncestors(setOf(StaticScope), nodePostprocess(StaticScope))
+                // TODO handle try-catch
             }
             is DefinitionStmt -> {
-                val left = node.leftOp
-                val right = node.rightOp
+                val left = stmt.leftOp
+                val right = stmt.rightOp
 
-                input.copyTo(output)
-                removeValue(output, left)
+                val leftNodesDelete = lvalueNodes(input, left, LvalueUsage.DELETION)
 
-                val sources = findSourcesForValue(input, right) + input.findSources(ControlFlow, canBeSelf = false).subtype()!!
-                if (sources.isNotEmpty()) {
-                    addNodesToValue(output, left, sources)
+                for (remove in leftNodesDelete.lvalues) {
+                    output.graph.deleteAllSources(remove)
+                }
+
+                val leftNodes = lvalueNodes(output, left, LvalueUsage.ASSIGN)
+                val rightNodes = rvalueNodes(input, right)
+
+                for (leftNode in leftNodes.lvalues) {
+                    for (rightNode in rightNodes) {
+                        output.graph.touch(rightNode, leftNode)
+                    }
+                    for (rightNode in leftNodes.rvalues) {
+                        output.graph.touch(rightNode, leftNode)
+                    }
+                    output.graph.touch(output.control, leftNode)
+                }
+
+                val leftRight = rvalueNodes(input, left)
+                val rightLeft = lvalueNodes(output, right, LvalueUsage.ASSIGN)
+                for(leftNode in rightLeft.lvalues) {
+                    for(rightNode in leftRight) {
+                        output.graph.touch(rightNode, leftNode)
+                    }
                 }
             }
-            is IfStmt -> {
-                input.copyTo(output)
-                output.touchSources(findSourcesForValue(input, node.condition), ControlFlow)
+            is IfStmt, is SwitchStmt -> TODO()
+            is NopStmt, is BreakpointStmt, is MonitorStmt, is GotoStmt -> {
+                // no-op
             }
-            else -> {
-                LOGGER.warn("Unhandled passthru node ${node.javaClass}: $node")
-                input.copyTo(output)
-            }
+            is PlaceholderStmt -> TODO()
+            else -> throw UnsupportedOperationException("Unsupported operation ${stmt.javaClass}")
         }
-        println("Output: {$output}")
+        println("Output: {${output}}")
     }
 
-    private fun writeGlobalOutput(flow: FlowSet) {
-        println("Writing global output")
-        for (source in flow.findSources(ThisScope, canBeSelf = false)) {
-            println("Append outputContract: $source -> <this>")
-            outputContract.touch(source as PublicNode, ThisScope)
-        }
-        for (source in flow.findSources(StaticScope, canBeSelf = false)) {
-            println("Append outputContract: $source -> <static>")
-            outputContract.touch(source as PublicNode, StaticScope)
+    private fun nodePostprocess(dest: PublicNode) = { node: Node ->
+        if (node is PublicNode && node !== dest) {
+            outputContract.addNodeIfMissing(node)
+            outputContract.touch(node, dest)
         }
     }
-}
-
-/**
- * Returns the set of ultimate sources affecting a value
- */
-private fun findSourcesForValue(flowSet: FlowSet, value: Value): Set<PublicNode> = when (value) {
-    is ParameterRef -> setOf(ParamSource(value.index))
-    is ThisRef -> setOf(ThisScope)
-    is Local -> {
-        val variable = flowSet.nodes.firstOrNull { it is VariableNode && it.name == value.name }
-        if (variable != null) {
-            flowSet.findSources(variable).subtype() ?: throw ClassCastException("Non-PublicNode data sources found")
-        } else {
-            emptySet()
-        }
-    }
-    is InstanceFieldRef -> findSourcesForValue(flowSet, value.base)
-    is BinopExpr -> findSourcesForValue(flowSet, value.op1) + findSourcesForValue(flowSet, value.op2)
-    else -> {
-        LOGGER.warn("Unhandled value ${value.javaClass}: $value")
-        emptySet()
-    }
-}
-
-private fun removeValue(flowSet: FlowSet, value: Value) {
-    // TODO remove
-}
-
-private fun addNodesToValue(flowSet: FlowSet, dest: Value, sources: Set<PublicNode>): Unit = when (dest) {
-    // TODO verify different logic for lvalue vs rvalue
-
-    is Local -> {
-        val variable = VariableNode(dest.name)
-        println(variable)
-        flowSet.addNodeIfMissing(variable)
-        for (source in sources) {
-            println("$source -> $variable")
-            flowSet.touch(source, variable)
-        }
-    }
-    is InstanceFieldRef -> {
-        // even public.secret.c = 1 is still a leak
-        // therefore, instance assignment propagate secret requirement to all sources
-        // dest.base is a reference, so we need to propagate further
-        val leftSources = findSourcesForValue(flowSet, dest.base)
-        for (left in leftSources) {
-            for (source in sources) {
-                flowSet.touch(source, left)
-            }
-        }
-    }
-    is StaticFieldRef -> {
-        for (source in sources) {
-            flowSet.touch(source, StaticScope)
-        }
-    }
-    else -> TODO("not yet implemented: ${dest.javaClass.simpleName}")
 }

@@ -1,5 +1,12 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     kotlin("jvm")
+}
+
+val compileKotlin: KotlinCompile by tasks
+compileKotlin.kotlinOptions.apply {
+    jvmTarget = "1.8"
 }
 
 dependencies {

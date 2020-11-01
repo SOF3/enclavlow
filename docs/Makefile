@@ -14,7 +14,7 @@ TraditionalFalsePositive.class: TraditionalFalsePositive.java
 	javac TraditionalFalsePositive.java
 
 sootOutput/TraditionalFalsePositive.jimple: TraditionalFalsePositive.class soot.jar
-	java -jar soot.jar -f jimple -cp $$(echo /usr/lib/jvm/java-8-openjdk-*/jre/lib/rt.jar):. TraditionalFalsePositive
+	java -jar soot.jar -f jimple -cp VIRTUAL_FS_FOR_JDK:. TraditionalFalsePositive
 
 soot.jar:
 	wget https://repo1.maven.org/maven2/org/soot-oss/soot/4.2.1/soot-4.2.1-jar-with-dependencies.jar -O soot.jar

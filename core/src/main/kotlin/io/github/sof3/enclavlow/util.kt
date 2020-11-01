@@ -65,3 +65,11 @@ inline fun <T, reified U : T> Set<T>.subtype(): Set<U>? {
     @Suppress("UNCHECKED_CAST")
     return this as Set<U>
 }
+
+inline fun <K, V> MutableMap<K, V>.getOrFill(k: K, fill: () -> V) : V {
+    val get = this[k]
+    if(get != null) return get
+    val value = fill()
+    this[k] = value
+    return value
+}

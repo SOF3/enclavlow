@@ -52,11 +52,11 @@ object ThisScope : PublicNode() {
 /**
  * Data source from a parameter
  */
-class ParamSource(private val index: Int) : PublicNode() {
+class ParamNode(private val index: Int) : PublicNode() {
     override val name: String
         get() = "param$index"
 
-    override fun equals(other: Any?) = other is ParamSource && index == other.index
+    override fun equals(other: Any?) = other is ParamNode && index == other.index
 
     override fun hashCode() = index.hashCode()
 }
@@ -78,6 +78,7 @@ sealed class PrivateNode : Node()
  * Data from/to a variable with jimple name `name`
  */
 class VariableNode(val name: String) : PrivateNode() {
+    init{ println("Constructed $name")}
     override fun toString() = name
 
     override fun equals(other: Any?) = other is VariableNode && name == other.name
@@ -88,6 +89,10 @@ class VariableNode(val name: String) : PrivateNode() {
 /**
  * Flows to ControlFlow indicates the current control flow contains data
  */
-object ControlFlow : PrivateNode() {
+class ControlNode(val parent: ControlNode?) : PrivateNode() {
     override fun toString() = "<control>"
+
+    override fun equals(other: Any?) = this === other
+
+    override fun hashCode() = System.identityHashCode(this)
 }

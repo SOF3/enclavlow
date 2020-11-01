@@ -1,6 +1,6 @@
 package io.github.sof3.enclavlow
 
-fun <T : Any> newDirGraph(
+fun <T : Any> newDiGraph(
     nodes: IndexedSet<T>,
 ): MutableDiGraph<T> {
     val edges = MutableList(nodes.size) { MutableList(nodes.size) { false } }
@@ -58,20 +58,27 @@ sealed class DiGraph<T : Any>(
         return edges.mapIndexed { i, arr -> if (arr[j]) nodes[i] else null }.filterNotNull()
     }
 
-    fun findSources(node: T, canBeSelf: Boolean = true): Set<T> {
-        val stack = findSourceStack.get()
-        if (node.hashCode() in stack) {
-            throw Exception("Infinite recursion detected")
+    fun visitAncestors(leaves: Set<T>, visitor: (T) -> Unit) {
+        val visited = mutableSetOf<Int>()
+        for(leaf in leaves) {
+            visitAncestors(leaf, visited, visitor)
         }
-        stack.add(node.hashCode())
+    }
 
-        try {
-            val inputs = flowsTo(node)
-            if (inputs.isEmpty() && canBeSelf) return setOf(node)
+    private fun visitAncestors(leaf: T, visited: MutableSet<Int>, visitor: (T) -> Unit) {
+        val j = nodes.find(leaf) ?: throw IllegalArgumentException("Nonexistent node $leaf")
+        for(i in 0 until nodes.size) {
+            if(edges[i][j] && visited.add(i)) {
+                visitor(nodes[i])
+                visitAncestors(nodes[i], visited, visitor)
+            }
+        }
+    }
 
-            return inputs.flatMap { findSources(it) }.toSet()
-        } finally {
-            stack.remove(node.hashCode())
+    fun deleteAllSources(dest: T) {
+        val j = nodes.find(dest) ?: throw IllegalArgumentException("Nonexistent node $dest")
+        for(i in 0 until nodes.size) {
+            edges[i][j] = false
         }
     }
 }

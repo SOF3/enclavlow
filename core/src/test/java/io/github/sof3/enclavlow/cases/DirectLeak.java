@@ -30,4 +30,9 @@ public class DirectLeak {
         y = 0;
         return y;
     }
+
+    @SuppressWarnings({"UnusedAssignment", "ParameterCanBeLocal"})
+    public static void assignParam(int x) {
+        x = 1;
+    }
 }

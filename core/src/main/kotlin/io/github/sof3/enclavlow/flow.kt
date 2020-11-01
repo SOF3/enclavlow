@@ -9,27 +9,22 @@ fun makeContract(
     extraNodes: Collection<PublicNode> = emptyList(),
     fn: MakeContractContext<PublicNode>.() -> Unit = {},
 ): MutableContract {
-    val nodes = indexedSetOf<PublicNode>(ThisScope, StaticScope, ReturnScope, ThrowScope)
-    nodes.addAll((0 until paramCount).map { ParamSource(it) })
+    val nodes = indexedSetOf(ThisScope, StaticScope, ReturnScope, ThrowScope)
+    nodes.addAll((0 until paramCount).map { ParamNode(it) })
     nodes.addAll(extraNodes)
 
-    val graph = newDirGraph(nodes)
+    val graph = newDiGraph(nodes)
     fn(MakeContractContext(graph))
     return graph
 }
 
-fun makeFlowSet(
-    paramCount: Int,
-    extraNodes: Collection<Node> = emptyList(),
-    fn: MakeContractContext<Node>.() -> Unit = {},
-): FlowSet {
-    val nodes = indexedSetOf(ThisScope, StaticScope, ReturnScope, ThrowScope, ControlFlow)
-    nodes.addAll((0 until paramCount).map { ParamSource(it) })
-    nodes.addAll(extraNodes)
+fun makeFlowSet(vararg extraNodes: Iterable<Node>): FlowSet {
+    val nodes = indexedSetOf<Node>(ThisScope, StaticScope, ReturnScope, ThrowScope)
+    for (extra in extraNodes) {
+        nodes.addAll(extra)
+    }
 
-    val graph = newDirGraph(nodes)
-    fn(MakeContractContext(graph))
-    return graph
+    return newDiGraph(nodes)
 }
 
 class MakeContractContext<T : Any>(private val graph: MutableDiGraph<T>) {
