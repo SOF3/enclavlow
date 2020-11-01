@@ -1,0 +1,13 @@
+digraph contract {
+getSumParam0[label = "getSum: param \#0"];
+parseParam0[label = "parse: param \#0"];
+parseReturn[label = "parse: return"];
+computeSumParam0[label = "computeSum: param \#0"];
+computeSumReturn[label = "computeSum: return"];
+getSumParam0 -> parseParam0;
+parseParam0 -> parseReturn;
+"@Source" -> parseReturn;
+parseReturn -> computeSumParam0;
+computeSumParam0 -> computeSumReturn;
+computeSumReturn -> "@Sink";
+}
