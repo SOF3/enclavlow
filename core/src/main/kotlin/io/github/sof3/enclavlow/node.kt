@@ -85,11 +85,14 @@ sealed class PrivateNode : Node()
 /**
  * Data from/to a variable with jimple name `name`
  */
-class VariableNode(val name: String) : PrivateNode() {
-    init{ println("Constructed $name")}
+class LocalVarNode(val name: String) : PrivateNode() {
+    init {
+        println("Constructed $name")
+    }
+
     override fun toString() = name
 
-    override fun equals(other: Any?) = other is VariableNode && name == other.name
+    override fun equals(other: Any?) = other is LocalVarNode && name == other.name
 
     override fun hashCode() = name.hashCode()
 }
@@ -97,8 +100,17 @@ class VariableNode(val name: String) : PrivateNode() {
 /**
  * Flows to ControlFlow indicates the current control flow contains data
  */
-class ControlNode(val parent: ControlNode?) : PrivateNode() {
-    override fun toString() = "<control>"
+class ControlNode(val parent: ControlNode?, private val branchId: Int) : PrivateNode() {
+    override fun toString(): String {
+        val stack = mutableListOf<Int>()
+        getStack(stack)
+        return "<control ${stack.joinToString(".")}>"
+    }
+
+    private fun getStack(list: MutableList<Int>) {
+        parent?.getStack(list)
+        list.add(branchId)
+    }
 
     override fun equals(other: Any?) = this === other
 

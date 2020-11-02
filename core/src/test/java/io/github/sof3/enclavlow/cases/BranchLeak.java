@@ -29,12 +29,4 @@ public class BranchLeak {
     // It is expected behaviour that `if(secret) return e else return e` is considered as a `secret` leak.
     // It may be too complicated to determine that this is not a real leak,
     // while most code styles would recommend moving out the return statement anyway.
-
-    public static int loopAssign(int i) {
-        int a = 0;
-        for (int j = 0; j < i; j++) {
-            a += j;
-        }
-        return a;
-    }
 }

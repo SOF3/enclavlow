@@ -1,6 +1,5 @@
 package io.github.sof3.enclavlow
 
-import org.slf4j.LoggerFactory
 import soot.Body
 import soot.BodyTransformer
 import soot.PackManager
@@ -17,11 +16,9 @@ import soot.jimple.ReturnStmt
 import soot.jimple.ReturnVoidStmt
 import soot.jimple.SwitchStmt
 import soot.jimple.ThrowStmt
-import soot.toolkits.graph.DirectedGraph
 import soot.toolkits.graph.ExceptionalUnitGraph
-import soot.toolkits.scalar.ForwardFlowAnalysis
-
-val LOGGER = LoggerFactory.getLogger(SenFlow::class.java)!!
+import soot.toolkits.graph.UnitGraph
+import soot.toolkits.scalar.ForwardBranchedFlowAnalysis
 
 object SenTransformer : BodyTransformer() {
     val contracts = hashMapOf<String, Contract>()
@@ -41,19 +38,31 @@ object SenTransformer : BodyTransformer() {
 
 fun newLocalFlow(paramCount: Int): LocalFlow {
     val params = List(paramCount) { ParamNode(it) }
-    val control = ControlNode(null)
+    val control = ControlNode(null, 0)
     val graph = makeFlowSet(params + control)
     return LocalFlow(graph, mutableMapOf(), params, control)
 }
 
 data class LocalFlow(
     val graph: FlowSet,
-    var locals: MutableMap<String, VariableNode>,
+    var locals: MutableMap<String, LocalVarNode>,
     var params: List<ParamNode>,
     var control: ControlNode,
 ) {
-    fun pushControl() {
-        val newControl = ControlNode(control)
+    fun getOrAddLocal(name: String): LocalVarNode {
+        val local = locals.getOrFill(name) { LocalVarNode(name) }
+        graph.addNodeIfMissing(local)
+        return local
+    }
+
+    fun getLocal(name: String): LocalVarNode? {
+        val local = locals[name] ?: return null
+        graph.addNodeIfMissing(local)
+        return local
+    }
+
+    fun pushControl(branchId: Int) {
+        val newControl = ControlNode(control, branchId)
         graph.addNodeIfMissing(newControl)
         control = newControl
     }
@@ -67,9 +76,9 @@ data class LocalFlow(
 }
 
 class SenFlow(
-    graph: DirectedGraph<soot.Unit>,
+    graph: UnitGraph,
     private val paramCount: Int,
-) : ForwardFlowAnalysis<soot.Unit, LocalFlow>(graph) {
+) : ForwardBranchedFlowAnalysis<LocalFlow>(graph) {
     val outputContract: MutableContract = makeContract(paramCount)
 
     override fun newInitialFlow() = newLocalFlow(paramCount)
@@ -82,8 +91,12 @@ class SenFlow(
             a || b
         }.copyTo(out.graph)
 
-        assert(in1.control.parent == in2.control.parent)
+        assert(in1.control.parent == in2.control.parent) { "Merged flows did not diverge from the same parent control" }
         // pop control
+        out.locals = mutableMapOf<String, LocalVarNode>().apply {
+            putAll(in1.locals)
+            putAll(in2.locals)
+        }
         out.control = in1.control.parent ?: throw AssertionError("Cannot merge flows without parent controls")
     }
 
@@ -91,10 +104,13 @@ class SenFlow(
 
     public override fun doAnalysis() = super.doAnalysis()
 
-    override fun flowThrough(input: LocalFlow, stmt: soot.Unit, output: LocalFlow) {
+    override fun flowThrough(input: LocalFlow, stmt: soot.Unit, fallOutList: List<LocalFlow>, branchOutList: List<LocalFlow>) {
+        println()
         println("${stmt.javaClass.simpleName}: $stmt")
-        println("Input: {${input}}")
-        input.copyTo(output)
+        println("Input: {$input}")
+        val output = fallOutList.getOrNull(0)
+        assert(fallOutList.size <= 1) {"Unsupported fallOutList non-singleton"}
+        if(output != null) input.copyTo(output)
 
         when (stmt) {
             is ReturnStmt -> {
@@ -114,6 +130,8 @@ class SenFlow(
                 // TODO handle try-catch
             }
             is DefinitionStmt -> {
+                output!!
+
                 val left = stmt.leftOp
                 val right = stmt.rightOp
 
@@ -138,19 +156,29 @@ class SenFlow(
 
                 val leftRight = rvalueNodes(input, left)
                 val rightLeft = lvalueNodes(output, right, LvalueUsage.ASSIGN)
-                for(leftNode in rightLeft.lvalues) {
-                    for(rightNode in leftRight) {
+                for (leftNode in rightLeft.lvalues) {
+                    for (rightNode in leftRight) {
                         output.graph.touch(rightNode, leftNode)
                     }
                 }
             }
             is IfStmt, is SwitchStmt -> {
-                val cond = if(stmt is SwitchStmt) {
-                    stmt.key
-                } else if(stmt is IfStmt){
-                    stmt.condition
-                } else {
-                    throw AssertionError()
+                output!!
+
+                val cond = when (stmt) {
+                    is SwitchStmt -> stmt.key
+                    is IfStmt -> stmt.condition
+                    else -> throw AssertionError()
+                }
+                val nodes = rvalueNodes(input, cond)
+                for (branchedOutput in branchOutList) {
+                    input.copyTo(branchedOutput)
+                    for ((i, flow) in setOf(output, branchedOutput).withIndex()) {
+                        flow.pushControl(i)
+                        for (node in nodes) {
+                            flow.graph.touch(node, flow.control)
+                        }
+                    }
                 }
             }
             is NopStmt, is BreakpointStmt, is MonitorStmt, is GotoStmt -> {
@@ -162,7 +190,8 @@ class SenFlow(
             }
             else -> throw UnsupportedOperationException("Unsupported operation ${stmt.javaClass}")
         }
-        println("Output: {${output}}")
+        println("Output: $fallOutList")
+        println("Branched Output: $branchOutList")
     }
 
     private fun nodePostprocess(dest: PublicNode) = { node: Node ->

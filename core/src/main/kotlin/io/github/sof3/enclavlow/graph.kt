@@ -60,15 +60,15 @@ sealed class DiGraph<T : Any>(
 
     fun visitAncestors(leaves: Set<T>, visitor: (T) -> Unit) {
         val visited = mutableSetOf<Int>()
-        for(leaf in leaves) {
+        for (leaf in leaves) {
             visitAncestors(leaf, visited, visitor)
         }
     }
 
     private fun visitAncestors(leaf: T, visited: MutableSet<Int>, visitor: (T) -> Unit) {
         val j = nodes.find(leaf) ?: throw IllegalArgumentException("Nonexistent node $leaf")
-        for(i in 0 until nodes.size) {
-            if(edges[i][j] && visited.add(i)) {
+        for (i in 0 until nodes.size) {
+            if (edges[i][j] && visited.add(i)) {
                 visitor(nodes[i])
                 visitAncestors(nodes[i], visited, visitor)
             }
@@ -77,7 +77,7 @@ sealed class DiGraph<T : Any>(
 
     fun deleteAllSources(dest: T) {
         val j = nodes.find(dest) ?: throw IllegalArgumentException("Nonexistent node $dest")
-        for(i in 0 until nodes.size) {
+        for (i in 0 until nodes.size) {
             edges[i][j] = false
         }
     }
@@ -110,7 +110,7 @@ class MutableDiGraph<T : Any>(
 
     fun touchSources(sources: Iterable<T>, to: T) {
         val b = nodes.find(to) ?: throw IllegalArgumentException("Nonexistent node $to")
-        for(from in sources) {
+        for (from in sources) {
             val a = nodes.find(from) ?: throw IllegalArgumentException("Nonexistent node $from")
             edges[a][b] = true
         }

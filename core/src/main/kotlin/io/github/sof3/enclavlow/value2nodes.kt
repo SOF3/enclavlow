@@ -29,9 +29,8 @@ private fun rvalueNodesImpl(flow: LocalFlow, value: Value): Sequence<Node> = seq
             // constant leaks no information
         }
         is Local -> {
-//            val node = flow.locals.getOrFill(value.name) { VariableNode(value.name) }
-            val node = flow.locals[value.name]
-                ?: throw IllegalArgumentException("rvalue variable should appear as an lvalue first")
+            val node = flow.getLocal(value.name)
+                ?: throw IllegalArgumentException("rvalue variable ${value.name} should appear as an lvalue first")
             yield(node)
         }
         is ThisRef -> {
@@ -100,27 +99,24 @@ private fun lvalueNodesImpl(flow: LocalFlow, value: Value, usage: LvalueUsage, r
     println("lvalueNodesImpl(${value.javaClass.simpleName} $value)")
     when (value) {
         // these expressions create new/constant values and can never be mutated in another expression
-        is Constant, is InstanceOfExpr, is UnopExpr, is BinopExpr, is AnyNewExpr, is InvokeExpr -> {}
+        is Constant, is InstanceOfExpr, is UnopExpr, is BinopExpr, is AnyNewExpr, is InvokeExpr -> {
+        }
         is ThisRef -> {
-            if(usage == LvalueUsage.ASSIGN) {
+            if (usage == LvalueUsage.ASSIGN) {
                 yield(ThisScope)
             }
         }
         is ParameterRef -> {
-            if(usage == LvalueUsage.ASSIGN) {
+            if (usage == LvalueUsage.ASSIGN) {
                 yield(flow.params[value.index])
             }
         }
         is Local -> when (usage) {
             LvalueUsage.ASSIGN -> {
-                yield(flow.locals.getOrFill(value.name) {
-                    val node = VariableNode(value.name)
-                    flow.graph.addNodeIfMissing(node)
-                    node
-                })
+                yield(flow.getOrAddLocal(value.name))
             }
             LvalueUsage.DELETION -> {
-                val node = flow.locals[value.name]
+                val node = flow.getLocal(value.name)
                 if (node != null) {
                     yield(node)
                 }

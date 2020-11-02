@@ -24,9 +24,4 @@ class BranchLeakTests {
     fun controlReset() = run<BranchLeak>("controlReset" to makeContract(1) {
         // there should be nothing leaked
     })
-
-    @Test
-    fun loopAssign() = run<BranchLeak>("loopAssign" to makeContract(1) {
-        ParamNode(0) into ReturnScope
-    })
 }
