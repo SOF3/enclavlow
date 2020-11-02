@@ -67,8 +67,18 @@ private fun rvalueNodesImpl(flow: LocalFlow, value: Value): Sequence<Node> = seq
             // constructing an object without calling any constructors does not leak anything
         }
         is InvokeExpr -> {
-            println(value.method.declaration)
-            TODO()
+            if (value.method.declaringClass.name == "io.github.sof3.enclavlow.api.Enclavlow") {
+                val method = value.method.name
+                if(method == "sourceMarker" || method.endsWith("SourceMarker")) {
+                    yield(ExplicitSourceNode)
+                } else if(method == "sinkMarker" || method.endsWith("SinkMarker")) {
+                    // TODO
+                } else {
+                    throw IllegalArgumentException("Unknown method in io.github.sof3.enclavlow.api.Enclavlow called")
+                }
+            }else{
+                TODO()
+            }
         }
         is CastExpr -> {
             yieldAll(rvalueNodesImpl(flow, value.op))
