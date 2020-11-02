@@ -9,6 +9,7 @@ import soot.jimple.BreakpointStmt
 import soot.jimple.DefinitionStmt
 import soot.jimple.GotoStmt
 import soot.jimple.IfStmt
+import soot.jimple.InvokeStmt
 import soot.jimple.MonitorStmt
 import soot.jimple.NopStmt
 import soot.jimple.PlaceholderStmt
@@ -143,11 +144,22 @@ class SenFlow(
                     }
                 }
             }
-            is IfStmt, is SwitchStmt -> TODO()
+            is IfStmt, is SwitchStmt -> {
+                val cond = if(stmt is SwitchStmt) {
+                    stmt.key
+                } else if(stmt is IfStmt){
+                    stmt.condition
+                } else {
+                    throw AssertionError()
+                }
+            }
             is NopStmt, is BreakpointStmt, is MonitorStmt, is GotoStmt -> {
                 // no-op
             }
             is PlaceholderStmt -> TODO()
+            is InvokeStmt -> {
+                // TODO
+            }
             else -> throw UnsupportedOperationException("Unsupported operation ${stmt.javaClass}")
         }
         println("Output: {${output}}")

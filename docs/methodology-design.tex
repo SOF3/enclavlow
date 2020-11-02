@@ -15,7 +15,7 @@ where each node represents an element that may be leaked.
 	allocating $y$ outside an enclave reduces the indistinguishability of $x$.
 \end{defin}
 
-Note that this definition ("our definition") differs slightly from
+Note that this definition (\q{our definition}) differs slightly from
 the usual definition of flow graphs (especially in DTA),
 where an edge $(x, y)$ represents the flow of information from $x$ to $y$ \cite{YinHeng2007Pcsi}.
 In the usual definition, only adversary read access to $y$ is concerned,
@@ -25,16 +25,16 @@ while in our definition, the adversary possesses write access to $x$.
 \pname{} adopts an approach where a CFG is constructed for each method analyzed.
 The CFG contains the following nodes:
 \begin{itemize}
-	\item "Static": Represents data located in static class fields
-	\item "This": Represents the object on which a method was invoked
-	\item "Param $x$": Each parameter is represented by a node
-	\item "Return": Represents data flow through the return path
-	\item "Throw": Represents data flow through the return path
-	\item "@Source": Represents variables in the method explicitly declared as \code{@Source}
-	\item "@Sink": Represents variables (or replaces the "Return" node)
+	\item \q{Static}: Represents data located in static class fields
+	\item \q{This}: Represents the object on which a method was invoked
+	\item \q{Param $x$}: Each parameter is represented by a node
+	\item \q{Return}: Represents data flow through the return path
+	\item \q{Throw}: Represents data flow through the return path
+	\item \q{@Source}: Represents variables in the method explicitly declared as \code{@Source}
+	\item \q{@Sink}: Represents variables (or replaces the \q{Return} node)
 		in the method explicitly declared as \code{@Sink}
-	\item "Control": This is a special node representing how many times the function is called.
-	\item "This", "Param $y$", "Return", "Throw" and "Control"
+	\item \q{Control}: This is a special node representing how many times the function is called.
+	\item \q{This}, \q{Param $y$}, \q{Return}, \q{Throw} and \q{Control}
 		from each function called from the current node
 \end{itemize}
 
@@ -84,13 +84,13 @@ The LFG extends the CFG with the following additions:
 \begin{itemize}
 	\item Each local variable (some may exist as intermediate values in source code)
 		is allocated a node.
-	\item Each branch has its own "control" node.
+	\item Each branch has its own \q{control} node.
 \end{itemize}
 
 The \emph{consume} operation consumes statements in form of 3AC \cite{sootsurvivor}.
 Every step adds or removes some flow edges,
 as described exhaustively in Table \ref{table:tac}.
-The relationship between the graph and the "lvalue"/"rvalue" terminology
+The relationship between the graph and the \q{lvalue}/\q{rvalue} terminology
 in Table \ref{table:tac} are explained in Table \ref{table:lrvalue}.
 
 The \emph{branch} operation performs a deep clone of the LFG
@@ -111,20 +111,21 @@ hence inferring the sensitive value that determined the branch halting problem.
 		\hline
 		\textbf{Instruction type} & \textbf{Effects on LFG}
 		\\ \hline
-		\multirow3*{Assignment} & "Control" flows to lvalue nodes of destination. \\
+		\multirow4*{Assignment} & \q{Control} flows to lvalue nodes of destination. \\
 		& Erases current connections to lvalue nodes of destination. \\
-		& rvalue nodes of source flow to lvalue nodes of destination.
+		& rvalue nodes of source flow to lvalue nodes of destination. \\
+		& lvalue nodes of source flow to rvalue nodes of destination.
 		\\ \hline
-		\multirow2*{Return} & "Control" flows to "Return" node. \\
-		& rvalue nodes of returned value flow to "Return" node.
+		\multirow2*{Return} & \q{Control} flows to \q{Return} node. \\
+		& rvalue nodes of returned value flow to \q{Return} node.
 		\\ \hline
-		\multirow2*{Throw} & "Control" flows to "Throw" node. \\
-		& rvalue nodes of thrown value leaks to "Throw" node.
+		\multirow2*{Throw} & \q{Control} flows to \q{Throw} node. \\
+		& rvalue nodes of thrown value leaks to \q{Throw} node.
 		\\ \hline
 		\multirow3*{Conditional (If/Switch)}
-		& A new "Control" node is pushed to the control stack. \\
-		& Previous "Control" flows to the new "Control". \\
-		& rvalue nodes of predicate leaks to the new "Control".
+		& A new \q{Control} node is pushed to the control stack. \\
+		& Previous \q{Control} flows to the new \q{Control}. \\
+		& rvalue nodes of predicate leaks to the new \q{Control}.
 		\\ \hline
 		Method call & Same effect as assigning call result to a sink variable.
 		\\ \hline
@@ -149,17 +150,17 @@ hence inferring the sensitive value that determined the branch halting problem.
 		\\ \hline
 		Instance field access \code{a.b} & lvalues of \code a & rvalues of \code a
 		\\ \hline
-		Static field access \code{Class.field} & "Static" & none
+		Static field access \code{Class.field} & \q{Static} & none
 		\\ \hline
 		Parameter & the parameter node & the parameter node
 		\\ \hline
 		Local variable & its own dedicated node & its own dedicated node
 		\\ \hline
-		\code{this} & "This" & "This"
+		\code{this} & \q{This} & \q{This}
 		\\ \hline
 		Class cast and instanceof & lvalues of the underlying value & rvalues of the underlying value
 		\\ \hline
-		Method/constructor call & "Return" of the called method & "Return" of the called method
+		Method/constructor call & \q{Return} of the called method & \q{Return} of the called method
 		\\ \hline
 	\end{tabular}
 	\label{table:lrvalue}

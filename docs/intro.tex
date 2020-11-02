@@ -8,7 +8,7 @@ attackers with privileged access to the hardware or software.
 Modern hardware offer TEE technologies,
 such as SGX in Intel CPUs,
 with which trusted execution code and sensitive data
-are processed in secure "enclaves",
+are processed in secure \q{enclaves},
 which is protected at hardware level to prevent access
 from other hardware or software layers.
 
@@ -26,7 +26,7 @@ where users annotate methods with \code{@JECall} and \code{@JOCall}
 to move control flow into or out of enclaves.
 It is the responsibility of the user to determine the correct positions
 for the \code{@JECall} and \code{@JOCall} annotations,
-namely the enclave boundary partitioning".
+namely the enclave boundary partitioning.
 Since JVM, compared to native applications running on the CPU,
 involves an entirely different approach
 with regard to software development and distribution,
@@ -40,13 +40,13 @@ for adversaries to compromise protected data \cite{glamdring}.
 Second, this implies all memory used by the application
 are placed in the enclave memory (the EPC),
 which is restricted to 100 MB before significant performance degrading
-("1,000X slowdown compared to regular OS paging") \cite{uranus}.
+(\q{1,000X slowdown compared to regular OS paging}) \cite{uranus}.
 On the other hand, if the enclave is smaller than necessary,
 adversaries can either obtain sensitive data directly or
 infer sensitive characteristics of them indirectly.
 
 This project presents \pname{}
-\footnote{"enclavlow" is a new term coined from the words "enclave" and "flow".},
+\footnote{\q{enclavlow} is a new term coined from the words \q{enclave} and \q{flow}.},
 an information flow analysis tool
 for identifying data leak from enclaves.
 The user first annotates variables as \code{@Source} and \code{@Sink}.

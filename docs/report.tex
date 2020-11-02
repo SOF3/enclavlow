@@ -31,6 +31,8 @@
 \setmainfont{TeX Gyre Termes}
 % \usepackage{sourcecodepro}
 
+\usepackage{csquotes}
+
 \usepackage[pdf]{graphviz}
 
 \title{Data flow analysis for Uranus applications}
@@ -44,6 +46,8 @@
 		caption={#3}]{#2}
 	\end{minipage}
 }
+
+\def\q#1{\enquote{#1}}
 
 \def\pname{\emph{enclavlow}}
 
@@ -64,10 +68,10 @@
 \thispagestyle{empty}
 \setlength\columnsep{3em}
 \begin{multicols}2
-\tableofcontents
-\listoffigures
-\listoftables
-\lstlistoflistings
+	\tableofcontents
+	\listoffigures
+	\listoftables
+	\lstlistoflistings
 \end{multicols}
 
 % Main body
@@ -91,8 +95,10 @@
 
 \newpage
 \addcontentsline{toc}{section}{References}
-\bibliographystyle{acm}
-\bibliography{cite.bib}{}
+\begin{multicols}2
+	\bibliographystyle{acm}
+	\bibliography{cite.bib}{}
+\end{multicols}
 % \end{multicols}
 
 \end{document}

@@ -62,11 +62,19 @@ class ParamNode(private val index: Int) : PublicNode() {
 }
 
 /**
- * Data source from a local variable explicitly declared as `@Source
+ * Data source from a local variable explicitly declared as `@Source`
  */
 object ExplicitSource : PublicNode() {
     override val name: String
         get() = "<@Source>"
+}
+
+/**
+ * Data source from a local variable explicitly declared as `@Sink`
+ */
+object ExplicitSink : PublicNode() {
+    override val name: String
+        get() = "<@Sink>"
 }
 
 /**

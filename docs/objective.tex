@@ -32,7 +32,7 @@ Attention to be given to the following points:
 		This is because parsing is a late stage after raw data extraction,
 		and \code{@Source} should only be applied on the ultimate source.
 	\item Line 5 and line 2 altogether assert that
-		"computing the sum of \code{raw} is a legitimate leak".
+		\q{computing the sum of \code{raw} is a legitimate leak}.
 	\item On line 8, \code{parse} is not marked \code{@Sink},
 		because the leak of sensitive information should be analyzed.
 	\item On line 17, \code{computeSum} is not marked \code{@Sink}.
@@ -66,7 +66,7 @@ the union of such data flows is displayed.
 
 \paragraph{Redundant protection}
 Methods detected to be run inside enclaves but never involved with any sensitive data
-are highlighted in an index called "Redundant protection".
+are highlighted in an index called \q{Redundant protection}.
 For each highlighted method, the developer
 should mark it as \code{@JOCall} to run out of enclaves
 or move its \code{@JECall} annotation to appropriate method calls,
@@ -76,7 +76,7 @@ or adjust the \code{@Source}/\code{@Sink} annotations.
 Methods which result in immediate data leaks,
 such as methods passing security-sensitive data to other \code{@JOCall} methods
 or methods marked \code{@JECall} returning/throwing security-sensitive data,
-are highlighted in an index called "Data leaks".
+are highlighted in an index called \q{Data leaks}.
 For each highlighted method, the developer
 should move it into enclave boundaries,
 or adjust the \code{@Source}/\code{@Sink} annotations.
