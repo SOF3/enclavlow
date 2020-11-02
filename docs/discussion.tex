@@ -36,13 +36,15 @@ since analyzing across JNI boundary implies
 the need to interact with a native analysis tool,
 which is entirely out of scope of this project.
 Since Uranus effectively denies system calls,
-the contract is always assumed to be $\left\{ (p, \text{return}) : p \in \text{params} \right\}$.
+the contract is always assumed to be
+$\left\{ (p, \text{return}) : p \in \text{params} \right\}$.
 
 For the sake of consistency with Uranus,
 it was originally intended to expose \code{sourceMarker} and \code{sinkMarker}
 as annotations on local variables instead of method calls.
 However, JLS 9.6.1.2 explicitly stated that
-\q{an annotation on a local variable declaration is never retained in the binary representation} \cite{jls},
+\q{an annotation on a local variable declaration
+is never retained in the binary representation} \cite{jls},
 so a method call based approach is used instead.
 
 At the technical aspect,

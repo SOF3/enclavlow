@@ -42,10 +42,9 @@
 
 
 \def\IncludeCode#1#2#3{
-	\begin{minipage}{\linewidth}
-		\lstinputlisting[style=j, language=java, label={#1},
-		caption={#3}]{#2}
-	\end{minipage}
+	% \begin{minipage}{\linewidth}
+		\lstinputlisting[style=j, language=java, float,label={#1}, caption={#3}]{#2}
+	% \end{minipage}
 }
 
 \def\q#1{\enquote{#1}}
