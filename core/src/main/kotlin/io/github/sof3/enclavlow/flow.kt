@@ -1,24 +1,27 @@
 package io.github.sof3.enclavlow
 
-typealias Contract = DiGraph<PublicNode>
-typealias MutableContract = MutableDiGraph<PublicNode>
-typealias FlowSet = MutableDiGraph<Node>
+data class Contract<G: ContractFlowGraph>(val graph: G, val callTags: CallTags)
+
+typealias ContractFlowGraph = DiGraph<PublicNode>
+typealias MutableContractFlowGraph = MutableDiGraph<PublicNode>
+typealias LocalFlowGraph = MutableDiGraph<Node>
 
 fun makeContract(
+    callTags: CallTags,
     paramCount: Int,
     extraNodes: Collection<PublicNode> = emptyList(),
     fn: MakeContractContext<PublicNode>.() -> Unit = {},
-): MutableContract {
+): Contract<MutableContractFlowGraph> {
     val nodes = indexedSetOf(ThisNode, StaticNode, ReturnNode, ThrowNode, ExplicitSourceNode, ExplicitSinkNode)
     nodes.addAll((0 until paramCount).map { ParamNode(it) })
     nodes.addAll(extraNodes)
 
     val graph = newDiGraph(nodes)
     fn(MakeContractContext(graph))
-    return graph
+    return Contract(graph, callTags)
 }
 
-fun makeFlowSet(vararg extraNodes: Iterable<Node>): FlowSet {
+fun makeLocalFlowGraph(vararg extraNodes: Iterable<Node>): LocalFlowGraph {
     val nodes = indexedSetOf<Node>(ThisNode, StaticNode, ReturnNode, ThrowNode, ExplicitSourceNode, ExplicitSinkNode)
     for (extra in extraNodes) {
         nodes.addAll(extra)
@@ -31,4 +34,10 @@ class MakeContractContext<T : Any>(private val graph: MutableDiGraph<T>) {
     infix fun T.into(other: T) {
         graph.touch(this, other)
     }
+}
+
+enum class CallTags {
+    UNSPECIFIED,
+    ENCLAVE_CALL,
+    OUTSIDE_CALL,
 }

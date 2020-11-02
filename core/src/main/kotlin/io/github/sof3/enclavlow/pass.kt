@@ -16,19 +16,34 @@ import soot.jimple.ReturnStmt
 import soot.jimple.ReturnVoidStmt
 import soot.jimple.SwitchStmt
 import soot.jimple.ThrowStmt
+import soot.tagkit.VisibilityAnnotationTag
 import soot.toolkits.graph.ExceptionalUnitGraph
 import soot.toolkits.graph.UnitGraph
 import soot.toolkits.scalar.ForwardBranchedFlowAnalysis
 
 object SenTransformer : BodyTransformer() {
-    val contracts = hashMapOf<String, Contract>()
+    val contracts = hashMapOf<String, Contract<out ContractFlowGraph>>()
 
     init {
-        PackManager.v().getPack("jtp").add(Transform("jtp.sen", this))
+        PackManager.v().getPack("jap").add(Transform("jap.sen", this))
     }
 
     override fun internalTransform(body: Body, phaseName: String, options: MutableMap<String, String>) {
-        val flow = SenFlow(ExceptionalUnitGraph(body), body.method.parameterCount)
+        var callTags = CallTags.UNSPECIFIED
+        for (tag in body.method.tags) {
+            if (tag is VisibilityAnnotationTag) {
+                for (annot in tag.annotations) {
+                    if (annot.type == "Ledu/hku/cs/uranus/IntelSGX;") {
+                        callTags = CallTags.ENCLAVE_CALL
+                    } else if (annot.type == "Ledu/hku/cs/uranus/IntelSGXOcall;") {
+                        callTags = CallTags.OUTSIDE_CALL
+                    }
+                }
+            }
+        }
+
+        val flow = SenFlow(ExceptionalUnitGraph(body), body.method.parameterCount, callTags)
+        println()
         println(body)
         flow.doAnalysis()
         contracts[body.method.name] = flow.outputContract
@@ -39,12 +54,12 @@ object SenTransformer : BodyTransformer() {
 fun newLocalFlow(paramCount: Int): LocalFlow {
     val params = List(paramCount) { ParamNode(it) }
     val control = ControlNode(null, 0)
-    val graph = makeFlowSet(params + control)
+    val graph = makeLocalFlowGraph(params + control)
     return LocalFlow(graph, mutableMapOf(), params, control)
 }
 
 data class LocalFlow(
-    val graph: FlowSet,
+    val graph: LocalFlowGraph,
     var locals: MutableMap<String, LocalVarNode>,
     var params: List<ParamNode>,
     var control: ControlNode,
@@ -78,8 +93,9 @@ data class LocalFlow(
 class SenFlow(
     graph: UnitGraph,
     private val paramCount: Int,
+    callTags: CallTags,
 ) : ForwardBranchedFlowAnalysis<LocalFlow>(graph) {
-    val outputContract: MutableContract = makeContract(paramCount)
+    val outputContract: Contract<MutableContractFlowGraph> = makeContract(callTags, paramCount)
 
     override fun newInitialFlow() = newLocalFlow(paramCount)
     override fun merge(in1: LocalFlow, in2: LocalFlow, out: LocalFlow) {
@@ -109,8 +125,8 @@ class SenFlow(
         println("${stmt.javaClass.simpleName}: $stmt")
         println("Input: {$input}")
         val output = fallOutList.getOrNull(0)
-        assert(fallOutList.size <= 1) {"Unsupported fallOutList non-singleton"}
-        if(output != null) input.copyTo(output)
+        assert(fallOutList.size <= 1) { "Unsupported fallOutList non-singleton" }
+        if (output != null) input.copyTo(output)
 
         when (stmt) {
             is ReturnStmt -> {
@@ -196,8 +212,8 @@ class SenFlow(
 
     private fun nodePostprocess(dest: PublicNode) = { node: Node ->
         if (node is PublicNode && node !== dest) {
-            outputContract.addNodeIfMissing(node)
-            outputContract.touch(node, dest)
+            outputContract.graph.addNodeIfMissing(node)
+            outputContract.graph.touch(node, dest)
         }
     }
 }

@@ -1,6 +1,7 @@
 package io.github.sof3.enclavlow.tests
 
 import io.github.sof3.enclavlow.Contract
+import io.github.sof3.enclavlow.ContractFlowGraph
 import io.github.sof3.enclavlow.SenTransformer
 import soot.Scene
 import soot.options.Options
@@ -9,10 +10,10 @@ import java.lang.management.ManagementFactory
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-private val allRuns = hashMapOf<Class<*>, Map<String, Contract>>()
+private val allRuns = hashMapOf<Class<*>, Map<String, Contract<out ContractFlowGraph>>>()
 
-internal inline fun <reified T> testMethod(vararg results: Pair<String, Contract>): Unit = runImpl(T::class.java, results)
-private fun <T> runImpl(clazz: Class<T>, expecedResults: Array<out Pair<String, Contract>>) = synchronized(allRuns) {
+internal inline fun <reified T> testMethod(vararg results: Pair<String, Contract<out ContractFlowGraph>>): Unit = runImpl(T::class.java, results)
+private fun <T> runImpl(clazz: Class<T>, expectedResults: Array<out Pair<String, Contract<out ContractFlowGraph>>>) = synchronized(allRuns) {
     try {
         if (clazz !in allRuns) {
             val options = Options.v()
@@ -33,7 +34,7 @@ private fun <T> runImpl(clazz: Class<T>, expecedResults: Array<out Pair<String, 
         }
 
         val actual = allRuns[clazz]!!
-        for (expect in expecedResults) {
+        for (expect in expectedResults) {
             assertTrue("Method ${expect.first} was not analyzed, only got ${actual.keys}") {
                 expect.first in actual
             }
