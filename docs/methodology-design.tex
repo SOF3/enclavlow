@@ -30,9 +30,8 @@ The CFG contains the following nodes:
 	\item \q{Param $x$}: Each parameter is represented by a node
 	\item \q{Return}: Represents data flow through the return path
 	\item \q{Throw}: Represents data flow through the return path
-	\item \q{@Source}: Represents variables in the method explicitly declared as \code{@Source}
-	\item \q{@Sink}: Represents variables (or replaces the \q{Return} node)
-		in the method explicitly declared as \code{@Sink}
+	\item \q{Source}: Represents variables in the method explicitly wrapped in \code{sourceMarker}
+	\item \q{Sink}: Represents locals in the method explicitly declared as \code{sinkMarker}
 	\item \q{Control}: This is a special node representing how many times the function is called.
 	\item \q{This}, \q{Param $y$}, \q{Return}, \q{Throw} and \q{Control}
 		from each function called from the current node
@@ -65,10 +64,10 @@ with unconnected nodes omitted.
 			computeSumReturn[label = "computeSum\noexpand\n return"];
 			getSumParam0 -> parseParam0;
 			parseParam0 -> parseReturn;
-			"@Source" -> parseReturn;
+			"Source" -> parseReturn;
 			parseReturn -> computeSumParam0;
 			computeSumParam0 -> computeSumReturn;
-			computeSumReturn -> "@Sink";
+			computeSumReturn -> "Sink";
 			}
 	\end{center}
 	\label{fig:SourceSinkContract}

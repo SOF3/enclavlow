@@ -114,19 +114,19 @@ class SenFlow(
 
         when (stmt) {
             is ReturnStmt -> {
-                input.graph.visitAncestors(setOf(input.control) + rvalueNodes(input, stmt.op), nodePostprocess(ReturnScope))
-                input.graph.visitAncestors(setOf(ThisScope), nodePostprocess(ThisScope))
-                input.graph.visitAncestors(setOf(StaticScope), nodePostprocess(StaticScope))
+                input.graph.visitAncestors(setOf(input.control) + rvalueNodes(input, stmt.op), nodePostprocess(ReturnNode))
+                input.graph.visitAncestors(setOf(ThisNode), nodePostprocess(ThisNode))
+                input.graph.visitAncestors(setOf(StaticNode), nodePostprocess(StaticNode))
             }
             is ReturnVoidStmt -> {
-                input.graph.visitAncestors(setOf(input.control), nodePostprocess(ReturnScope))
-                input.graph.visitAncestors(setOf(ThisScope), nodePostprocess(ThisScope))
-                input.graph.visitAncestors(setOf(StaticScope), nodePostprocess(StaticScope))
+                input.graph.visitAncestors(setOf(input.control), nodePostprocess(ReturnNode))
+                input.graph.visitAncestors(setOf(ThisNode), nodePostprocess(ThisNode))
+                input.graph.visitAncestors(setOf(StaticNode), nodePostprocess(StaticNode))
             }
             is ThrowStmt -> {
-                input.graph.visitAncestors(setOf(input.control) + rvalueNodes(input, stmt.op), nodePostprocess(ThrowScope))
-                input.graph.visitAncestors(setOf(ThisScope), nodePostprocess(ThisScope))
-                input.graph.visitAncestors(setOf(StaticScope), nodePostprocess(StaticScope))
+                input.graph.visitAncestors(setOf(input.control) + rvalueNodes(input, stmt.op), nodePostprocess(ThrowNode))
+                input.graph.visitAncestors(setOf(ThisNode), nodePostprocess(ThisNode))
+                input.graph.visitAncestors(setOf(StaticNode), nodePostprocess(StaticNode))
                 // TODO handle try-catch
             }
             is DefinitionStmt -> {

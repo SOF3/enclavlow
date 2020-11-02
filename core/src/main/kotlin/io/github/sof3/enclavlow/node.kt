@@ -18,7 +18,7 @@ sealed class PublicNode : Node() {
 /**
  * Data to caller through return path
  */
-object ReturnScope : PublicNode() {
+object ReturnNode : PublicNode() {
     override val name: String
         get() = "<return>"
 }
@@ -26,7 +26,7 @@ object ReturnScope : PublicNode() {
 /**
  * Data to caller through throw path
  */
-object ThrowScope : PublicNode() {
+object ThrowNode : PublicNode() {
     override val name: String
         get() = "<throw>"
 }
@@ -36,7 +36,7 @@ object ThrowScope : PublicNode() {
  *
  * Data from static scope are always considered insensitive.
  */
-object StaticScope : PublicNode() {
+object StaticNode : PublicNode() {
     override val name: String
         get() = "<static>"
 }
@@ -44,7 +44,7 @@ object StaticScope : PublicNode() {
 /**
  * Data from/to `this`
  */
-object ThisScope : PublicNode() {
+object ThisNode : PublicNode() {
     override val name: String
         get() = "this"
 }
@@ -54,7 +54,7 @@ object ThisScope : PublicNode() {
  */
 class ParamNode(private val index: Int) : PublicNode() {
     override val name: String
-        get() = "param$index"
+        get() = "param#$index"
 
     override fun equals(other: Any?) = other is ParamNode && index == other.index
 
@@ -62,19 +62,19 @@ class ParamNode(private val index: Int) : PublicNode() {
 }
 
 /**
- * Data source from a local variable explicitly declared as `@Source`
+ * Data source from a local variable explicitly declared as `sourceMarker`
  */
-object ExplicitSource : PublicNode() {
+object ExplicitSourceNode : PublicNode() {
     override val name: String
-        get() = "<@Source>"
+        get() = "<source>"
 }
 
 /**
- * Data source from a local variable explicitly declared as `@Sink`
+ * Data source from a local variable explicitly declared as `sinkMarker`
  */
-object ExplicitSink : PublicNode() {
+object ExplicitSinkNode : PublicNode() {
     override val name: String
-        get() = "<@Sink>"
+        get() = "<sink>"
 }
 
 /**

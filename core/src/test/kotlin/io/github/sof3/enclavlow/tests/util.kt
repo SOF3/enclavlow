@@ -11,7 +11,7 @@ import kotlin.test.assertTrue
 
 private val allRuns = hashMapOf<Class<*>, Map<String, Contract>>()
 
-internal inline fun <reified T> run(vararg results: Pair<String, Contract>): Unit = runImpl(T::class.java, results)
+internal inline fun <reified T> testMethod(vararg results: Pair<String, Contract>): Unit = runImpl(T::class.java, results)
 private fun <T> runImpl(clazz: Class<T>, expecedResults: Array<out Pair<String, Contract>>) = synchronized(allRuns) {
     try {
         if (clazz !in allRuns) {

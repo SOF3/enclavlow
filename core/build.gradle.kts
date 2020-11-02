@@ -14,7 +14,7 @@ dependencies {
     implementation("org.soot-oss", "soot", "4.2.1")
     testImplementation("junit", "junit", "4.13")
     testImplementation("org.jetbrains.kotlin", "kotlin-test-junit")
-    testCompileOnly(project(":api"))
+    testImplementation(project(":api"))
 }
 
 tasks.test {

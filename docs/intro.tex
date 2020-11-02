@@ -49,17 +49,17 @@ This project presents \pname{}
 \footnote{\q{enclavlow} is a new term coined from the words \q{enclave} and \q{flow}.},
 an information flow analysis tool
 for identifying data leak from enclaves.
-The user first annotates variables as \code{@Source} and \code{@Sink}.
-The tool performs information flow analysis from \code{@Source} variables,
+The user first wraps sensitive data sources in \code{sourceMarker} and sinks in \code{sinkMarker}.
+The tool performs information flow analysis from \code{sourceMarker} variables,
 identifying the ways that data from such variables are leaked
 to the system outside the executing enclave
-without first passing through a \code{@Sink} variable.
+without first passing through a \code{sinkMarker} variable.
 The tool compiles a report in HTML format that summarizes the following:
 \begin{itemize}
 	\item \textbf{Data leak}:
 		The report displays the lines of code on which sensitive data are moved
 		into areas accessible by privileged adversaries.
-		It demonstrates the path from the \code{@Source} variable to the point of leak.
+		It demonstrates the path from the \code{sourceMarker} expression to the point of leak.
 	\item \textbf{Redundant protection}:
 		The report lists the functions that could not hold any sensitive data in its local variables,
 		hence should be moved out of the enclave partition.

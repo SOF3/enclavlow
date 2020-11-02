@@ -2,6 +2,7 @@ report.pdf: report.tex \
 	Makefile \
 	title.tex abstract.tex abbr.tex intro.tex objective.tex \
 	methodology.tex methodology-design.tex discussion.tex conclusion.tex \
+	cite.bib \
 	KnownFalsePositives.java \
 	OopSubstAttack.java \
 	sootOutput/TraditionalFalsePositive.jimple

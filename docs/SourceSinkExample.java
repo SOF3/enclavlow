@@ -1,13 +1,12 @@
 class SourceSinkExample {
 	@JECall
-	@Sink
 	int getSum(byte[] encrypted) {
 		List<Integer> raw = parse(encrypted);
-		return computeSum(raw);
+		return sinkMarker(computeSum(raw));
 	}
 
 	List<Integer> parse(byte[] encrypted) {
-		@Source byte[] buf = PRIVATE_KEY.decrypt(encrypted);
+		byte[] buf = sourceMarker(PRIVATE_KEY.decrypt(encrypted));
 		List<Integer> result = new ArrayList<>();
 		for(byte i : buf) {
 			result.add((int) i);

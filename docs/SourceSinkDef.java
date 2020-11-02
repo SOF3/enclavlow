@@ -1,7 +1,7 @@
-@Target(AnnotationTarget.LOCAL_VARIABLE)
-@Retention(RetentionPolicy.BINARY)
-public @interface Source {}
+package io.github.sof3.enclavlow.api;
 
-@Target({AnnotationTarget.LOCAL_VARIABLE, AnnotationTarget.METHOD})
-@Retention(RetentionPolicy.BINARY)
-public @interface Sink {}
+public class Enclavlow {
+    public static <T> T sourceMarker(value: T) { return value; }
+
+    public static <T> T sinkMarker(value: T) { return value; }
+}

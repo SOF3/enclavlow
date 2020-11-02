@@ -1,53 +1,47 @@
 package io.github.sof3.enclavlow.tests
 
-import io.github.sof3.enclavlow.ExplicitSource
 import io.github.sof3.enclavlow.ParamNode
-import io.github.sof3.enclavlow.ReturnScope
-import io.github.sof3.enclavlow.StaticScope
-import io.github.sof3.enclavlow.ThisScope
-import io.github.sof3.enclavlow.ThrowScope
-import io.github.sof3.enclavlow.cases.DirectLeak
+import io.github.sof3.enclavlow.ReturnNode
+import io.github.sof3.enclavlow.StaticNode
+import io.github.sof3.enclavlow.ThisNode
+import io.github.sof3.enclavlow.ThrowNode
+import io.github.sof3.enclavlow.cases.AssignLeak
 import io.github.sof3.enclavlow.makeContract
 import kotlin.test.Test
 
-class DirectLeakTests {
+class AssignLeakTests {
     @Test
-    fun paramToReturn() = run<DirectLeak>("paramToReturn" to makeContract(1) {
-        ParamNode(0) into ReturnScope
+    fun paramToReturn() = testMethod<AssignLeak>("paramToReturn" to makeContract(1) {
+        ParamNode(0) into ReturnNode
     })
 
     @Test
-    fun paramToThrow() = run<DirectLeak>("paramToThrow" to makeContract(1) {
-        ParamNode(0) into ThrowScope
+    fun paramToThrow() = testMethod<AssignLeak>("paramToThrow" to makeContract(1) {
+        ParamNode(0) into ThrowNode
     })
 
     @Test
-    fun paramToStatic() = run<DirectLeak>("paramToStatic" to makeContract(1) {
-        ParamNode(0) into StaticScope
+    fun paramToStatic() = testMethod<AssignLeak>("paramToStatic" to makeContract(1) {
+        ParamNode(0) into StaticNode
     })
 
     @Test
-    fun paramToThis() = run<DirectLeak>("paramToThis" to makeContract(1) {
-        ParamNode(0) into ThisScope
+    fun paramToThis() = testMethod<AssignLeak>("paramToThis" to makeContract(1) {
+        ParamNode(0) into ThisNode
     })
 
     @Test
-    fun thisToStatic() = run<DirectLeak>("thisToStatic" to makeContract(0) {
-        ThisScope into StaticScope
+    fun thisToStatic() = testMethod<AssignLeak>("thisToStatic" to makeContract(0) {
+        ThisNode into StaticNode
     })
 
     @Test
-    fun zeroizeAssign() = run<DirectLeak>("zeroizeAssign" to makeContract(1) {
+    fun zeroizeAssign() = testMethod<AssignLeak>("zeroizeAssign" to makeContract(1) {
         // there should be nothing leaked
     })
 
     @Test
-    fun returnSource() = run<DirectLeak>("returnSource" to makeContract(0) {
-        ExplicitSource into ReturnScope
-    })
-
-    @Test
-    fun assignParam() = run<DirectLeak>("assignParam" to makeContract(1) {
+    fun assignParam() = testMethod<AssignLeak>("assignParam" to makeContract(1) {
         // there should be nothing leaked
     })
 }

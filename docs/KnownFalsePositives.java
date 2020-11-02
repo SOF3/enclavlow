@@ -14,8 +14,8 @@ class KnownFalsePositives {
 	 * but not for class constant literals.
 	 */
 	int foo(int x) {
-		@Source boolean secret = getSecret();
-		if(secret) {
+		boolean secret = sourceMarker(1);
+		if (secret) {
 			return x;
 		} else {
 			return x;

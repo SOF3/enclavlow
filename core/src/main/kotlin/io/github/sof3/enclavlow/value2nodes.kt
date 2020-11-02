@@ -34,7 +34,7 @@ private fun rvalueNodesImpl(flow: LocalFlow, value: Value): Sequence<Node> = seq
             yield(node)
         }
         is ThisRef -> {
-            yield(ThisScope)
+            yield(ThisNode)
         }
         is ParameterRef -> {
             yield(flow.params[value.index])
@@ -67,6 +67,7 @@ private fun rvalueNodesImpl(flow: LocalFlow, value: Value): Sequence<Node> = seq
             // constructing an object without calling any constructors does not leak anything
         }
         is InvokeExpr -> {
+            println(value.method.declaration)
             TODO()
         }
         is CastExpr -> {
@@ -103,7 +104,7 @@ private fun lvalueNodesImpl(flow: LocalFlow, value: Value, usage: LvalueUsage, r
         }
         is ThisRef -> {
             if (usage == LvalueUsage.ASSIGN) {
-                yield(ThisScope)
+                yield(ThisNode)
             }
         }
         is ParameterRef -> {
@@ -124,7 +125,7 @@ private fun lvalueNodesImpl(flow: LocalFlow, value: Value, usage: LvalueUsage, r
         }
         is CaughtExceptionRef -> TODO()
         is StaticFieldRef -> {
-            yield(StaticScope)
+            yield(StaticNode)
         }
         is InstanceFieldRef -> {
             when (usage) {

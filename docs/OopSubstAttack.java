@@ -1,7 +1,7 @@
 class OopSubstAttack {
 	@JECall
 	public void foo(CharSequence cs) {
-		@Source byte[] secret = getSecret();
+		byte[] secret = sourceMarker(new byte[0]});
 		writeEncrypted(cs.substr(secret.length()));
 	}
 }

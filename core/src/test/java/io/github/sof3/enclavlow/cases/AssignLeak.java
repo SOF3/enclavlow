@@ -1,9 +1,7 @@
 package io.github.sof3.enclavlow.cases;
 
-import io.github.sof3.enclavlow.api.Source;
-
 @SuppressWarnings("unused")
-public class DirectLeak {
+public class AssignLeak {
     public static int paramToReturn(int x) {
         return x;
     }
@@ -31,11 +29,6 @@ public class DirectLeak {
         @SuppressWarnings({"SuspiciousNameCombination", "UnusedAssignment"}) int y = x;
         y = 0;
         return y;
-    }
-
-    public static int returnSource() {
-        @Source int x = 1;
-        return x;
     }
 
     @SuppressWarnings({"UnusedAssignment", "ParameterCanBeLocal"})

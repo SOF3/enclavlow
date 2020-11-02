@@ -9,7 +9,7 @@ fun makeContract(
     extraNodes: Collection<PublicNode> = emptyList(),
     fn: MakeContractContext<PublicNode>.() -> Unit = {},
 ): MutableContract {
-    val nodes = indexedSetOf(ThisScope, StaticScope, ReturnScope, ThrowScope)
+    val nodes = indexedSetOf(ThisNode, StaticNode, ReturnNode, ThrowNode, ExplicitSourceNode, ExplicitSinkNode)
     nodes.addAll((0 until paramCount).map { ParamNode(it) })
     nodes.addAll(extraNodes)
 
@@ -19,7 +19,7 @@ fun makeContract(
 }
 
 fun makeFlowSet(vararg extraNodes: Iterable<Node>): FlowSet {
-    val nodes = indexedSetOf<Node>(ThisScope, StaticScope, ReturnScope, ThrowScope)
+    val nodes = indexedSetOf<Node>(ThisNode, StaticNode, ReturnNode, ThrowNode, ExplicitSourceNode, ExplicitSinkNode)
     for (extra in extraNodes) {
         nodes.addAll(extra)
     }
