@@ -74,18 +74,22 @@ private fun rvalueNodesImpl(flow: LocalFlow, value: Value): Sequence<Node> = seq
         is InvokeExpr -> {
             if (value.method.declaringClass.name == "io.github.sof3.enclavlow.api.Enclavlow") {
                 val method = value.method.name
-                if(method == "sourceMarker" || method.endsWith("SourceMarker")) {
+                if (method == "sourceMarker" || method.endsWith("SourceMarker")) {
                     yield(ExplicitSourceNode)
-                } else if(method == "sinkMarker" || method.endsWith("SinkMarker")) {
-                    for(arg in value.args) {
-                        for(node in rvalueNodes(flow, arg)) {
+                } else if (method == "sinkMarker" || method.endsWith("SinkMarker")) {
+                    for (arg in value.args) {
+                        for (node in rvalueNodes(flow, arg)) {
                             flow.graph.touch(node, ExplicitSinkNode)
                         }
                     }
                 } else {
                     throw IllegalArgumentException("Unknown method in io.github.sof3.enclavlow.api.Enclavlow called")
                 }
-            }else{
+            } else if (value.method.isNative) {
+                for (arg in value.args) {
+                    yieldAll(rvalueNodesImpl(flow, arg))
+                }
+            } else {
                 // TODO
             }
         }
