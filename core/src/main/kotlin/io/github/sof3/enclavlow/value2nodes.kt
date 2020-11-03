@@ -21,6 +21,11 @@ import soot.jimple.UnopExpr
 
 // Conversion between soot.Value and Node
 
+/**
+ * Computes the source nodes in flow when value is used as an rvalue
+ *
+ * `flow` is mutated when `value` is a method invocation.
+ */
 fun rvalueNodes(flow: LocalFlow, value: Value): Set<Node> = rvalueNodesImpl(flow, value).toSet()
 
 private fun rvalueNodesImpl(flow: LocalFlow, value: Value): Sequence<Node> = sequence {
@@ -72,12 +77,16 @@ private fun rvalueNodesImpl(flow: LocalFlow, value: Value): Sequence<Node> = seq
                 if(method == "sourceMarker" || method.endsWith("SourceMarker")) {
                     yield(ExplicitSourceNode)
                 } else if(method == "sinkMarker" || method.endsWith("SinkMarker")) {
-                    // TODO
+                    for(arg in value.args) {
+                        for(node in rvalueNodes(flow, arg)) {
+                            flow.graph.touch(node, ExplicitSinkNode)
+                        }
+                    }
                 } else {
                     throw IllegalArgumentException("Unknown method in io.github.sof3.enclavlow.api.Enclavlow called")
                 }
             }else{
-                TODO()
+                // TODO
             }
         }
         is CastExpr -> {

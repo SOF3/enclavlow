@@ -130,23 +130,24 @@ class SenFlow(
 
         when (stmt) {
             is ReturnStmt -> {
+                // in 3AC, return statements are never followed by invocation calls
+                // so it is safe to just pass input to rvalueNodes
                 input.graph.visitAncestors(setOf(input.control) + rvalueNodes(input, stmt.op), nodePostprocess(ReturnNode))
-                input.graph.visitAncestors(setOf(ThisNode), nodePostprocess(ThisNode))
-                input.graph.visitAncestors(setOf(StaticNode), nodePostprocess(StaticNode))
+                nodePostprocessCommon(input.graph)
             }
             is ReturnVoidStmt -> {
                 input.graph.visitAncestors(setOf(input.control), nodePostprocess(ReturnNode))
-                input.graph.visitAncestors(setOf(ThisNode), nodePostprocess(ThisNode))
-                input.graph.visitAncestors(setOf(StaticNode), nodePostprocess(StaticNode))
+                nodePostprocessCommon(input.graph)
             }
             is ThrowStmt -> {
+                // in 3AC, throw statements are never followed by invocation calls
+                // so it is safe to just pass input to rvalueNodes
                 input.graph.visitAncestors(setOf(input.control) + rvalueNodes(input, stmt.op), nodePostprocess(ThrowNode))
-                input.graph.visitAncestors(setOf(ThisNode), nodePostprocess(ThisNode))
-                input.graph.visitAncestors(setOf(StaticNode), nodePostprocess(StaticNode))
+                nodePostprocessCommon(input.graph)
                 // TODO handle try-catch
             }
             is DefinitionStmt -> {
-                output!!
+                output!! // definition stmt must not be last
 
                 val left = stmt.leftOp
                 val right = stmt.rightOp
@@ -157,8 +158,11 @@ class SenFlow(
                     output.graph.deleteAllSources(remove)
                 }
 
+                // precompute the nodes to avoid mutations on output from affecting node searches
                 val leftNodes = lvalueNodes(output, left, LvalueUsage.ASSIGN)
-                val rightNodes = rvalueNodes(input, right)
+                val rightNodes = rvalueNodes(output, right)
+                val leftRight = rvalueNodes(output, left)
+                val rightLeft = lvalueNodes(output, right, LvalueUsage.ASSIGN)
 
                 for (leftNode in leftNodes.lvalues) {
                     for (rightNode in rightNodes) {
@@ -170,8 +174,6 @@ class SenFlow(
                     output.graph.touch(output.control, leftNode)
                 }
 
-                val leftRight = rvalueNodes(input, left)
-                val rightLeft = lvalueNodes(output, right, LvalueUsage.ASSIGN)
                 for (leftNode in rightLeft.lvalues) {
                     for (rightNode in leftRight) {
                         output.graph.touch(rightNode, leftNode)
@@ -179,14 +181,14 @@ class SenFlow(
                 }
             }
             is IfStmt, is SwitchStmt -> {
-                output!!
+                output!! // conditional stmt must not be last
 
                 val cond = when (stmt) {
                     is SwitchStmt -> stmt.key
                     is IfStmt -> stmt.condition
                     else -> throw AssertionError()
                 }
-                val nodes = rvalueNodes(input, cond)
+                val nodes = rvalueNodes(output, cond)
                 for (branchedOutput in branchOutList) {
                     input.copyTo(branchedOutput)
                     for ((i, flow) in setOf(output, branchedOutput).withIndex()) {
@@ -202,12 +204,20 @@ class SenFlow(
             }
             is PlaceholderStmt -> TODO()
             is InvokeStmt -> {
-                // TODO
+                output!! // InvokeStmt must not be last
+
+                rvalueNodes(output, stmt.invokeExpr)
             }
             else -> throw UnsupportedOperationException("Unsupported operation ${stmt.javaClass}")
         }
         println("Output: $fallOutList")
         println("Branched Output: $branchOutList")
+    }
+
+    private fun nodePostprocessCommon(graph: LocalFlowGraph) {
+        graph.visitAncestors(setOf(ThisNode), nodePostprocess(ThisNode))
+        graph.visitAncestors(setOf(StaticNode), nodePostprocess(StaticNode))
+        graph.visitAncestors(setOf(ExplicitSinkNode), nodePostprocess(ExplicitSinkNode))
     }
 
     private fun nodePostprocess(dest: PublicNode) = { node: Node ->

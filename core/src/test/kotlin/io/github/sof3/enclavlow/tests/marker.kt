@@ -16,7 +16,7 @@ class MarkerLeakTests {
     })
 
     @Test
-    fun returnSink() = testMethod<MarkerLeak>("returnSource" to makeContract(CallTags.UNSPECIFIED, 1) {
+    fun returnSink() = testMethod<MarkerLeak>("returnSink" to makeContract(CallTags.UNSPECIFIED, 1) {
         ParamNode(0) into ExplicitSinkNode
     })
 }
