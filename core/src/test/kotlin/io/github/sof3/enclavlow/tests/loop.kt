@@ -9,7 +9,7 @@ import kotlin.test.Test
 
 class LoopLeakTests {
     @Test
-    fun loopAssign() = testMethod<LoopLeak>("loopAssign" to makeContract(CallTags.UNSPECIFIED, 1) {
+    fun loopAssign() = testMethod<LoopLeak>("loopAssign", makeContract(CallTags.UNSPECIFIED, 1) {
         ParamNode(0) into ReturnNode
     })
 }

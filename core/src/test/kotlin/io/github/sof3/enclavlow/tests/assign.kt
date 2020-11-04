@@ -12,37 +12,37 @@ import kotlin.test.Test
 
 class AssignLeakTests {
     @Test
-    fun paramToReturn() = testMethod<AssignLeak>("paramToReturn" to makeContract(CallTags.UNSPECIFIED, 1) {
+    fun paramToReturn() = testMethod<AssignLeak>("paramToReturn", makeContract(CallTags.UNSPECIFIED, 1) {
         ParamNode(0) into ReturnNode
     })
 
     @Test
-    fun paramToThrow() = testMethod<AssignLeak>("paramToThrow" to makeContract(CallTags.UNSPECIFIED, 1) {
+    fun paramToThrow() = testMethod<AssignLeak>("paramToThrow", makeContract(CallTags.UNSPECIFIED, 1) {
         ParamNode(0) into ThrowNode
     })
 
     @Test
-    fun paramToStatic() = testMethod<AssignLeak>("paramToStatic" to makeContract(CallTags.UNSPECIFIED, 1) {
+    fun paramToStatic() = testMethod<AssignLeak>("paramToStatic", makeContract(CallTags.UNSPECIFIED, 1) {
         ParamNode(0) into StaticNode
     })
 
     @Test
-    fun paramToThis() = testMethod<AssignLeak>("paramToThis" to makeContract(CallTags.UNSPECIFIED, 1) {
+    fun paramToThis() = testMethod<AssignLeak>("paramToThis", makeContract(CallTags.UNSPECIFIED, 1) {
         ParamNode(0) into ThisNode
     })
 
     @Test
-    fun thisToStatic() = testMethod<AssignLeak>("thisToStatic" to makeContract(CallTags.UNSPECIFIED, 0) {
+    fun thisToStatic() = testMethod<AssignLeak>("thisToStatic", makeContract(CallTags.UNSPECIFIED, 0) {
         ThisNode into StaticNode
     })
 
     @Test
-    fun zeroizeAssign() = testMethod<AssignLeak>("zeroizeAssign" to makeContract(CallTags.UNSPECIFIED, 1) {
+    fun zeroizeAssign() = testMethod<AssignLeak>("zeroizeAssign", makeContract(CallTags.UNSPECIFIED, 1) {
         // there should be nothing leaked
     })
 
     @Test
-    fun assignParam() = testMethod<AssignLeak>("assignParam" to makeContract(CallTags.UNSPECIFIED, 1) {
+    fun assignParam() = testMethod<AssignLeak>("assignParam", makeContract(CallTags.UNSPECIFIED, 1) {
         // there should be nothing leaked
     })
 }

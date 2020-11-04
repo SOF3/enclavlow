@@ -10,10 +10,10 @@ import java.lang.management.ManagementFactory
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-private val allRuns = hashMapOf<Class<*>, Map<String, Contract<out ContractFlowGraph>>>()
+private val allRuns = hashMapOf<Class<*>, Map<Pair<String, String>, Contract<out ContractFlowGraph>>>()
 
-internal inline fun <reified T> testMethod(vararg results: Pair<String, Contract<out ContractFlowGraph>>): Unit = runImpl(T::class.java, results)
-private fun <T> runImpl(clazz: Class<T>, expectedResults: Array<out Pair<String, Contract<out ContractFlowGraph>>>) = synchronized(allRuns) {
+internal inline fun <reified T> testMethod(method: String, contract: Contract<out ContractFlowGraph>): Unit = runImpl(T::class.java, method, contract)
+private fun <T> runImpl(clazz: Class<T>, method: String, expectedContract: Contract<out ContractFlowGraph>) = synchronized(allRuns) {
     try {
         if (clazz !in allRuns) {
             val options = Options.v()
@@ -33,13 +33,12 @@ private fun <T> runImpl(clazz: Class<T>, expectedResults: Array<out Pair<String,
             allRuns[clazz] = SenTransformer.contracts.toMap()
         }
 
+        val key = clazz.name to method
         val actual = allRuns[clazz]!!
-        for (expect in expectedResults) {
-            assertTrue("Method ${expect.first} was not analyzed, only got ${actual.keys}") {
-                expect.first in actual
-            }
-            assertEquals(expect.second, actual[expect.first], "Method ${expect.first} has unexpected contract")
+        assertTrue("Method $method was not analyzed, only got ${actual.keys}") {
+            key in actual
         }
+        assertEquals(expectedContract, actual[key], "Method $method has unexpected contract")
     } finally {
         try {
             soot.Timers.v().totalTimer.end()

@@ -149,7 +149,7 @@ sealed class DiGraph<T : Any>(
      * with the smallest path length sums
      */
     inline fun lca(a: T, b: T, nodeFilter: (T) -> Boolean, edgeFilter: (Edge) -> Boolean): T? {
-        println("Finding LCA of $a and $b in $this")
+        printDebug("Finding LCA of $a and $b in $this")
         val index = lcaIndex(indexOf(a), indexOf(b), { nodeFilter(nodes[it]) }, edgeFilter) ?: return null
         return nodes[index]
     }

@@ -23,7 +23,7 @@ import soot.toolkits.graph.UnitGraph
 import soot.toolkits.scalar.ForwardBranchedFlowAnalysis
 
 object SenTransformer : BodyTransformer() {
-    val contracts = hashMapOf<String, Contract<out ContractFlowGraph>>()
+    val contracts = hashMapOf<Pair<String, String>, Contract<out ContractFlowGraph>>()
 
     init {
         PackManager.v().getPack("jap").add(Transform("jap.sen", this))
@@ -44,11 +44,14 @@ object SenTransformer : BodyTransformer() {
         }
 
         val flow = SenFlow(ExceptionalUnitGraph(body), body.method.parameterCount, callTags)
-        println()
-        println(body)
-        flow.doAnalysis()
-        contracts[body.method.name] = flow.outputContract
-        println("Contract: ${flow.outputContract}")
+        printDebug(body.toString())
+        block("Analyzing ${body.method.signature}") {
+            flow.doAnalysis()
+        }
+        contracts[body.method.declaringClass.name to body.method.name] = flow.outputContract
+        block("Contract of ${flow.outputContract.callTags} ${body.method.subSignature}") {
+            printDebug(flow.outputContract.graph)
+        }
     }
 }
 
@@ -67,9 +70,10 @@ class SenFlow(
     val outputContract: Contract<MutableContractFlowGraph> = makeContract(callTags, paramCount)
 
     override fun newInitialFlow() = newLocalFlow(paramCount)
-    override fun merge(in1: LocalFlow, in2: LocalFlow, out: LocalFlow) {
-        println()
-        println("Merging $in1 and $in2 to $out")
+    override fun merge(in1: LocalFlow, in2: LocalFlow, out: LocalFlow) = block("Merge") {
+        printDebug("in1: $in1")
+        printDebug("in2: $in2")
+        printDebug("out: ${out.control}")
 
         in1.graph.merge(in2.graph) { a, b ->
             // TODO handle ControlFlow
@@ -107,21 +111,25 @@ class SenFlow(
         }
     }
 
-    override fun copy(source: LocalFlow, dest: LocalFlow) = source copyTo dest
+    override fun copy(source: LocalFlow, dest: LocalFlow) = block("Copy") { source copyTo dest }
 
     public override fun doAnalysis() = super.doAnalysis()
 
-    override fun flowThrough(input: LocalFlow, stmt: soot.Unit, fallOutList: List<LocalFlow>, branchOutList: List<LocalFlow>) {
-        println()
-        println("${stmt.javaClass.simpleName}: $stmt")
-        println("Input: {$input}")
+    override fun flowThrough(
+        input: LocalFlow,
+        stmt: soot.Unit,
+        fallOutList: List<LocalFlow>,
+        branchOutList: List<LocalFlow>,
+    ) = block("Node $stmt") {
+        printDebug("${stmt.javaClass.simpleName}: $stmt")
+        printDebug("Input: {$input}")
         val output = fallOutList.getOrNull(0)
         if (fallOutList.size > 1) throw java.lang.AssertionError("Unsupported fallOutList non-singleton")
 
         when (stmt) {
             is ReturnStmt -> {
                 val final = input.finalizedCopy()
-                println("Final: $final")
+                printDebug("Final: $final")
                 nodePostprocessCommon(final.graph)
 
                 // in 3AC, return statements are never followed by invocation calls
@@ -211,8 +219,8 @@ class SenFlow(
             }
             else -> throw UnsupportedOperationException("Unsupported operation ${stmt.javaClass}")
         }
-        println("Output: $fallOutList")
-        println("Branched Output: $branchOutList")
+        printDebug("Output: $fallOutList")
+        printDebug("Branched Output: $branchOutList")
     }
 
     private fun nodePostprocessCommon(graph: LocalFlowGraph) {
@@ -271,7 +279,7 @@ class LocalFlow(
 ////        dest.graph.touch(dest.control, control, "Flow copy\\nBackward")
 //        dest.finalizers = ArrayDeque(finalizers)
 
-        println("$control copyTo ${dest.control}")
+        printDebug("$control copyTo ${dest.control}")
     }
 
     override fun equals(other: Any?): Boolean {
@@ -279,4 +287,6 @@ class LocalFlow(
         if (graph.filterNodes { it !is ControlNode } != other.graph.filterNodes { it !is ControlNode }) return false
         return params == other.params && locals == other.locals
     }
+
+    override fun hashCode() = throw UnsupportedOperationException("LocalFlow is not hashable")
 }

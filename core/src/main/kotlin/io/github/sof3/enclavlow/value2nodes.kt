@@ -121,7 +121,7 @@ fun lvalueNodes(flow: LocalFlow, value: Value, usage: LvalueUsage): LvalueResult
 }
 
 private fun lvalueNodesImpl(flow: LocalFlow, value: Value, usage: LvalueUsage, rvalues: MutableSet<Node>): Sequence<Node> = sequence {
-    println("lvalueNodesImpl(${value.javaClass.simpleName} $value)")
+    printDebug("lvalueNodesImpl(${value.javaClass.simpleName} $value)")
     when (value) {
         // these expressions create new/constant values and can never be mutated in another expression
         is Constant, is InstanceOfExpr, is UnopExpr, is BinopExpr, is AnyNewExpr, is InvokeExpr -> {

@@ -9,7 +9,7 @@ import kotlin.test.Test
 
 class BinomLeak {
     @Test
-    fun binomPlus() = testMethod<BinomLeak>("binomPlus" to makeContract(CallTags.UNSPECIFIED, 2) {
+    fun binomPlus() = testMethod<BinomLeak>("binomPlus", makeContract(CallTags.UNSPECIFIED, 2) {
         ParamNode(0) into ReturnNode
         ParamNode(1) into ReturnNode
     })

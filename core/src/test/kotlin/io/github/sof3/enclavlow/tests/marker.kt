@@ -11,12 +11,12 @@ import kotlin.test.Test
 
 class MarkerLeakTests {
     @Test
-    fun returnSource() = testMethod<MarkerLeak>("returnSource" to makeContract(CallTags.UNSPECIFIED, 0) {
+    fun returnSource() = testMethod<MarkerLeak>("returnSource", makeContract(CallTags.UNSPECIFIED, 0) {
         ExplicitSourceNode into ReturnNode
     })
 
     @Test
-    fun returnSink() = testMethod<MarkerLeak>("returnSink" to makeContract(CallTags.UNSPECIFIED, 1) {
+    fun returnSink() = testMethod<MarkerLeak>("returnSink", makeContract(CallTags.UNSPECIFIED, 1) {
         ParamNode(0) into ExplicitSinkNode
     })
 }

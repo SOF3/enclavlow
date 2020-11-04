@@ -10,24 +10,24 @@ import kotlin.test.Test
 
 class BranchLeakTests {
     @Test
-    fun conditionalAssign() = testMethod<BranchLeak>("conditionalAssign" to makeContract(CallTags.UNSPECIFIED, 1) {
+    fun conditionalAssign() = testMethod<BranchLeak>("conditionalAssign", makeContract(CallTags.UNSPECIFIED, 1) {
         ParamNode(0) into ReturnNode
     })
 
     @Test
-    fun conditionalThrow() = testMethod<BranchLeak>("conditionalThrow" to makeContract(CallTags.UNSPECIFIED, 2) {
+    fun conditionalThrow() = testMethod<BranchLeak>("conditionalThrow", makeContract(CallTags.UNSPECIFIED, 2) {
         ParamNode(0) into ReturnNode
         ParamNode(0) into ThrowNode
         ParamNode(1) into ThrowNode
     })
 
     @Test
-    fun controlReset() = testMethod<BranchLeak>("controlReset" to makeContract(CallTags.UNSPECIFIED, 1) {
+    fun controlReset() = testMethod<BranchLeak>("controlReset", makeContract(CallTags.UNSPECIFIED, 1) {
         // there should be nothing leaked
     })
 
     @Test
-    fun switchMux() = testMethod<BranchLeak>("switchMux" to makeContract(CallTags.UNSPECIFIED, 5) {
+    fun switchMux() = testMethod<BranchLeak>("switchMux", makeContract(CallTags.UNSPECIFIED, 5) {
         ParamNode(0) into ReturnNode
         ParamNode(1) into ReturnNode
         ParamNode(2) into ReturnNode
