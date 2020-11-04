@@ -8,6 +8,7 @@ import soot.Transform
 import soot.options.Options
 import soot.tagkit.VisibilityAnnotationTag
 import soot.toolkits.graph.ExceptionalUnitGraph
+import java.util.*
 
 inline fun analyzeMethod(
     className: String,
@@ -19,7 +20,7 @@ inline fun analyzeMethod(
     val options = Options.v()
     options.set_output_format(Options.output_format_jimple)
     configure(options)
-    SenTransformer.contracts.clear()
+    SenTransformer.contracts.get().clear()
     val clazz = Scene.v().loadClassAndSupport(className)
     Scene.v().loadNecessaryClasses()
     clazz.setApplicationClass()
@@ -29,10 +30,7 @@ inline fun analyzeMethod(
     }
     val body = method.retrieveActiveBody()
     SenTransformer.transform(body)
-    block("Transformer output $className $methodName") {
-        printDebug(SenTransformer.contracts[className to method.subSignature])
-    }
-    return SenTransformer.contracts[className to method.subSignature]!!
+    return SenTransformer.contracts.get()[className to method.subSignature]!!
 }
 
 enum class MethodNameType {
@@ -50,7 +48,7 @@ enum class MethodNameType {
 }
 
 object SenTransformer : BodyTransformer() {
-    val contracts = hashMapOf<Pair<String, String>, Contract<out ContractFlowGraph>>()
+    val contracts: ThreadLocal<HashMap<Pair<String, String>, Contract<out DiGraph<PublicNode>>>> = ThreadLocal.withInitial { hashMapOf() }!!
 
     init {
         PackManager.v().getPack("jap").add(Transform("jap.sen", this))
@@ -75,7 +73,7 @@ object SenTransformer : BodyTransformer() {
         block("Analyzing ${body.method.signature}") {
             flow.doAnalysis()
         }
-        contracts[body.method.declaringClass.name to body.method.subSignature] = flow.outputContract
+        contracts.get()[body.method.declaringClass.name to body.method.subSignature] = flow.outputContract
         block("Contract of ${flow.outputContract.callTags} ${body.method.subSignature}") {
             printDebug(flow.outputContract.graph)
         }

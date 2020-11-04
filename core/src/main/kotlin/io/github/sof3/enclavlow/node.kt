@@ -1,5 +1,7 @@
 package io.github.sof3.enclavlow
 
+import java.util.concurrent.atomic.AtomicInteger
+
 /**
  * A node of data flow
  */
@@ -97,13 +99,13 @@ class LocalVarNode(val name: String) : PrivateNode() {
  * Flows to ControlFlow indicates the current control flow contains data
  */
 class ControlNode : PrivateNode() {
-    private val id = count++
+    private val id = count.getAndAdd(1)
 
     override fun toString(): String {
         return "control$id"
     }
 
     companion object {
-        private var count = 0
+        private var count = AtomicInteger(0)
     }
 }

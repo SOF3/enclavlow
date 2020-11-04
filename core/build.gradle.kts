@@ -19,5 +19,6 @@ dependencies {
 
 tasks.test {
     useJUnit {
+        maxParallelForks = Runtime.getRuntime().availableProcessors()
     }
 }

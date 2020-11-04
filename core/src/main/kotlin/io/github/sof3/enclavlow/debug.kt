@@ -9,24 +9,26 @@ object DebugOutput {
 
     private fun getIndent() = tags.lastOrNull() ?: ""
 
-    fun pushTag(tag: String) {
-        if (!IS_DEBUG) return
+    fun pushTag(tag: String) = synchronized(this) {
+        if (!IS_DEBUG) return@synchronized
         print(getIndent())
         println("{$tag}")
         tags.add("  ".repeat(tags.size + 1))
+        return@synchronized
     }
 
-    fun popTag() {
-        if (!IS_DEBUG) return
+    fun popTag() = synchronized(this) {
+        if (!IS_DEBUG) return@synchronized
         tags.removeLast()
+        return@synchronized
     }
 
-    fun put(message: String) {
+    fun put(message: String) = synchronized(this) {
         if (!IS_DEBUG) return
 
         if (counter > 10000) throw Error("Too many debug messages; possible infinite loop?")
 
-        val time = "[%+.3f] ".format((System.nanoTime() - EPOCH) / 1e6f)
+        val time = "[${Thread.currentThread().id} %+.3f] ".format((System.nanoTime() - EPOCH) / 1e6f)
         for ((i, line) in message.split("\n").withIndex()) {
             print(getIndent())
             print(if (i == 0) time else " ".repeat(time.length))
@@ -34,6 +36,8 @@ object DebugOutput {
         }
 
         counter++
+
+        return@synchronized
     }
 }
 
