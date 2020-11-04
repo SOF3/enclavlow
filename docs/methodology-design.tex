@@ -1,4 +1,4 @@
-\subsection{Design}
+\subsection{Design}\label{subsec:design}
 Since the adversary has arbitrary access to any untrusted memory and instruction,
 the security policies of \pname{} differ slightly from typical information flow analysis.
 For instance, the statement \code{a.b.c = d;} usually
@@ -17,7 +17,7 @@ where each node represents an element that may be leaked.
 
 Note that this definition (\q{our definition}) differs slightly from
 the usual definition of flow graphs (especially in DTA),
-where an edge $(x, y)$ represents the flow of information from $x$ to $y$ \cite{YinHeng2007Pcsi}.
+where an edge $(x, y)$ represents the flow of information from $x$ to $y$ ~\cite{YinHeng2007Pcsi}.
 In the usual definition, only adversary read access to $y$ is concerned,
 while in our definition, the adversary possesses write access to $x$.
 
@@ -49,11 +49,11 @@ the exact subclasses that could be passed.
 In case multiple subclasses are possible,
 their contract graphs are merged by taking the union of all flow edges.
 
-See Figure \ref{fig:SourceSinkContract} for an example of AFG,
+See Figure~\ref{fig:SourceSinkContract} for an example of AFG,
 with unconnected nodes omitted.
 
 \begin{figure}
-	\caption{Example CFG for Listing \ref{lst:SourceSinkExample}}
+	\caption{Example CFG for Listing~\ref{lst:SourceSinkExample}}
 	\begin{center}
 		\digraph[scale=0.5]{contract}{
 			rankdir = "LR";
@@ -86,11 +86,11 @@ The LFG extends the CFG with the following additions:
 	\item Each branch has its own \q{control} node.
 \end{itemize}
 
-The \emph{consume} operation consumes statements in form of 3AC \cite{sootsurvivor}.
+The \emph{consume} operation consumes statements in form of 3AC~\cite{sootsurvivor}.
 Every step adds or removes some flow edges,
-as described exhaustively in Table \ref{table:tac}.
+as described exhaustively in Table~\ref{tab:tac}.
 The relationship between the graph and the \q{lvalue}/\q{rvalue} terminology
-in Table \ref{table:tac} are explained in Table \ref{table:lrvalue}.
+in Table~\ref{tab:tac} are explained in Table~\ref{tab:lrvalue}.
 
 The \emph{branch} operation performs a deep clone of the LFG
 and continues following each branch with its clone.
@@ -129,7 +129,7 @@ hence inferring the sensitive value that determined the branch halting problem.
 		Method call & Same effect as assigning call result to a sink variable.
 		\\ \hline
 	\end{tabular}
-	\label{table:tac}
+	\label{tab:tac}
 \end{table}
 
 \begin{table}
@@ -162,15 +162,15 @@ hence inferring the sensitive value that determined the branch halting problem.
 		Method/constructor call & \q{Return} of the called method & \q{Return} of the called method
 		\\ \hline
 	\end{tabular}
-	\label{table:lrvalue}
+	\label{tab:lrvalue}
 \end{table}
 
 In traditional information flow analysis,
 this naive approach described in the table appears to result in high false positive rate
 as it does not separate the internal structure used by instance fields and arrays.
-For example, consider Listing \ref{lst:traditional-false-positive}
-(Jimple code in Listing \ref{lst:traditional-false-positive-jimple}).
-At return point, the LFG becomes as shown in Figure \ref{fig:tfp-graph}.
+For example, consider Listing~\ref{lst:traditional-false-positive}
+(Jimple code in Listing~\ref{lst:traditional-false-positive-jimple}).
+At return point, the LFG becomes as shown in Figure~\ref{fig:tfp-graph}.
 Intuitively, this appears incorrect;
 param \#0 does not flow to \code{return}
 since it is just used for \code{this.bar} but not \code{this.qux}.
@@ -185,7 +185,7 @@ Recall the definition of an edge in the LFG used in this project,
 where $a \to b$ implies $b$ must to be protected if $a$ is protected.
 
 \begin{figure}
-	\caption{LFG of \code{TraditionalFalsePositive.foo(int)} in Listing \ref{lst:traditional-false-positive}}
+	\caption{LFG of \code{TraditionalFalsePositive.foo(int)} in Listing~\ref{lst:traditional-false-positive}}
 	\begin{center}
 		\digraph[scale=0.5]{local}{
 			rankdir = "LR";

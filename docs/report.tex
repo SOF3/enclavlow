@@ -41,19 +41,19 @@
 \date{28 October 2020}
 
 
-\def\IncludeCode#1#2#3{
+\newcommand{\IncludeCode}[3]{
 	% \begin{minipage}{\linewidth}
 		\lstinputlisting[style=j, language=java, float,label={#1}, caption={#3}]{#2}
 	% \end{minipage}
 }
 
-\def\q#1{\enquote{#1}}
+\newcommand{\q}[1]{\enquote{#1}}
 
-\def\pname{\emph{enclavlow}}
+\newcommand{\pname}{\emph{enclavlow}}
 
 \definecolor{code}{rgb}{0.95, 0.95, 0.95}
 \sethlcolor{code}
-\def\code#1{\colorbox{code}{\texttt{\footnotesize #1}}}
+\newcommand{\code}[1]{\colorbox{code}{\texttt{\footnotesize #1}}}
 
 \begin{document}
 % title page
@@ -74,11 +74,10 @@
 	\lstlistoflistings
 \end{multicols}
 
-% Main body
+% main body
 \setcounter{page}0
 \newpage
 
-% \begin{multicols}2
 \input{abbr}
 
 \setlength\parskip{1.3em}
@@ -97,8 +96,7 @@
 \addcontentsline{toc}{section}{References}
 \begin{multicols}2
 	\bibliographystyle{acm}
-	\bibliography{cite.bib}{}
+	\bibliography{cite}
 \end{multicols}
-% \end{multicols}
 
 \end{document}
