@@ -69,7 +69,8 @@ private fun rvalueNodesImpl(flow: LocalFlow, value: Value): Sequence<Node> = seq
             yieldAll(rvalueNodesImpl(flow, value.size))
         }
         is NewExpr -> {
-            // constructing an object without calling any constructors does not leak anything
+            // constructing an object without invoking the constructor does not leak anything
+            // soot will pass another InvokeExpr when the constructor is called
         }
         is InvokeExpr -> {
             if (value.method.declaringClass.name == "io.github.sof3.enclavlow.api.Enclavlow") {
@@ -79,7 +80,7 @@ private fun rvalueNodesImpl(flow: LocalFlow, value: Value): Sequence<Node> = seq
                 } else if (method == "sinkMarker" || method.endsWith("SinkMarker")) {
                     for (arg in value.args) {
                         for (node in rvalueNodes(flow, arg)) {
-                            flow.graph.touch(node, ExplicitSinkNode)
+                            flow.graph.touch(node, ExplicitSinkNode, "Sink marker")
                         }
                     }
                 } else {

@@ -25,4 +25,13 @@ class BranchLeakTests {
     fun controlReset() = testMethod<BranchLeak>("controlReset" to makeContract(CallTags.UNSPECIFIED, 1) {
         // there should be nothing leaked
     })
+
+    @Test
+    fun switchMux() = testMethod<BranchLeak>("switchMux" to makeContract(CallTags.UNSPECIFIED, 5) {
+        ParamNode(0) into ReturnNode
+        ParamNode(1) into ReturnNode
+        ParamNode(2) into ReturnNode
+        ParamNode(3) into ReturnNode
+        ParamNode(4) into ReturnNode
+    })
 }

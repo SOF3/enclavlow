@@ -1,5 +1,6 @@
 package io.github.sof3.enclavlow.cases;
 
+@SuppressWarnings("unused")
 public class LoopLeak {
     public static int loopAssign(int i) {
         int a = 0;

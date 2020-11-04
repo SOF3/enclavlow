@@ -20,7 +20,7 @@ sealed class PublicNode : Node() {
  */
 object ReturnNode : PublicNode() {
     override val name: String
-        get() = "<return>"
+        get() = "return"
 }
 
 /**
@@ -28,7 +28,7 @@ object ReturnNode : PublicNode() {
  */
 object ThrowNode : PublicNode() {
     override val name: String
-        get() = "<throw>"
+        get() = "throw"
 }
 
 /**
@@ -38,7 +38,7 @@ object ThrowNode : PublicNode() {
  */
 object StaticNode : PublicNode() {
     override val name: String
-        get() = "<static>"
+        get() = "static"
 }
 
 /**
@@ -54,7 +54,7 @@ object ThisNode : PublicNode() {
  */
 class ParamNode(private val index: Int) : PublicNode() {
     override val name: String
-        get() = "param#$index"
+        get() = "param$index"
 
     override fun equals(other: Any?) = other is ParamNode && index == other.index
 
@@ -86,10 +86,6 @@ sealed class PrivateNode : Node()
  * Data from/to a variable with jimple name `name`
  */
 class LocalVarNode(val name: String) : PrivateNode() {
-    init {
-        println("Constructed $name")
-    }
-
     override fun toString() = name
 
     override fun equals(other: Any?) = other is LocalVarNode && name == other.name
@@ -100,19 +96,14 @@ class LocalVarNode(val name: String) : PrivateNode() {
 /**
  * Flows to ControlFlow indicates the current control flow contains data
  */
-class ControlNode(val parent: ControlNode?, private val branchId: Int) : PrivateNode() {
+class ControlNode : PrivateNode() {
+    private val id = count++
+
     override fun toString(): String {
-        val stack = mutableListOf<Int>()
-        getStack(stack)
-        return "<control ${stack.joinToString(".")}>"
+        return "control$id"
     }
 
-    private fun getStack(list: MutableList<Int>) {
-        parent?.getStack(list)
-        list.add(branchId)
+    companion object {
+        private var count = 0
     }
-
-    override fun equals(other: Any?) = this === other
-
-    override fun hashCode() = System.identityHashCode(this)
 }

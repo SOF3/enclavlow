@@ -9,8 +9,8 @@ fun <T : Any> indexedSetOf(vararg values: T): IndexedSet<T> {
 }
 
 class IndexedSet<T : Any> internal constructor(
-    private val values: MutableList<T> = mutableListOf<T>(),
-    private val index: MutableMap<T, Int> = mutableMapOf<T, Int>(),
+    private val values: MutableList<T> = mutableListOf(),
+    private val index: MutableMap<T, Int> = mutableMapOf(),
 ) : Iterable<T>, Cloneable {
     fun addIfMissing(value: T): Boolean {
         if (index.containsKey(value)) return false
@@ -51,7 +51,7 @@ class IndexedSet<T : Any> internal constructor(
 
     override fun hashCode() = throw NotImplementedError()
 
-    override fun toString() = "IndexedSet{$values}"
+    override fun toString() = "{$values}"
 
     public override fun clone() = IndexedSet<T>(values.toMutableList(), index.toMutableMap())
 }
@@ -72,4 +72,8 @@ inline fun <K, V> MutableMap<K, V>.getOrFill(k: K, fill: () -> V): V {
     val value = fill()
     this[k] = value
     return value
+}
+
+inline fun alwaysAssert(cond: Boolean, message: () -> String) {
+    if (!cond) throw AssertionError(message())
 }
