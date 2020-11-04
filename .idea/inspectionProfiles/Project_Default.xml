@@ -1,0 +1,16 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="AndroidLintUnknownNullness" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="EmptyStatementBody" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="m_reportEmptyBlocks" value="true" />
+      <option name="commentsAreContent" value="true" />
+    </inspection_tool>
+    <inspection_tool class="HasPlatformType" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="reportPlatformArguments" value="true" />
+    </inspection_tool>
+    <inspection_tool class="LatexMissingImport" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="numberOfIndexedUsePackages" value="21" />
+    </inspection_tool>
+  </profile>
+</component>

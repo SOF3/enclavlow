@@ -2,7 +2,11 @@ build
 bin
 *.class
 .gradle
-.idea
+.idea/*
 sootOutput
 *.jar
 *.jimple
+!.idea/jsonSchemas.xml
+!.idea/codeStyles
+!.idea/inspectionProfiles
+!.idea/scopes

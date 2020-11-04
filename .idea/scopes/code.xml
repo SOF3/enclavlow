@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="code" pattern="src[enclavlow.api.main]:edu.hku.cs.uranus..*||src[enclavlow.core.main]:io.github.sof3.enclavlow..*||src[enclavlow.plugin.main]:io.github.sof3.enclavlow.plugin..*||test[enclavlow.core.test]:io.github.sof3.enclavlow.cases..*||test[enclavlow.core.test]:io.github.sof3.enclavlow.tests..*" />
+</component>
