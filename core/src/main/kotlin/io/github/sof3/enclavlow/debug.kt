@@ -24,9 +24,10 @@ object DebugOutput {
 
         if (counter > 10000) throw Error("Too many debug messages; possible infinite loop?")
 
-        for (line in message.split("\n")) {
+        val time = "[%+.3f] ".format((System.nanoTime() - EPOCH) / 1e6f)
+        for ((i, line) in message.split("\n").withIndex()) {
             print(getIndent())
-            print("[%+.3f] ".format((System.nanoTime() - EPOCH) / 1e6f))
+            print(if (i == 0) time else " ".repeat(time.length))
             println(line)
         }
 

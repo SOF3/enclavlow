@@ -6,7 +6,7 @@ plugins {
 
 val compileKotlin: KotlinCompile by tasks
 compileKotlin.kotlinOptions.apply {
-    jvmTarget = "1.8"
+    jvmTarget = "1.6"
 }
 
 dependencies {
@@ -19,6 +19,6 @@ dependencies {
 
 tasks.test {
     useJUnit {
-        setForkEvery(1)
+//        setForkEvery(1)
     }
 }

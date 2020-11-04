@@ -44,7 +44,7 @@ sealed class DiGraph<T : Any>(
     override fun hashCode() = throw NotImplementedError()
 
     override fun toString(): String {
-        return toGraphviz("DirGraph${System.identityHashCode(this)}", {
+        return toGraphviz("DiGraph${System.identityHashCode(this)}", {
             val ret = mutableListOf(
                 "label" to it.toString(),
                 "color" to ("#" + it.javaClass.hashCode().toString(16).padStart(6, '0').substring(0, 6))
