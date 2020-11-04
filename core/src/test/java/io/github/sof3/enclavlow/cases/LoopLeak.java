@@ -1,7 +1,5 @@
 package io.github.sof3.enclavlow.cases;
 
-import edu.hku.cs.uranus.IntelSGXOcall;
-
 @SuppressWarnings("unused")
 public class LoopLeak {
     public static int loopAssign(int i) {

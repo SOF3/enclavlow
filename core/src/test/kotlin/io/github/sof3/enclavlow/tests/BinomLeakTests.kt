@@ -7,7 +7,7 @@ import io.github.sof3.enclavlow.cases.BinomLeak
 import io.github.sof3.enclavlow.makeContract
 import kotlin.test.Test
 
-class BinomLeak {
+class BinomLeakTests {
     @Test
     fun binomPlus() = testMethod<BinomLeak>("binomPlus", makeContract(CallTags.UNSPECIFIED, 2) {
         ParamNode(0) into ReturnNode
