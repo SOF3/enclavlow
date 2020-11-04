@@ -15,8 +15,6 @@ infix fun Edge?.graphEquals(other: Any?): Boolean {
     return (this == null) == (other == null)
 }
 
-private val findSourceStack = ThreadLocal.withInitial { mutableSetOf<Int>() }
-
 sealed class DiGraph<T : Any>(
     nodes: IndexedSet<T>,
     edges: MutableList<MutableList<Edge?>>,

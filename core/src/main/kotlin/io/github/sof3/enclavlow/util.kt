@@ -53,17 +53,7 @@ class IndexedSet<T : Any> internal constructor(
 
     override fun toString() = "{$values}"
 
-    public override fun clone() = IndexedSet<T>(values.toMutableList(), index.toMutableMap())
-}
-
-inline fun <T, reified U : T> Set<T>.subtype(): Set<U>? {
-    for (item in this) {
-        if (item !is U) {
-            return null
-        }
-    }
-    @Suppress("UNCHECKED_CAST")
-    return this as Set<U>
+    public override fun clone() = IndexedSet(values.toMutableList(), index.toMutableMap())
 }
 
 inline fun <K, V> MutableMap<K, V>.getOrFill(k: K, fill: () -> V): V {

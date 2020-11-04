@@ -3,6 +3,7 @@ package io.github.sof3.enclavlow.cases;
 import static io.github.sof3.enclavlow.api.Enclavlow.intSinkMarker;
 import static io.github.sof3.enclavlow.api.Enclavlow.intSourceMarker;
 
+@SuppressWarnings("unused")
 public class MarkerLeak {
     public static int returnSource() {
         return intSourceMarker(1);

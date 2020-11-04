@@ -16,6 +16,7 @@ public class BranchLeak {
         }
     }
 
+    @SuppressWarnings("SameReturnValue")
     public static int controlReset(boolean cond) {
         if (cond) {
             /* no-op */

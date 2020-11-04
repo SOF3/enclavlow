@@ -4,6 +4,7 @@
  * @internal This class is semver-exempt. Do not call directly.
  */
 @file:JvmName("Enclavlow")
+@file:Suppress("unused")
 
 package io.github.sof3.enclavlow.api
 
