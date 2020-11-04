@@ -10,12 +10,14 @@ object DebugOutput {
     private fun getIndent() = tags.lastOrNull() ?: ""
 
     fun pushTag(tag: String) {
+        if (!IS_DEBUG) return
         print(getIndent())
         println("{$tag}")
         tags.add("  ".repeat(tags.size + 1))
     }
 
     fun popTag() {
+        if (!IS_DEBUG) return
         tags.removeLast()
     }
 

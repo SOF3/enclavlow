@@ -1,9 +1,10 @@
+@SuppressWarnings("unused")
 class TraditionalFalsePositive{
 	Bar bar;
 	Qux qux;
 
-	Qux foo(int y) {
-		this.bar.x = y;
+	Qux foo(int x) {
+		this.bar.x = x;
 		return this.qux;
 	}
 

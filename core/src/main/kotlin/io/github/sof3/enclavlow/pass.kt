@@ -9,7 +9,7 @@ import soot.options.Options
 import soot.tagkit.VisibilityAnnotationTag
 import soot.toolkits.graph.ExceptionalUnitGraph
 
-inline fun analyzeClass(
+inline fun analyzeMethod(
     className: String,
     methodName: String,
     methodNameType: MethodNameType,

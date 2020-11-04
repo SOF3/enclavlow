@@ -42,24 +42,32 @@ sealed class DiGraph<T : Any>(
     override fun hashCode() = throw NotImplementedError()
 
     override fun toString(): String {
-        return toGraphviz("DiGraph${System.identityHashCode(this)}", {
+        return toGraphviz("DiGraph${System.identityHashCode(this)}")
+    }
+
+    /**
+     * Returns a string in Graphviz DOT format representing this graph
+     */
+    inline fun toGraphviz(
+        name: String,
+        graphAttr: List<Pair<String, String>> = emptyList(),
+        nodeAttr: (T) -> List<Pair<String, String>> = {
             val ret = mutableListOf(
                 "label" to it.toString(),
                 "color" to ("#" + it.javaClass.hashCode().toString(16).padStart(6, '0').substring(0, 6))
             )
             if (it is ControlNode) ret.add("fillColor" to "lightblue")
             ret
-        }, { _, _, edge ->
+        },
+        edgeAttr: (T, T, Edge) -> List<Pair<String, String>> = { _, _, edge ->
             listOf("label" to edge.causes.joinToString(", "))
-        })
-    }
-
-    /**
-     * Returns a string in Graphviz DOT format representing this graph
-     */
-    private inline fun toGraphviz(name: String, nodeAttr: (T) -> List<Pair<String, String>>, edgeAttr: (T, T, Edge) -> List<Pair<String, String>>): String {
+        },
+    ): String {
         val ret = StringBuilder()
         ret.appendLine("digraph $name {")
+        for ((k, v) in graphAttr) {
+            ret.appendLine("\t $k = \"$v\";")
+        }
         for ((i, node) in nodes.withIndex()) {
             val attrs = nodeAttr(node)
             val attrString = attrs.map { (k, v) -> "$k = \"$v\"" }
