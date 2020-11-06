@@ -23,19 +23,26 @@ while in our definition, the adversary possesses write access to $x$.
 
 \subsubsection{\acf{CFG}}
 \pname{} adopts an approach where a \ac{CFG} is constructed for each method analyzed.
-The \ac{CFG} contains the following nodes:
-\begin{itemize}
-	\item \q{Static}: Represents data located in static class fields
-	\item \q{This}: Represents the object on which a method was invoked
-	\item \q{Param $x$}: Each parameter is represented by a node
-	\item \q{Return}: Represents data flow through the return path
-	\item \q{Throw}: Represents data flow through the return path
-	\item \q{Source}: Represents variables in the method explicitly wrapped in \code{sourceMarker}
-	\item \q{Sink}: Represents locals in the method explicitly declared as \code{sinkMarker}
-	\item \q{Control}: This is a special node representing how many times the function is called.
-	\item \q{This}, \q{Param $y$}, \q{Return}, \q{Throw} and \q{Control}
-		from each function called from the current node
-\end{itemize}
+The \ac{CFG} contains the nodes listed in Table \ref{tab:cfg-nodes}.
+
+\begin{table}
+	\caption{Nodes in \ac{CFG}}
+	\centering
+	\begin{tabular}{|c|c|}
+		\hline
+		Static & Represents data located in static class fields \\ \hline
+		This & Represents the object on which a method was invoked \\ \hline
+		Param $x$ & Each parameter is represented by a node \\ \hline
+		Return & Represents data flow through the return path \\ \hline
+		Throw & Represents data flow through the return path \\ \hline
+		Source & Represents variables in the method explicitly wrapped in \code{sourceMarker} \\ \hline
+		Sink & Represents locals in the method explicitly declared as \code{sinkMarker} \\ \hline
+		Control & This is a special node representing how many times the function is called. \\ \hline
+		This & \q{Param $y$}, \q{Return}, \q{Throw} and \q{Control}
+		from each function called from the current node \\ \hline
+	\end{tabular}
+	\label{tab:cfg-nodes}
+\end{table}
 
 After all methods in a class are evaluated,
 the CFGs of child methods called from the analyzed methods
@@ -49,8 +56,8 @@ the exact subclasses that could be passed.
 In case multiple subclasses are possible,
 their contract graphs are merged by taking the union of all flow edges.
 
-See Figure~\ref{fig:SourceSinkContract} for an example of \ac{AFG},
-with unconnected nodes omitted.
+See Figure~\ref{fig:SourceSinkContract} for an example of \ac{AFG}.
+Unconnected nodes are omitted for brevity.
 
 \begin{figure}
 	\caption{Example \ac{CFG} for Listing~\ref{lst:SourceSinkExample}}
@@ -58,16 +65,23 @@ with unconnected nodes omitted.
 		\digraph[scale=0.5]{contract}{
 			rankdir = "LR";
 			getSumParam0[label = "getSum\noexpand\n param \#0"];
+			getSumControl[label = "getSum\noexpand\n control"];
 			parseParam0[label = "parse\noexpand\n param \#0"];
 			parseReturn[label = "parse\noexpand\n return"];
+			parseControl[label = "parse\noexpand\n control"];
 			computeSumParam0[label = "computeSum\noexpand\n param \#0"];
 			computeSumReturn[label = "computeSum\noexpand\n return"];
+			computeSumControl[label = "computeSum\noexpand\n control"];
+			Source -> parseReturn [color = "red"];
+			parseReturn -> computeSumParam0 [color = "red"];
+			computeSumParam0 -> computeSumReturn [color = "red"];
+			computeSumReturn -> Sink [color = "red"];
 			getSumParam0 -> parseParam0;
 			parseParam0 -> parseReturn;
-			"Source" -> parseReturn;
-			parseReturn -> computeSumParam0;
-			computeSumParam0 -> computeSumReturn;
-			computeSumReturn -> "Sink";
+			parseControl -> parseReturn;
+			computeSumControl -> computeSumReturn;
+			getSumControl -> parseControl;
+			getSumControl -> computeSumControl;
 			}
 	\end{center}
 	\label{fig:SourceSinkContract}
@@ -86,11 +100,11 @@ The \ac{LFG} extends the \ac{CFG} with the following additions:
 	\item Each branch has its own \q{control} node.
 \end{itemize}
 
-The \emph{consume} operation consumes statements in form of \ac{3AC}~\cite{sootsurvivor}.
+The \emph{consume} operation consumes statements in form of \acf{3AC}~\cite{sootsurvivor}.
 Every step adds or removes some flow edges,
 as described exhaustively in Table~\ref{tab:tac}.
-The relationship between the graph and the \q{lvalue}/\q{rvalue} terminology
-in Table~\ref{tab:tac} are explained in Table~\ref{tab:lrvalue}.
+The relationship between the graph and the \q{lvalue}s and \q{rvalue}s
+mentioned in Table~\ref{tab:tac} are explained in Table~\ref{tab:lrvalue}.
 
 The \emph{branch} operation performs a deep clone of the \ac{LFG}
 and continues following each branch with its clone.
