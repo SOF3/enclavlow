@@ -8,3 +8,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: ./gradlew core:test --info
+      - run: git clone git@github.com:SOF3/enclavlow gh-pages -b gh-pages
+      - run: "rm -rf gh-pages/tests/core/${{github.branch}} || true"
+      - run: cp -r core/build/reports/tests/test gh-pages/tests/core/${{github.branch}}
+      - run: 'git -c "user.email=41898282+github-actions[bot]@users.noreply.github.com" commit -m "Update tests for "${{github.sha}}'
+        working-directory: gh-pages
+      - run: git push
+        working-directory: gh-pages
