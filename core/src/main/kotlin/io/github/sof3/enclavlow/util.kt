@@ -65,7 +65,7 @@ inline fun <K, V> MutableMap<K, V>.getOrFill(k: K, fill: () -> V): V {
 }
 
 inline fun <T : Any, R> T?.notNull(fn: (T) -> R) {
-    if(this != null) {
+    if (this != null) {
         fn(this)
     }
 }
