@@ -1,7 +1,7 @@
-package io.github.sof3.enclavlow.cases;
+package io.github.sof3.enclavlow.cases.lfg;
 
 @SuppressWarnings("unused")
-public class AssignLeak {
+public class AssignCase {
     public static int paramToReturn(int x) {
         return x;
     }

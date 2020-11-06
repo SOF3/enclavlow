@@ -1,7 +1,7 @@
-package io.github.sof3.enclavlow.cases;
+package io.github.sof3.enclavlow.cases.lfg;
 
 @SuppressWarnings("unused")
-public class BranchLeak {
+public class BranchCase {
     public static int conditionalAssign(boolean cond) {
         int ret = 3;
         if (cond) {
