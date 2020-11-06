@@ -64,6 +64,12 @@ inline fun <K, V> MutableMap<K, V>.getOrFill(k: K, fill: () -> V): V {
     return value
 }
 
+inline fun <T : Any, R> T?.notNull(fn: (T) -> R) {
+    if(this != null) {
+        fn(this)
+    }
+}
+
 inline fun alwaysAssert(cond: Boolean, message: () -> String) {
     if (!cond) throw AssertionError(message())
 }

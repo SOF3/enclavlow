@@ -79,6 +79,8 @@ object ExplicitSinkNode : PublicNode() {
         get() = "<sink>"
 }
 
+class ProxyNode(override val name: String) : PublicNode()
+
 /**
  * A private node only considered within method local analysis
  */

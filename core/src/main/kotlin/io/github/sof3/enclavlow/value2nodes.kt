@@ -9,6 +9,7 @@ import soot.jimple.CastExpr
 import soot.jimple.CaughtExceptionRef
 import soot.jimple.Constant
 import soot.jimple.InstanceFieldRef
+import soot.jimple.InstanceInvokeExpr
 import soot.jimple.InstanceOfExpr
 import soot.jimple.InvokeExpr
 import soot.jimple.NewArrayExpr
@@ -91,7 +92,23 @@ private fun rvalueNodesImpl(flow: LocalFlow, value: Value): Sequence<Node> = seq
                     yieldAll(rvalueNodesImpl(flow, arg))
                 }
             } else {
-                // TODO
+                val call = createFnCall(value.method) // TODO specialize for polymorphism
+                for(node in call.allNodes()) {
+                    flow.graph.addNodeIfMissing(node)
+                }
+                // TODO handle ThrowNode
+                for((i, arg) in value.args.withIndex()) {
+                    for(sourceNode in rvalueNodes(flow, arg)) {
+                        flow.graph.touch(sourceNode, call.params[i], "Call param")
+                    }
+                }
+                if(value is InstanceInvokeExpr) {
+                    for(sourceNode in rvalueNodes(flow, value.base)) {
+                        flow.graph.touch(sourceNode, call.thisNode!!, "Call context")
+                    }
+                }
+                flow.graph.touch(flow.control, call.controlNode, "Call condition")
+                yield(call.returnNode)
             }
         }
         is CastExpr -> {

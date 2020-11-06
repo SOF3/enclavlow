@@ -1,5 +1,7 @@
 package io.github.sof3.enclavlow
 
+import soot.SootMethod
+import soot.Value
 import soot.jimple.BreakpointStmt
 import soot.jimple.DefinitionStmt
 import soot.jimple.GotoStmt
@@ -47,6 +49,10 @@ class SenFlow(
         out.locals = mutableMapOf<String, LocalVarNode>().apply {
             putAll(in1.locals)
             putAll(in2.locals)
+        }
+        out.calls = mutableListOf<FnCall>().apply {
+            addAll(in1.calls)
+            addAll(in2.calls)
         }
 
         out.finalizers.addAll(in1.finalizers union in2.finalizers)
@@ -112,33 +118,7 @@ class SenFlow(
                 val left = stmt.leftOp
                 val right = stmt.rightOp
 
-                val leftNodesDelete = lvalueNodes(input, left, LvalueUsage.DELETION)
-
-                for (remove in leftNodesDelete.lvalues) {
-                    output.graph.deleteAllSources(remove)
-                }
-
-                // precompute the nodes to avoid mutations on output from affecting node searches
-                val leftNodes = lvalueNodes(output, left, LvalueUsage.ASSIGN)
-                val rightNodes = rvalueNodes(output, right)
-                val leftRight = rvalueNodes(output, left)
-                val rightLeft = lvalueNodes(output, right, LvalueUsage.ASSIGN)
-
-                for (leftNode in leftNodes.lvalues) {
-                    for (rightNode in rightNodes) {
-                        output.graph.touch(rightNode, leftNode, "Assignment")
-                    }
-                    for (rightNode in leftNodes.rvalues) {
-                        output.graph.touch(rightNode, leftNode, "Assignment\\nSide effect")
-                    }
-                    output.graph.touch(output.control, leftNode, "Assignment\\nCondition")
-                }
-
-                for (leftNode in rightLeft.lvalues) {
-                    for (rightNode in leftRight) {
-                        output.graph.touch(rightNode, leftNode, "Assignment\\nBack flow")
-                    }
-                }
+                handleAssign(output, left, right)
             }
             is IfStmt, is SwitchStmt -> {
                 val cond = when (stmt) {
@@ -191,17 +171,48 @@ class SenFlow(
     }
 }
 
+fun handleAssign(output: LocalFlow, left: Value, right: Value) {
+    val leftNodesDelete = lvalueNodes(output, left, LvalueUsage.DELETION)
+
+    for (remove in leftNodesDelete.lvalues) {
+        output.graph.deleteAllSources(remove)
+    }
+
+    // precompute the nodes to avoid mutations on output from affecting node searches
+    val leftNodes = lvalueNodes(output, left, LvalueUsage.ASSIGN)
+    val rightNodes = rvalueNodes(output, right)
+    val leftRight = rvalueNodes(output, left)
+    val rightLeft = lvalueNodes(output, right, LvalueUsage.ASSIGN)
+
+    for (leftNode in leftNodes.lvalues) {
+        for (rightNode in rightNodes) {
+            output.graph.touch(rightNode, leftNode, "Assignment")
+        }
+        for (rightNode in leftNodes.rvalues) {
+            output.graph.touch(rightNode, leftNode, "Assignment\\nSide effect")
+        }
+        output.graph.touch(output.control, leftNode, "Assignment\\nCondition")
+    }
+
+    for (leftNode in rightLeft.lvalues) {
+        for (rightNode in leftRight) {
+            output.graph.touch(rightNode, leftNode, "Assignment\\nBack flow")
+        }
+    }
+}
+
 fun newLocalFlow(paramCount: Int): LocalFlow {
     val params = List(paramCount) { ParamNode(it) }
     val control = ControlNode()
     val graph = makeLocalFlowGraph(params + control)
-    return LocalFlow(graph, control, mutableMapOf(), params)
+    return LocalFlow(graph, control, mutableMapOf(), mutableListOf(), params)
 }
 
 class LocalFlow(
     val graph: LocalFlowGraph,
     var control: ControlNode,
     var locals: MutableMap<String, LocalVarNode>,
+    var calls: MutableList<FnCall>,
     var params: List<ParamNode>,
 ) {
     var finalizers = ArrayDeque<(LocalFlow) -> Unit>()
@@ -228,6 +239,7 @@ class LocalFlow(
     infix fun copyTo(dest: LocalFlow) {
         graph copyTo dest.graph
         dest.locals = locals
+        dest.calls = calls
         dest.params = params
         dest.control = control
 //        dest.control = ControlNode() // construct a new instance in case it's overwritten (?)
@@ -246,8 +258,41 @@ class LocalFlow(
     override fun equals(other: Any?): Boolean {
         if (other !is LocalFlow) return false
         if (graph.filterNodes { it !is ControlNode } != other.graph.filterNodes { it !is ControlNode }) return false
-        return params == other.params && locals == other.locals
+        return params == other.params && locals == other.locals && calls == other.calls
     }
 
     override fun hashCode() = throw UnsupportedOperationException("LocalFlow is not hashable")
+}
+
+data class FnIden(
+    val declClass: String,
+    val subSig: String,
+)
+
+data class FnCall(
+    val iden: FnIden,
+    val params: List<ProxyNode>,
+    val thisNode: ProxyNode?,
+    val returnNode: ProxyNode,
+    val throwNode: ProxyNode,
+    val controlNode: ProxyNode,
+) {
+    fun allNodes() = sequence {
+        yieldAll(params)
+        thisNode.notNull {
+            yield(it)
+        }
+        yield(returnNode)
+        yield(throwNode)
+    }
+}
+
+fun createFnCall(method: SootMethod): FnCall {
+    val iden = FnIden(method.declaringClass.name, method.subSignature)
+    val params = List(method.parameterCount) { ProxyNode("<$iden>\nparam $it") }
+    val thisNode = if (method.isStatic) null else ProxyNode("<$iden>\nthis")
+    val returnNode = ProxyNode("<$iden>\nreturn")
+    val throwNode = ProxyNode("<$iden>\nthrow")
+    val controlNode = ProxyNode("<$iden>\ncontrol")
+    return FnCall(iden, params, thisNode, returnNode, throwNode, controlNode)
 }
