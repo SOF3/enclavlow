@@ -1,5 +1,5 @@
 @SuppressWarnings("unused")
-class TraditionalFalsePositive{
+class IagoAttack{
 	Bar bar;
 	Qux qux;
 

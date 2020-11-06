@@ -6,40 +6,40 @@ such as AWS~\cite{aws} and Microsoft Azure~\cite{azure},
 there is increasing demand for trusted execution where
 applications are protected from
 attackers with privileged access to the hardware or software.
-Modern hardware offer TEE technologies,
-such as SGX in Intel CPUs,
+Modern hardware offer \ac{TEE} technologies,
+such as \ac{SGX} in Intel CPUs,
 with which trusted execution code and sensitive data
 are processed in secure \q{enclaves},
 which is protected at hardware level to prevent access
 from other hardware or software layers.
 
-One significant application of TEEs is in big data processing,
+One significant application of \ac{TEE} is in big data processing,
 where confidential user data are processed,
 and protection from cloud providers may be necessary
 for complianc with privacy regulations such as GDPR~\cite{gdpr}.
 However, a significant subset of such applications are written
-using languages that use JVM as the runtime,
+using languages that use \ac{JVM} as the runtime,
 such as Hadoop~\cite{apachehadoop} and Spark~\cite{apachespark}
 Recently, Uranus, a system for
-writing SGX applications in Java languages, was released~\cite{uranus}.
-It provides simple interface for SGX,
+writing \ac{SGX} applications in Java languages, was released~\cite{uranus}.
+It provides simple interface for \ac{SGX},
 where users annotate methods with \code{@JECall} and \code{@JOCall}
 to move control flow into or out of enclaves.
 It is the responsibility of the user to determine the correct positions
 for the \code{@JECall} and \code{@JOCall} annotations,
 namely the enclave boundary partitioning.
-Since JVM, compared to native applications running on the CPU,
+Since \ac{JVM}, compared to native applications running on the CPU,
 involves an entirely different approach
 with regard to software development and distribution,
-the tools applicable for native applications are mostly incompatible with JVM,
+the tools applicable for native applications are mostly incompatible with \ac{JVM},
 introducing the corresponding new research areas.
 
-Running the whole application within an SGX enclave is undesirable for two reasons.
+Running the whole application within an \ac{SGX} enclave is undesirable for two reasons.
 First, this violates the principle of least privilege,
 where the whole application becomes possible attack surface
 for adversaries to compromise protected data~\cite{glamdring}.
 Second, this implies all memory used by the application
-are placed in the enclave memory (the EPC),
+are placed in the enclave memory (the \ac{EPC}),
 which is restricted to 100 MB before significant performance degrading
 (\q{1,000X slowdown compared to regular OS paging})~\cite{uranus}.
 On the other hand, if the enclave is smaller than necessary,
@@ -73,11 +73,11 @@ and generates the report for the analysis from those classes.
 
 \subsection{Prior art}\label{subsec:prior-art}
 Information flow analysis is not a new technology in the field.
-While this project analyzes JVM code using SGX enclaves,
+While this project analyzes \ac{JVM} code using \ac{SGX} enclaves,
 prior research on \emph{native} code \emph{automatic partition} was found.
 
 Glamdring~\cite{glamdring} is a C framework that
-automatically selects the minimal SGX enclave boundaries
+automatically selects the minimal \ac{SGX} enclave boundaries
 based on user requirements specified through C pragma directives.
 However, since the process is fully automated,
 it has a lower tolerance of false positives,
@@ -85,7 +85,7 @@ which increases the risk of unintentional data leak.
 This project, unlike Glamdring, will only perform analysis but not automatic partitioning,
 allowing for greater false positive tolerance.
 
-Phosphor~\cite{BellJonathan2014Pidd} is a DTA framework
+Phosphor~\cite{BellJonathan2014Pidd} is a \ac{DTA} framework
 that modifies Java bytecode to add tags to sensitive data at runtime
 and check if such tags are leaked.
 Although dynamic taint is more accurate,

@@ -10,7 +10,7 @@ are not focus areas of this project, and hence will not be discussed further.
 
 \subsection{System Requirements}\label{subsec:system-requirements}
 The logical code of this project is mostly implemented in Kotlin,
-a JVM language with more concise syntax than Java.
+a \ac{JVM} language with more concise syntax than Java.
 However, to ensure that he behaviour analyzed
 is as explicit as possible,
 all test cases are written in Java.
@@ -31,14 +31,14 @@ such as Maven plugins, IDE plugins, etc.
 \subsection{Flow analysis framework}\label{subsec:flow-analysis-framework}
 Soot~\cite{sootsurvivor} was selected as the framework for conducting flow analysis.
 Although multiple existing flow analysis systems using Soot alrady exist,
-they are not designed against SGX enclave protection,
+they are not designed against \ac{SGX} enclave protection,
 but \pname{} adopts more strict security policies
 to prevent attacks from more privileged attackers,
 unlike traditional information flow analysis
 that mostly detects user input as the source of insecurity.
 
 Soot takes Java bytecode files (\code{*.class}) as input
-and compiles them into a 3AC language called Jimple,
+and compiles them into a \ac{3AC} language called Jimple,
 which simplifies analysis work.
 The consume-branch-merge approach mentioned in the last subsection
 was inspired by the forward flow analysis interface in Jimple.

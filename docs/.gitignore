@@ -3,6 +3,8 @@
 *.aux
 *.bbl
 *.blg
+*.glo
+*.ist
 *.lof
 *.log
 *.lol

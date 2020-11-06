@@ -1,7 +1,7 @@
 \section{Results and Discussion}\label{sec:results-and-discussion}
 
 \subsection{Difficulties and Limitations}\label{subsec:difficulties-and-limitations}
-The principles of OOP imply that a method called may be swapped with another subclass
+The principles of \ac{OOP} imply that a method called may be swapped with another subclass
 that performs different actions than the current one.
 Although Uranus prevents the adversary
 from passing arbitrary malicious code into the enclave memory,
@@ -12,7 +12,7 @@ If \code{cs} is passed with a \code{substr} implementation
 that writes its parameters to a static variable,
 the function would leak the length of the security-sensitive secret,
 which is not desirable.
-To correctly solve the vulnerability of OOP substitution,
+To correctly solve the vulnerability of \ac{OOP} substitution,
 it is necessary to perform call graph analysis on the actual classes passed to the method,
 which involves more complex framework level work.
 
@@ -32,8 +32,8 @@ which are not going to be fixed because of the unlikeness of use.
 \IncludeCode{lst:known-false-positives}{./KnownFalsePositives.java}
 {Known false positives}
 
-It is also impossible to analyze further than the JNI level,
-since analyzing across JNI boundary implies
+It is also impossible to analyze further than the \ac{JNI} level,
+since analyzing across \ac{JNI} boundary implies
 the need to interact with a native analysis tool,
 which is entirely out of scope of this project.
 Since Uranus effectively denies system calls,
@@ -43,7 +43,7 @@ $\left\{ (p, \text{return}) : p \in \text{params} \right\}$.
 For the sake of consistency with Uranus,
 it was originally intended to expose \code{sourceMarker} and \code{sinkMarker}
 as annotations on local variables instead of method calls.
-However, JLS 9.6.1.2 explicitly stated that
+However, \ac{JLS} 9.6.1.2 explicitly stated that
 \q{an annotation on a local variable declaration
 is never retained in the binary representation}~\cite{jls},
 so a method call based approach is used instead.
@@ -53,7 +53,7 @@ multiple technical challenges were encountered when using Soot.
 Since Soot was designed to be a command line tool,
 it does not support direct calling from other environments very well.
 In particular, the entrypoint of Soot API is the \code{soot.Main.main()} method,
-which is the standard CLI interface in Java.
+which is the standard \ac{CLI} interface in Java.
 As a result, extra time is spent on clearing global states used by Soot.
 Furthermore, due to restrictions in the Soot framework,
 each tested Java method must be run in a separate JVM,

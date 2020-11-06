@@ -11,6 +11,16 @@
 \bookmarksetup{numbered}
 
 \usepackage{cite}
+\usepackage{acro}
+\acsetup{first-style=long-short}
+
+\newcommand{\acdef}[2]{
+	\DeclareAcronym{#1}{
+		short = #1,
+		long = #2
+	}
+}
+\input{abbr}
 
 \usepackage{listings}
 \lstdefinestyle{j}{
@@ -30,7 +40,7 @@
 
 \usepackage{fontspec}
 \setmainfont{TeX Gyre Termes}
-% \usepackage{sourcecodepro}
+\usepackage{sourcecodepro}
 
 \usepackage{csquotes}
 
@@ -72,14 +82,15 @@
 	\listoffigures
 	\listoftables
 	\lstlistoflistings
+
+	\printacronyms[
+		name = Abbreviations
+	]
 \end{multicols}
 
 % main body
 \setcounter{page}0
 \newpage
-
-\input{abbr}
-
 \setlength\parskip{1.3em}
 
 \input{intro}

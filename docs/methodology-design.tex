@@ -16,14 +16,14 @@ where each node represents an element that may be leaked.
 \end{defin}
 
 Note that this definition (\q{our definition}) differs slightly from
-the usual definition of flow graphs (especially in DTA),
+the usual definition of flow graphs (especially in \ac{DTA}),
 where an edge $(x, y)$ represents the flow of information from $x$ to $y$~\cite{YinHeng2007Pcsi}.
 In the usual definition, only adversary read access to $y$ is concerned,
 while in our definition, the adversary possesses write access to $x$.
 
-\subsubsection{Contract flow graph (CFG)}
-\pname{} adopts an approach where a CFG is constructed for each method analyzed.
-The CFG contains the following nodes:
+\subsubsection{\acf{CFG}}
+\pname{} adopts an approach where a \ac{CFG} is constructed for each method analyzed.
+The \ac{CFG} contains the following nodes:
 \begin{itemize}
 	\item \q{Static}: Represents data located in static class fields
 	\item \q{This}: Represents the object on which a method was invoked
@@ -40,20 +40,20 @@ The CFG contains the following nodes:
 After all methods in a class are evaluated,
 the CFGs of child methods called from the analyzed methods
 are lazily evaluated as well.
-All CFGs are merged into an aggregate flow graph (AFG),
+All CFGs are merged into an \ac{AFG},
 joined using the function call nodes.
 
-For the case of OOP polymorphism,
+For the case of \ac{OOP} polymorphism,
 call graph analysis is performed to identify
 the exact subclasses that could be passed.
 In case multiple subclasses are possible,
 their contract graphs are merged by taking the union of all flow edges.
 
-See Figure~\ref{fig:SourceSinkContract} for an example of AFG,
+See Figure~\ref{fig:SourceSinkContract} for an example of \ac{AFG},
 with unconnected nodes omitted.
 
 \begin{figure}
-	\caption{Example CFG for Listing~\ref{lst:SourceSinkExample}}
+	\caption{Example \ac{CFG} for Listing~\ref{lst:SourceSinkExample}}
 	\begin{center}
 		\digraph[scale=0.5]{contract}{
 			rankdir = "LR";
@@ -73,26 +73,26 @@ with unconnected nodes omitted.
 	\label{fig:SourceSinkContract}
 \end{figure}
 
-\subsubsection{Local flow graph (LFG)}
-To construct the CFG,
+\subsubsection{\acf{LFG}}
+To construct the \ac{CFG},
 a local graph is constructed.
 The analysis follows along the control flow of the program,
 performing the \emph{consume}, \emph{branch} and \emph{merge} operations.
 
-The LFG extends the CFG with the following additions:
+The \ac{LFG} extends the \ac{CFG} with the following additions:
 \begin{itemize}
 	\item Each local variable (some may exist as intermediate values in source code)
 		is allocated a node.
 	\item Each branch has its own \q{control} node.
 \end{itemize}
 
-The \emph{consume} operation consumes statements in form of 3AC~\cite{sootsurvivor}.
+The \emph{consume} operation consumes statements in form of \ac{3AC}~\cite{sootsurvivor}.
 Every step adds or removes some flow edges,
 as described exhaustively in Table~\ref{tab:tac}.
 The relationship between the graph and the \q{lvalue}/\q{rvalue} terminology
 in Table~\ref{tab:tac} are explained in Table~\ref{tab:lrvalue}.
 
-The \emph{branch} operation performs a deep clone of the LFG
+The \emph{branch} operation performs a deep clone of the \ac{LFG}
 and continues following each branch with its clone.
 
 The \emph{merge} operation pops the uppermost control flow node from the graph,
@@ -104,11 +104,11 @@ which is important for attacks that count the number of times a method was calle
 hence inferring the sensitive value that determined the branch halting problem.
 
 \begin{table}
-	\caption{3AC instructions affecting LFG}
+	\caption{\ac{3AC} instructions affecting \ac{LFG}}
 	\centering
 	\begin{tabular}{|c|l|}
 		\hline
-		\textbf{Instruction type} & \textbf{Effects on LFG}
+		\textbf{Instruction type} & \textbf{Effects on \ac{LFG}}
 		\\ \hline
 		\multirow4*{Assignment} & \q{Control} flows to lvalue nodes of destination. \\
 		& Erases current connections to lvalue nodes of destination. \\
@@ -168,24 +168,25 @@ hence inferring the sensitive value that determined the branch halting problem.
 In traditional information flow analysis,
 this naive approach described in the table appears to result in high false positive rate
 as it does not separate the internal structure used by instance fields and arrays.
-For example, consider Listing~\ref{lst:traditional-false-positive}
-(Jimple code in Listing~\ref{lst:traditional-false-positive-jimple}).
-At return point, the LFG becomes as shown in Figure~\ref{fig:tfp-graph}.
+For example, consider Listing~\ref{lst:iago-attack}
+(Jimple code in Listing~\ref{lst:iago-attack-jimple}).
+At return point, the \ac{LFG} becomes as shown in Figure~\ref{fig:tfp-graph}.
 Intuitively, this appears incorrect;
 param \#0 does not flow to \code{return}
 since it is just used for \code{this.bar} but not \code{this.qux}.
 Nevertheless, in the threat model where
 the adversary has access to modify any memory allocated outside the enclave,
-assignment may not always work as intended;
-if the \code{TraditionalFalsePositive} context was allocated outside the enclave,
+such a program is vulnerable to Iago attacks~\cite{iago},
+where assignment to object fields may not always work as intended;
+if the \code{IagoAttack} context was allocated outside the enclave,
 \code{this.bar} might be modified by the adversary to \code{this.qux}
 (even if they belong to different classes),
 hence leaking into the return value.
-Recall the definition of an edge in the LFG used in this project,
+Recall the definition of an edge in the \ac{LFG} used in this project,
 where $a \to b$ implies $b$ must to be protected if $a$ is protected.
 
 \begin{figure}
-	\caption{LFG of \code{TraditionalFalsePositive.foo(int)} in Listing~\ref{lst:traditional-false-positive}}
+	\caption{\ac{LFG} of \code{IagoAttack.foo(int)} in Listing~\ref{lst:iago-attack}}
 	\begin{center}
 		\digraph[scale=0.5]{local}{
 			rankdir = "LR";
@@ -201,9 +202,9 @@ where $a \to b$ implies $b$ must to be protected if $a$ is protected.
 	\label{fig:tfp-graph}
 \end{figure}
 
-\IncludeCode{lst:traditional-false-positive}{./TraditionalFalsePositive.java}
-{Traditional false positive}
+\IncludeCode{lst:iago-attack}{./IagoAttack.java}
+{Iago attack}
 
-\IncludeCode{lst:traditional-false-positive-jimple}
-{./sootOutput/TraditionalFalsePositive.jimple}
-{Traditional false positive (Jimple output)}
+\IncludeCode{lst:iago-attack-jimple}
+{./sootOutput/IagoAttack.jimple}
+{Iago attack (Jimple output)}
