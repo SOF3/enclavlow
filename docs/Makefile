@@ -5,7 +5,7 @@ report.pdf: report.tex \
 	KnownFalsePositives.java \
 	OopSubstAttack.java \
 	sootOutput/TraditionalFalsePositive.jimple \
-	../doc-fig/build/TraditionalFalsePositive.dot
+	# ../doc-fig/build/TraditionalFalsePositive.dot
 	true | xelatex -halt-on-error -shell-escape report
 	true | bibtex report
 	true | xelatex -halt-on-error -shell-escape report

@@ -29,7 +29,7 @@ However, the \code{enclavlow-core} subproject can be reused in other contexts,
 such as Maven plugins, IDE plugins, etc.
 
 \subsection{Flow analysis framework}\label{subsec:flow-analysis-framework}
-Soot ~\cite{sootsurvivor} was selected as the framework for conducting flow analysis.
+Soot~\cite{sootsurvivor} was selected as the framework for conducting flow analysis.
 Although multiple existing flow analysis systems using Soot alrady exist,
 they are not designed against SGX enclave protection,
 but \pname{} adopts more strict security policies
@@ -44,7 +44,7 @@ The consume-branch-merge approach mentioned in the last subsection
 was inspired by the forward flow analysis interface in Jimple.
 
 Other flow analysis frameworks were also considered,
-such as Joana ~\cite{joana} and JFlow ~\cite{jflow}.
+such as Joana~\cite{joana} and JFlow~\cite{jflow}.
 Soot was chosen due to its distinctively thorough documentation
 and builtin support for call graph analysis.
 

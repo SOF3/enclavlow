@@ -21,7 +21,7 @@ which involves more complex framework level work.
 
 Despite optimizations and simplifications,
 it is still not possible to perform 100\% accurate information flow analysis
-within efficient time complexity ~\cite{SmithGeoffrey2007PoSI}.
+within efficient time complexity~\cite{SmithGeoffrey2007PoSI}.
 For example, this project merges conditional branches together
 by taking the union of flow graphs,
 resulting in easy false positive rates.
@@ -45,7 +45,7 @@ it was originally intended to expose \code{sourceMarker} and \code{sinkMarker}
 as annotations on local variables instead of method calls.
 However, JLS 9.6.1.2 explicitly stated that
 \q{an annotation on a local variable declaration
-is never retained in the binary representation} ~\cite{jls},
+is never retained in the binary representation}~\cite{jls},
 so a method call based approach is used instead.
 
 At the technical aspect,
