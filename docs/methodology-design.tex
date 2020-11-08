@@ -11,7 +11,7 @@ where each node represents an element that may be leaked.
 
 \begin{defin}
 	Given a flow graph $(V, E)$, for all $x, y \in V$,
-	$(x, y) \in E$ in a flow graph if and only if
+	$(x, y) \in E$ if and only if
 	allocating $y$ outside an enclave reduces the indistinguishability of $x$.
 \end{defin}
 
@@ -112,7 +112,7 @@ and continues following each branch with its clone.
 The \emph{merge} operation pops the uppermost control flow node from the graph,
 and takes the union of all flows from each branched graph.
 
-Note that the control flow stack is always pushed from a conditional instruction
+The control flow stack is always pushed from a conditional instruction
 before splitting into branches,
 which is important for attacks that count the number of times a method was called,
 hence inferring the sensitive value that determined the branch halting problem.
@@ -153,11 +153,10 @@ hence inferring the sensitive value that determined the branch halting problem.
 		\hline
 		\textbf{Expression type} & \textbf{lvalue nodes} & \textbf{rvalue nodes}
 		\\ \hline
-		Binary operations & Unreachable & Union of rvalues from operands
+		Binary operations & unreachable & union of rvalues from operands
 		\\ \hline
-		Array literal \code{new int[a]} & \multirow2*{Unreachable}
-		& \multirow2*{Union of rvalues from count or literal elements} \\
-		or \code{new int[]\{a\}} & &
+		Array literal \code{new int[a]} & unreachable
+		& union of rvalues from count or literal elements
 		\\ \hline
 		Array access \code{a[b]} & lvalues of \code a & rvalues of \code a and \code b
 		\\ \hline
@@ -165,7 +164,7 @@ hence inferring the sensitive value that determined the branch halting problem.
 		\\ \hline
 		Static field access \code{Class.field} & \q{Static} & none
 		\\ \hline
-		Parameter & the parameter node & the parameter node
+		Parameter & the parameter node \footnotemark{} & the parameter node
 		\\ \hline
 		Local variable & its own dedicated node & its own dedicated node
 		\\ \hline
@@ -178,6 +177,9 @@ hence inferring the sensitive value that determined the branch halting problem.
 	\end{tabular}
 	\label{tab:lrvalue}
 \end{table}
+
+\footnotetext{Jimple always first assigns parameters to a local variable,
+so direct assignments to the parameter variable will not overwrite it}
 
 In traditional information flow analysis,
 this naive approach described in the table appears to result in high false positive rate

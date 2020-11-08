@@ -12,9 +12,9 @@ compileKotlin.kotlinOptions.apply {
 dependencies {
     implementation("org.jetbrains.kotlin", "kotlin-stdlib", "1.4.10")
     implementation("org.soot-oss", "soot", "4.2.1")
+    api(project(":api"))
     testImplementation("junit", "junit", "4.13")
     testImplementation("org.jetbrains.kotlin", "kotlin-test-junit")
-    testImplementation(project(":api"))
 }
 
 tasks.test {

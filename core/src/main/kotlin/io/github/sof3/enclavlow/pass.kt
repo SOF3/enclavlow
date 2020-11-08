@@ -1,5 +1,7 @@
 package io.github.sof3.enclavlow
 
+import edu.hku.cs.uranus.IntelSGX
+import edu.hku.cs.uranus.IntelSGXOcall
 import soot.Body
 import soot.BodyTransformer
 import soot.PackManager
@@ -50,18 +52,14 @@ enum class MethodNameType {
 object SenTransformer : BodyTransformer() {
     val contracts: ThreadLocal<HashMap<Pair<String, String>, Contract<out DiGraph<PublicNode>>>> = ThreadLocal.withInitial { hashMapOf() }!!
 
-    init {
-        PackManager.v().getPack("jap").add(Transform("jap.sen", this))
-    }
-
     override fun internalTransform(body: Body, phaseName: String, options: MutableMap<String, String>) {
         var callTags = CallTags.UNSPECIFIED
         for (tag in body.method.tags) {
             if (tag is VisibilityAnnotationTag) {
                 for (annot in tag.annotations) {
-                    if (annot.type == "Ledu/hku/cs/uranus/IntelSGX;") {
+                    if (annot.type == "L${IntelSGX::class.java.name.replace('.', '/')};") {
                         callTags = CallTags.ENCLAVE_CALL
-                    } else if (annot.type == "Ledu/hku/cs/uranus/IntelSGXOcall;") {
+                    } else if (annot.type == "L${IntelSGXOcall::class.java.name.replace('.', '/')};") {
                         callTags = CallTags.OUTSIDE_CALL
                     }
                 }

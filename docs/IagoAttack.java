@@ -1,4 +1,3 @@
-@SuppressWarnings("unused")
 class IagoAttack{
 	Bar bar;
 	Qux qux;

@@ -43,6 +43,11 @@ class AssignTests {
     })
 
     @Test
+    fun paramToParam() = testMethod<AssignCase>("paramToParam", makeContract(CallTags.UNSPECIFIED, 2) {
+        ParamNode(0) into ParamNode(1)
+    })
+
+    @Test
     fun assignParam() = testMethod<AssignCase>("assignParam", makeContract(CallTags.UNSPECIFIED, 1) {
         // there should be nothing leaked
     })

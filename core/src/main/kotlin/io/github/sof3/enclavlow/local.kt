@@ -90,7 +90,7 @@ class SenFlow(
             is ReturnStmt -> {
                 val final = input.finalizedCopy()
                 printDebug("Final: $final")
-                nodePostprocessCommon(final.graph)
+                nodePostprocessCommon(final)
 
                 // in 3AC, return statements are never followed by invocation calls
                 // so it is safe to just pass input to rvalueNodes
@@ -98,13 +98,13 @@ class SenFlow(
             }
             is ReturnVoidStmt -> {
                 val final = input.finalizedCopy()
-                nodePostprocessCommon(final.graph)
+                nodePostprocessCommon(final)
 
                 final.graph.visitAncestors(setOf(final.control), nodePostprocess(ReturnNode))
             }
             is ThrowStmt -> {
                 val final = input.finalizedCopy()
-                nodePostprocessCommon(final.graph)
+                nodePostprocessCommon(final)
 
                 // in 3AC, throw statements are never followed by invocation calls
                 // so it is safe to just pass input to rvalueNodes
@@ -157,10 +157,13 @@ class SenFlow(
         printDebug("Branched Output: $branchOutList")
     }
 
-    private fun nodePostprocessCommon(graph: LocalFlowGraph) {
-        graph.visitAncestors(setOf(ThisNode), nodePostprocess(ThisNode))
-        graph.visitAncestors(setOf(StaticNode), nodePostprocess(StaticNode))
-        graph.visitAncestors(setOf(ExplicitSinkNode), nodePostprocess(ExplicitSinkNode))
+    private fun nodePostprocessCommon(flow: LocalFlow) {
+        flow.graph.visitAncestors(setOf(ThisNode), nodePostprocess(ThisNode))
+        flow.graph.visitAncestors(setOf(StaticNode), nodePostprocess(StaticNode))
+        flow.graph.visitAncestors(setOf(ExplicitSinkNode), nodePostprocess(ExplicitSinkNode))
+        for (paramNode in flow.params) {
+            flow.graph.visitAncestors(setOf(paramNode), nodePostprocess(paramNode))
+        }
     }
 
     private fun nodePostprocess(dest: PublicNode, cause: String = "LFG") = { node: Node ->
@@ -262,6 +265,8 @@ class LocalFlow(
     }
 
     override fun hashCode() = throw UnsupportedOperationException("LocalFlow is not hashable")
+
+    override fun toString() = "LocalFlow(control=$control, locals=$locals, params=$params, calls=$calls, graph=$graph)"
 }
 
 data class FnIden(
