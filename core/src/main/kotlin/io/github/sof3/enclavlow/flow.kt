@@ -1,6 +1,6 @@
 package io.github.sof3.enclavlow
 
-data class Contract<G : ContractFlowGraph>(val graph: G, val callTags: CallTags)
+data class Contract<G : ContractFlowGraph>(val graph: G, val callTags: CallTags, val calls: MutableList<FnCall>)
 
 typealias ContractFlowGraph = DiGraph<PublicNode>
 typealias MutableContractFlowGraph = MutableDiGraph<PublicNode>
@@ -18,7 +18,7 @@ fun makeContract(
 
     val graph = newDiGraph(nodes)
     fn(MakeContractContext(graph))
-    return Contract(graph, callTags)
+    return Contract(graph, callTags, mutableListOf())
 }
 
 fun makeLocalFlowGraph(vararg extraNodes: Iterable<Node>): LocalFlowGraph {
