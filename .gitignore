@@ -1,4 +1,5 @@
-build
+/build/**/*.*
+/*/build/*
 bin
 *.class
 .gradle
@@ -10,3 +11,4 @@ sootOutput
 !.idea/codeStyles
 !.idea/inspectionProfiles
 !.idea/scopes
+!/build/reports/dependency-graph/dependency-graph.png
