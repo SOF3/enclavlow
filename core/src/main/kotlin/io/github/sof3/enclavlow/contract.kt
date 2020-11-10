@@ -8,7 +8,6 @@ import soot.Scene
 import soot.options.Options
 import soot.tagkit.VisibilityAnnotationTag
 import soot.toolkits.graph.ExceptionalUnitGraph
-import java.util.HashMap
 
 inline fun analyzeMethod(
     className: String,

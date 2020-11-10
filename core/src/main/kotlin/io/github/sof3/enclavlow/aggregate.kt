@@ -1,7 +1,5 @@
 package io.github.sof3.enclavlow
 
-import java.lang.StringBuilder
-
 fun computeAggregate(classpath: List<String>, entryClasses: List<String>) {
     soot.G.reset()
 

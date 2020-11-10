@@ -17,7 +17,6 @@ import soot.jimple.SwitchStmt
 import soot.jimple.ThrowStmt
 import soot.toolkits.graph.UnitGraph
 import soot.toolkits.scalar.ForwardBranchedFlowAnalysis
-import java.util.*
 
 class SenFlow(
     graph: UnitGraph,
