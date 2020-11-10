@@ -162,7 +162,11 @@ class SenFlow(
         flow.graph.visitAncestors(setOf(StaticNode), nodePostprocess(StaticNode))
         flow.graph.visitAncestors(setOf(ExplicitSinkNode), nodePostprocess(ExplicitSinkNode))
         for (paramNode in flow.params) {
-            flow.graph.visitAncestors(setOf(paramNode), nodePostprocess(paramNode))
+            println("Searching ancestors of $paramNode")
+            flow.graph.visitAncestors(setOf(paramNode)) {
+                println("Visited $it")
+                nodePostprocess(paramNode)(it)
+            }
         }
     }
 

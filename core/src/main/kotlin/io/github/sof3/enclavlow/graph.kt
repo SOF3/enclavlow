@@ -8,7 +8,12 @@ fun <T : Any> newDiGraph(
 }
 
 data class Edge(val causes: MutableSet<String>) {
+    /**
+     * Indicates that this flow is the back flow of `b -> a`
+     * when `copyTo(a, b)` is called.
+     */
     var copyFlow: Boolean = false
+    var refOnly: Boolean = false
 }
 
 infix fun Edge?.graphEquals(other: Any?): Boolean {
