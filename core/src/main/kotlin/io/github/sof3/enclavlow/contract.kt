@@ -4,13 +4,11 @@ import edu.hku.cs.uranus.IntelSGX
 import edu.hku.cs.uranus.IntelSGXOcall
 import soot.Body
 import soot.BodyTransformer
-import soot.PackManager
 import soot.Scene
-import soot.Transform
 import soot.options.Options
 import soot.tagkit.VisibilityAnnotationTag
 import soot.toolkits.graph.ExceptionalUnitGraph
-import java.util.*
+import java.util.HashMap
 
 inline fun analyzeMethod(
     className: String,
@@ -32,7 +30,7 @@ inline fun analyzeMethod(
     }
     val body = method.retrieveActiveBody()
     SenTransformer.transform(body)
-    return SenTransformer.contracts.get()[className to method.subSignature]!!
+    return SenTransformer.contracts.get()[FnIden(className, method.subSignature)]!!
 }
 
 enum class MethodNameType {
@@ -50,7 +48,7 @@ enum class MethodNameType {
 }
 
 object SenTransformer : BodyTransformer() {
-    val contracts: ThreadLocal<HashMap<Pair<String, String>, Contract<out DiGraph<PublicNode>>>> = ThreadLocal.withInitial { hashMapOf() }!!
+    val contracts: ThreadLocal<HashMap<FnIden, Contract<out ContractFlowGraph>>> = ThreadLocal.withInitial { hashMapOf<FnIden, Contract<out ContractFlowGraph>>() }!!
 
     override fun internalTransform(body: Body, phaseName: String, options: MutableMap<String, String>) {
         var callTags = CallTags.UNSPECIFIED
@@ -71,9 +69,53 @@ object SenTransformer : BodyTransformer() {
         block("Analyzing ${body.method.signature}") {
             flow.doAnalysis()
         }
-        contracts.get()[body.method.declaringClass.name to body.method.subSignature] = flow.outputContract
+        contracts.get()[FnIden(body.method.declaringClass.name, body.method.subSignature)] = flow.outputContract
         block("Contract of ${flow.outputContract.callTags} ${body.method.subSignature}") {
             printDebug(flow.outputContract.graph)
         }
     }
+}
+
+data class Contract<G : ContractFlowGraph>(val graph: G, val callTags: CallTags, val calls: MutableList<FnCall>)
+
+typealias ContractFlowGraph = DiGraph<ContractNode, ContractEdge>
+typealias MutableContractFlowGraph = MutableDiGraph<ContractNode, ContractEdge>
+
+class ContractEdge : GraphEdge<ContractEdge> {
+    override fun mergeEdge(other: ContractEdge): ContractEdge {
+        TODO("Contract graphs shall not be merged")
+    }
+
+    override fun graphEqualsImpl(other: Any) = true
+
+    override fun getGraphvizAttributes(): Iterable<Pair<String, String>> {
+        return emptyList() // TODO
+    }
+}
+
+fun makeContract(
+    callTags: CallTags,
+    paramCount: Int,
+    extraNodes: Collection<ContractNode> = emptyList(),
+    fn: MakeContractContext<ContractNode, ContractEdge>.() -> Unit = {},
+): Contract<MutableContractFlowGraph> {
+    val nodes = indexedSetOf(ThisNode, StaticNode, ReturnNode, ThrowNode, ExplicitSourceNode, ExplicitSinkNode)
+    nodes.addAll((0 until paramCount).map { ParamNode(it) })
+    nodes.addAll(extraNodes)
+
+    val graph = newDiGraph(nodes) { ContractEdge() }
+    fn(MakeContractContext(graph))
+    return Contract(graph, callTags, mutableListOf())
+}
+
+class MakeContractContext<T : Any, E : GraphEdge<E>>(private val graph: MutableDiGraph<T, E>) {
+    infix fun T.into(other: T) {
+        graph.touch(this, other)
+    }
+}
+
+enum class CallTags {
+    UNSPECIFIED,
+    ENCLAVE_CALL,
+    OUTSIDE_CALL,
 }

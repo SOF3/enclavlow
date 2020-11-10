@@ -10,8 +10,8 @@ compileKotlin.kotlinOptions.apply {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin", "kotlin-stdlib", "1.3.70")
-    implementation("org.jetbrains.kotlin", "kotlin-reflect", "1.3.70")
+    implementation("org.jetbrains.kotlin", "kotlin-stdlib", "1.4.10")
+    implementation("org.jetbrains.kotlin", "kotlin-reflect", "1.4.10")
     implementation(project(":api"))
     implementation(project(":core"))
     implementation("org.soot-oss", "soot", "4.2.1")

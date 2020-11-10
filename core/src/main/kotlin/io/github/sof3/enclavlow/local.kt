@@ -17,6 +17,7 @@ import soot.jimple.SwitchStmt
 import soot.jimple.ThrowStmt
 import soot.toolkits.graph.UnitGraph
 import soot.toolkits.scalar.ForwardBranchedFlowAnalysis
+import java.util.*
 
 class SenFlow(
     graph: UnitGraph,
@@ -36,7 +37,7 @@ class SenFlow(
             // if flow is detected from either side
             if (a != null) {
                 if (b != null) {
-                    Edge((a.causes + b.causes).toMutableSet())
+                    a.mergeEdge(b)
                 } else {
                     a
                 }
@@ -63,10 +64,10 @@ class SenFlow(
         out.finalizers.addFirst { final ->
             val lca = final.graph.lca(merge1, merge2, { it is ControlNode }, { it.copyFlow })
             if (lca != null) {
-                final.graph.touch(lca, mergeTarget, "Flow merge")
+                final.graph.touch(lca, mergeTarget) { causes += "Flow merge" }
             } else {
-                final.graph.touch(merge1, mergeTarget, "Flow merge\\nHack")
-                final.graph.touch(merge2, mergeTarget, "Flow merge\\nHack")
+                final.graph.touch(merge1, mergeTarget) { causes += "Flow merge\\nHack" }
+                final.graph.touch(merge2, mergeTarget) { causes += "Flow merge\\nHack" }
             }
         }
     }
@@ -131,7 +132,7 @@ class SenFlow(
                 for (flow in listOf(fallOutList, branchOutList).flatten()) {
                     input copyTo flow
                     for (node in nodes) {
-                        flow.graph.touch(node, flow.control, "Branch")
+                        flow.graph.touch(node, flow.control) { causes += "Branch" }
                     }
                 }
             }
@@ -170,10 +171,10 @@ class SenFlow(
         }
     }
 
-    private fun nodePostprocess(dest: PublicNode, cause: String = "LFG") = { node: Node ->
-        if (node is PublicNode && node !== dest) {
+    private fun nodePostprocess(dest: ContractNode) = { node: LocalNode ->
+        if (node is ContractNode && node !== dest) {
             outputContract.graph.addNodeIfMissing(node)
-            outputContract.graph.touch(node, dest, cause)
+            outputContract.graph.touch(node, dest)
         }
     }
 }
@@ -193,17 +194,17 @@ fun handleAssign(output: LocalFlow, left: Value, right: Value) {
 
     for (leftNode in leftNodes.lvalues) {
         for (rightNode in rightNodes) {
-            output.graph.touch(rightNode, leftNode, "Assignment")
+            output.graph.touch(rightNode, leftNode) { causes += "Assignment" }
         }
         for (rightNode in leftNodes.rvalues) {
-            output.graph.touch(rightNode, leftNode, "Assignment\\nSide effect")
+            output.graph.touch(rightNode, leftNode) { causes += "Assignment\\nSide effect" }
         }
-        output.graph.touch(output.control, leftNode, "Assignment\\nCondition")
+        output.graph.touch(output.control, leftNode) { causes += "Assignment\\nCondition" }
     }
 
     for (leftNode in rightLeft.lvalues) {
         for (rightNode in leftRight) {
-            output.graph.touch(rightNode, leftNode, "Assignment\\nBack flow")
+            output.graph.touch(rightNode, leftNode) { causes += "Assignment\\nBack flow" }
         }
     }
 }
@@ -271,6 +272,41 @@ class LocalFlow(
     override fun hashCode() = throw UnsupportedOperationException("LocalFlow is not hashable")
 
     override fun toString() = "LocalFlow(control=$control, locals=$locals, params=$params, calls=$calls, graph=$graph)"
+}
+
+typealias LocalFlowGraph = MutableDiGraph<LocalNode, LocalEdge>
+
+fun makeLocalFlowGraph(vararg extraNodes: Iterable<LocalNode>): LocalFlowGraph {
+    val nodes = indexedSetOf<LocalNode>(ThisNode, StaticNode, ReturnNode, ThrowNode, ExplicitSourceNode, ExplicitSinkNode)
+    for (extra in extraNodes) {
+        nodes.addAll(extra)
+    }
+
+    return newDiGraph(nodes) { LocalEdge(mutableSetOf()) }
+}
+
+data class LocalEdge(val causes: MutableSet<String>) : GraphEdge<LocalEdge> {
+    /**
+     * Indicates that this flow is the back flow of `b -> a`
+     * when `copyTo(a, b)` is called.
+     */
+    var copyFlow: Boolean = false
+    var refOnly: Boolean = false
+
+    override fun mergeEdge(other: LocalEdge): LocalEdge {
+        val ret = LocalEdge(causes)
+        ret.copyFlow = copyFlow && other.copyFlow
+        ret.refOnly = refOnly && other.refOnly
+        return ret
+    }
+
+    override fun graphEqualsImpl(other: Any) = true
+
+    override fun getGraphvizAttributes(): Iterable<Pair<String, String>> {
+        return listOf(
+            "label" to causes.joinToString(",\\n")
+        )
+    }
 }
 
 data class FnIden(

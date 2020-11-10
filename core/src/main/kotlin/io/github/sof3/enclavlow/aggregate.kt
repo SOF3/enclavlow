@@ -1,6 +1,8 @@
 package io.github.sof3.enclavlow
 
-fun analyze(classpath: List<String>, entryClasses: List<String>) {
+import java.lang.StringBuilder
+
+fun computeAggregate(classpath: List<String>, entryClasses: List<String>) {
     soot.G.reset()
 
     val optionsConfig: soot.options.Options.() -> Unit = {
@@ -12,9 +14,9 @@ fun analyze(classpath: List<String>, entryClasses: List<String>) {
     scene.loadNecessaryClasses()
 
     val initial = mutableSetOf<Pair<String, String>>()
-    for(className in entryClasses) {
+    for (className in entryClasses) {
         val clazz = scene.loadClassAndSupport(className)
-        for(method in clazz.methodIterator()) {
+        for (method in clazz.methodIterator()) {
             initial.add(className to method.subSignature)
         }
     }
@@ -22,14 +24,14 @@ fun analyze(classpath: List<String>, entryClasses: List<String>) {
     var requests = initial.takeIf { it.isNotEmpty() }
     val contracts = mutableMapOf<Pair<String, String>, Contract<out ContractFlowGraph>>()
 
-    while(requests != null) {
+    while (requests != null) {
         val swap = mutableSetOf<Pair<String, String>>()
-        for(request in requests) {
+        for (request in requests) {
             val contract = analyzeMethod(request.first, request.second, MethodNameType.SUB_SIGNATURE, optionsConfig)
             contracts[request] = contract
-            for(call in contract.calls) {
+            for (call in contract.calls) {
                 val iden = call.iden.declClass to call.iden.subSig
-                if(iden !in contracts && iden !in requests) {
+                if (iden !in contracts && iden !in requests) {
                     swap.add(iden)
                 }
             }
@@ -37,5 +39,5 @@ fun analyze(classpath: List<String>, entryClasses: List<String>) {
         requests = swap.takeIf { it.isNotEmpty() }
     }
 
-    // TODO merge contracts into AFG
+    val aggregate = newDiGraph<ContractNode, ContractEdge> { ContractEdge() }
 }

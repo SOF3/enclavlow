@@ -5,13 +5,12 @@ import java.util.concurrent.atomic.AtomicInteger
 /**
  * A node of data flow
  */
-sealed class Node
-
+sealed class LocalNode
 
 /**
  * A publicly visible node that could appear in the contract
  */
-sealed class PublicNode : Node() {
+sealed class ContractNode : LocalNode() {
     protected abstract val name: String
 
     override fun toString() = name
@@ -20,7 +19,7 @@ sealed class PublicNode : Node() {
 /**
  * Data to caller through return path
  */
-object ReturnNode : PublicNode() {
+object ReturnNode : ContractNode() {
     override val name: String
         get() = "return"
 }
@@ -28,7 +27,7 @@ object ReturnNode : PublicNode() {
 /**
  * Data to caller through throw path
  */
-object ThrowNode : PublicNode() {
+object ThrowNode : ContractNode() {
     override val name: String
         get() = "throw"
 }
@@ -38,7 +37,7 @@ object ThrowNode : PublicNode() {
  *
  * Data from static scope are always considered insensitive.
  */
-object StaticNode : PublicNode() {
+object StaticNode : ContractNode() {
     override val name: String
         get() = "static"
 }
@@ -46,7 +45,7 @@ object StaticNode : PublicNode() {
 /**
  * Data from/to `this`
  */
-object ThisNode : PublicNode() {
+object ThisNode : ContractNode() {
     override val name: String
         get() = "this"
 }
@@ -54,7 +53,7 @@ object ThisNode : PublicNode() {
 /**
  * Data source from a parameter
  */
-class ParamNode(private val index: Int) : PublicNode() {
+class ParamNode(private val index: Int) : ContractNode() {
     override val name: String
         get() = "param$index"
 
@@ -66,7 +65,7 @@ class ParamNode(private val index: Int) : PublicNode() {
 /**
  * Data source from a local variable explicitly declared as `sourceMarker`
  */
-object ExplicitSourceNode : PublicNode() {
+object ExplicitSourceNode : ContractNode() {
     override val name: String
         get() = "<source>"
 }
@@ -74,17 +73,17 @@ object ExplicitSourceNode : PublicNode() {
 /**
  * Data source from a local variable explicitly declared as `sinkMarker`
  */
-object ExplicitSinkNode : PublicNode() {
+object ExplicitSinkNode : ContractNode() {
     override val name: String
         get() = "<sink>"
 }
 
-class ProxyNode(override val name: String) : PublicNode()
+class ProxyNode(override val name: String) : ContractNode()
 
 /**
  * A private node only considered within method local analysis
  */
-sealed class PrivateNode : Node()
+sealed class PrivateNode : LocalNode()
 
 /**
  * Data from/to a variable with jimple name `name`

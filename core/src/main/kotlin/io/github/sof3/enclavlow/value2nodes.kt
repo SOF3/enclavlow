@@ -27,9 +27,9 @@ import soot.jimple.UnopExpr
  *
  * `flow` is mutated when `value` is a method invocation.
  */
-fun rvalueNodes(flow: LocalFlow, value: Value): Set<Node> = rvalueNodesImpl(flow, value).toSet()
+fun rvalueNodes(flow: LocalFlow, value: Value): Set<LocalNode> = rvalueNodesImpl(flow, value).toSet()
 
-private fun rvalueNodesImpl(flow: LocalFlow, value: Value): Sequence<Node> = sequence {
+private fun rvalueNodesImpl(flow: LocalFlow, value: Value): Sequence<LocalNode> = sequence {
     when (value) {
         is Constant -> {
             // constant leaks no information
@@ -81,7 +81,7 @@ private fun rvalueNodesImpl(flow: LocalFlow, value: Value): Sequence<Node> = seq
                 } else if (method == "sinkMarker" || method.endsWith("SinkMarker")) {
                     for (arg in value.args) {
                         for (node in rvalueNodes(flow, arg)) {
-                            flow.graph.touch(node, ExplicitSinkNode, "Sink marker")
+                            flow.graph.touch(node, ExplicitSinkNode) { causes += "Sink marker" }
                         }
                     }
                 } else {
@@ -99,16 +99,16 @@ private fun rvalueNodesImpl(flow: LocalFlow, value: Value): Sequence<Node> = seq
                 // TODO handle ThrowNode
                 for ((i, arg) in value.args.withIndex()) {
                     for (sourceNode in rvalueNodes(flow, arg)) {
-                        flow.graph.touch(sourceNode, call.params[i], "Call param")
+                        flow.graph.touch(sourceNode, call.params[i]) { causes += "Call param" }
                     }
                 }
                 if (value is InstanceInvokeExpr) {
                     for (sourceNode in rvalueNodes(flow, value.base)) {
-                        flow.graph.touch(sourceNode, call.thisNode!!, "Call context")
+                        flow.graph.touch(sourceNode, call.thisNode!!) { causes += "Call context" }
                     }
                 }
                 // invokeDynamic and invokeStatic do not pass an objectRef
-                flow.graph.touch(flow.control, call.controlNode, "Call condition")
+                flow.graph.touch(flow.control, call.controlNode) { causes += "Call condition" }
                 yield(call.returnNode)
             }
         }
@@ -128,17 +128,17 @@ private fun rvalueNodesImpl(flow: LocalFlow, value: Value): Sequence<Node> = seq
 }
 
 data class LvalueResult(
-    val lvalues: Set<Node>,
-    val rvalues: Set<Node>,
+    val lvalues: Set<LocalNode>,
+    val rvalues: Set<LocalNode>,
 )
 
 fun lvalueNodes(flow: LocalFlow, value: Value, usage: LvalueUsage): LvalueResult {
-    val rvalues = mutableSetOf<Node>()
+    val rvalues = mutableSetOf<LocalNode>()
     val lvalues = lvalueNodesImpl(flow, value, usage, rvalues).toSet()
     return LvalueResult(lvalues, rvalues)
 }
 
-private fun lvalueNodesImpl(flow: LocalFlow, value: Value, usage: LvalueUsage, rvalues: MutableSet<Node>): Sequence<Node> = sequence {
+private fun lvalueNodesImpl(flow: LocalFlow, value: Value, usage: LvalueUsage, rvalues: MutableSet<LocalNode>): Sequence<LocalNode> = sequence {
     printDebug("lvalueNodesImpl(${value.javaClass.simpleName} $value)")
     when (value) {
         // these expressions create new/constant values and can never be mutated in another expression

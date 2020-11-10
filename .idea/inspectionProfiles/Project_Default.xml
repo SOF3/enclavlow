@@ -9,8 +9,5 @@
     <inspection_tool class="HasPlatformType" enabled="true" level="WEAK WARNING" enabled_by_default="true">
       <option name="reportPlatformArguments" value="true" />
     </inspection_tool>
-    <inspection_tool class="LatexMissingImport" enabled="true" level="WARNING" enabled_by_default="true">
-      <option name="numberOfIndexedUsePackages" value="21" />
-    </inspection_tool>
   </profile>
 </component>
