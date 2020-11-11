@@ -1,8 +1,8 @@
 package io.github.sof3.enclavlow.tests
 
-import io.github.sof3.enclavlow.CallTags
+import io.github.sof3.enclavlow.contract.CallTags
 import io.github.sof3.enclavlow.cases.AnnotationCheck
-import io.github.sof3.enclavlow.makeContract
+import io.github.sof3.enclavlow.contract.makeContract
 import kotlin.test.Test
 
 class AnnotationTests {

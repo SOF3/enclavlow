@@ -1,5 +1,30 @@
-package io.github.sof3.enclavlow
+package io.github.sof3.enclavlow.local
 
+import io.github.sof3.enclavlow.contract.ContractNode
+import io.github.sof3.enclavlow.contract.ExplicitSinkLocalNode
+import io.github.sof3.enclavlow.contract.ExplicitSourceLocalNode
+import io.github.sof3.enclavlow.GraphEdge
+import io.github.sof3.enclavlow.contract.LocalControlNode
+import io.github.sof3.enclavlow.contract.LocalNode
+import io.github.sof3.enclavlow.contract.LocalVarNode
+import io.github.sof3.enclavlow.MutableDiGraph
+import io.github.sof3.enclavlow.contract.ParamLocalNode
+import io.github.sof3.enclavlow.contract.ProxyLocalNode
+import io.github.sof3.enclavlow.contract.ReturnLocalNode
+import io.github.sof3.enclavlow.contract.StaticLocalNode
+import io.github.sof3.enclavlow.contract.ThisLocalNode
+import io.github.sof3.enclavlow.contract.ThrowLocalNode
+import io.github.sof3.enclavlow.alwaysAssert
+import io.github.sof3.enclavlow.block
+import io.github.sof3.enclavlow.contract.CallTags
+import io.github.sof3.enclavlow.contract.Contract
+import io.github.sof3.enclavlow.contract.MutableContractFlowGraph
+import io.github.sof3.enclavlow.contract.makeContract
+import io.github.sof3.enclavlow.getOrFill
+import io.github.sof3.enclavlow.indexedSetOf
+import io.github.sof3.enclavlow.newDiGraph
+import io.github.sof3.enclavlow.notNull
+import io.github.sof3.enclavlow.printDebug
 import soot.SootMethod
 import soot.Value
 import soot.jimple.BreakpointStmt
@@ -61,7 +86,7 @@ class SenFlow(
         val merge2 = in2.control
         val mergeTarget = out.control
         out.finalizers.addFirst { final ->
-            val lca = final.graph.lca(merge1, merge2, { it is ControlNode }, { it.copyFlow })
+            val lca = final.graph.lca(merge1, merge2, { it is LocalControlNode }, { it.copyFlow })
             if (lca != null) {
                 final.graph.touch(lca, mergeTarget) { causes += "Flow merge" }
             } else {
@@ -94,13 +119,13 @@ class SenFlow(
 
                 // in 3AC, return statements are never followed by invocation calls
                 // so it is safe to just pass input to rvalueNodes
-                final.graph.visitAncestors(setOf(final.control) + rvalueNodes(final, stmt.op), nodePostprocess(ReturnNode))
+                final.graph.visitAncestors(setOf(final.control) + rvalueNodes(final, stmt.op), nodePostprocess(ReturnLocalNode))
             }
             is ReturnVoidStmt -> {
                 val final = input.finalizedCopy()
                 nodePostprocessCommon(final)
 
-                final.graph.visitAncestors(setOf(final.control), nodePostprocess(ReturnNode))
+                final.graph.visitAncestors(setOf(final.control), nodePostprocess(ReturnLocalNode))
             }
             is ThrowStmt -> {
                 val final = input.finalizedCopy()
@@ -108,7 +133,7 @@ class SenFlow(
 
                 // in 3AC, throw statements are never followed by invocation calls
                 // so it is safe to just pass input to rvalueNodes
-                final.graph.visitAncestors(setOf(final.control) + rvalueNodes(final, stmt.op), nodePostprocess(ThrowNode))
+                final.graph.visitAncestors(setOf(final.control) + rvalueNodes(final, stmt.op), nodePostprocess(ThrowLocalNode))
 
                 // TODO handle try-catch
             }
@@ -158,9 +183,9 @@ class SenFlow(
     }
 
     private fun nodePostprocessCommon(flow: LocalFlow) {
-        flow.graph.visitAncestors(setOf(ThisNode), nodePostprocess(ThisNode))
-        flow.graph.visitAncestors(setOf(StaticNode), nodePostprocess(StaticNode))
-        flow.graph.visitAncestors(setOf(ExplicitSinkNode), nodePostprocess(ExplicitSinkNode))
+        flow.graph.visitAncestors(setOf(ThisLocalNode), nodePostprocess(ThisLocalNode))
+        flow.graph.visitAncestors(setOf(StaticLocalNode), nodePostprocess(StaticLocalNode))
+        flow.graph.visitAncestors(setOf(ExplicitSinkLocalNode), nodePostprocess(ExplicitSinkLocalNode))
         for (paramNode in flow.params) {
             println("Searching ancestors of $paramNode")
             flow.graph.visitAncestors(setOf(paramNode)) {
@@ -209,18 +234,18 @@ fun handleAssign(output: LocalFlow, left: Value, right: Value) {
 }
 
 fun newLocalFlow(paramCount: Int): LocalFlow {
-    val params = List(paramCount) { ParamNode(it) }
-    val control = ControlNode()
+    val params = List(paramCount) { ParamLocalNode(it) }
+    val control = LocalControlNode()
     val graph = makeLocalFlowGraph(params + control)
     return LocalFlow(graph, control, mutableMapOf(), mutableListOf(), params)
 }
 
 class LocalFlow(
     val graph: LocalFlowGraph,
-    var control: ControlNode,
+    var control: LocalControlNode,
     var locals: MutableMap<String, LocalVarNode>,
     var calls: MutableList<FnCall>,
-    var params: List<ParamNode>,
+    var params: List<ParamLocalNode>,
 ) {
     var finalizers = ArrayDeque<(LocalFlow) -> Unit>()
 
@@ -264,7 +289,7 @@ class LocalFlow(
 
     override fun equals(other: Any?): Boolean {
         if (other !is LocalFlow) return false
-        if (graph.filterNodes { it !is ControlNode } != other.graph.filterNodes { it !is ControlNode }) return false
+        if (graph.filterNodes { it !is LocalControlNode } != other.graph.filterNodes { it !is LocalControlNode }) return false
         return params == other.params && locals == other.locals && calls == other.calls
     }
 
@@ -276,7 +301,7 @@ class LocalFlow(
 typealias LocalFlowGraph = MutableDiGraph<LocalNode, LocalEdge>
 
 fun makeLocalFlowGraph(vararg extraNodes: Iterable<LocalNode>): LocalFlowGraph {
-    val nodes = indexedSetOf<LocalNode>(ThisNode, StaticNode, ReturnNode, ThrowNode, ExplicitSourceNode, ExplicitSinkNode)
+    val nodes = indexedSetOf<LocalNode>(ThisLocalNode, StaticLocalNode, ReturnLocalNode, ThrowLocalNode, ExplicitSourceLocalNode, ExplicitSinkLocalNode)
     for (extra in extraNodes) {
         nodes.addAll(extra)
     }
@@ -309,17 +334,17 @@ data class LocalEdge(val causes: MutableSet<String>) : GraphEdge<LocalEdge> {
 }
 
 data class FnIden(
-    val declClass: String,
-    val subSig: String,
+    val clazz: String,
+    val method: String,
 )
 
 data class FnCall(
     val iden: FnIden,
-    val params: List<ProxyNode>,
-    val thisNode: ProxyNode?,
-    val returnNode: ProxyNode,
-    val throwNode: ProxyNode,
-    val controlNode: ProxyNode,
+    val params: List<ProxyLocalNode>,
+    val thisNode: ProxyLocalNode?,
+    val returnNode: ProxyLocalNode,
+    val throwNode: ProxyLocalNode,
+    val controlNode: ProxyLocalNode,
 ) {
     fun allNodes() = sequence {
         yieldAll(params)
@@ -333,10 +358,10 @@ data class FnCall(
 
 fun createFnCall(method: SootMethod): FnCall {
     val iden = FnIden(method.declaringClass.name, method.subSignature)
-    val params = List(method.parameterCount) { ProxyNode("<$iden>\nparam $it") }
-    val thisNode = if (method.isStatic) null else ProxyNode("<$iden>\nthis")
-    val returnNode = ProxyNode("<$iden>\nreturn")
-    val throwNode = ProxyNode("<$iden>\nthrow")
-    val controlNode = ProxyNode("<$iden>\ncontrol")
+    val params = List(method.parameterCount) { ProxyLocalNode("<$iden>\nparam $it") }
+    val thisNode = if (method.isStatic) null else ProxyLocalNode("<$iden>\nthis")
+    val returnNode = ProxyLocalNode("<$iden>\nreturn")
+    val throwNode = ProxyLocalNode("<$iden>\nthrow")
+    val controlNode = ProxyLocalNode("<$iden>\ncontrol")
     return FnCall(iden, params, thisNode, returnNode, throwNode, controlNode)
 }

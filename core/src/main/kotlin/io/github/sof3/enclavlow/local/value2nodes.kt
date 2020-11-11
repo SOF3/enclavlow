@@ -1,5 +1,11 @@
-package io.github.sof3.enclavlow
+package io.github.sof3.enclavlow.local
 
+import io.github.sof3.enclavlow.contract.ExplicitSinkLocalNode
+import io.github.sof3.enclavlow.contract.ExplicitSourceLocalNode
+import io.github.sof3.enclavlow.contract.LocalNode
+import io.github.sof3.enclavlow.contract.StaticLocalNode
+import io.github.sof3.enclavlow.contract.ThisLocalNode
+import io.github.sof3.enclavlow.printDebug
 import soot.Local
 import soot.Value
 import soot.jimple.AnyNewExpr
@@ -27,7 +33,7 @@ import soot.jimple.UnopExpr
  *
  * `flow` is mutated when `value` is a method invocation.
  */
-fun rvalueNodes(flow: LocalFlow, value: Value): Set<LocalNode> = rvalueNodesImpl(flow, value).toSet()
+internal fun rvalueNodes(flow: LocalFlow, value: Value): Set<LocalNode> = rvalueNodesImpl(flow, value).toSet()
 
 private fun rvalueNodesImpl(flow: LocalFlow, value: Value): Sequence<LocalNode> = sequence {
     when (value) {
@@ -40,7 +46,7 @@ private fun rvalueNodesImpl(flow: LocalFlow, value: Value): Sequence<LocalNode> 
             yield(node)
         }
         is ThisRef -> {
-            yield(ThisNode)
+            yield(ThisLocalNode)
         }
         is ParameterRef -> {
             yield(flow.params[value.index])
@@ -77,11 +83,11 @@ private fun rvalueNodesImpl(flow: LocalFlow, value: Value): Sequence<LocalNode> 
             if (value.method.declaringClass.name == "io.github.sof3.enclavlow.api.Enclavlow") {
                 val method = value.method.name
                 if (method == "sourceMarker" || method.endsWith("SourceMarker")) {
-                    yield(ExplicitSourceNode)
+                    yield(ExplicitSourceLocalNode)
                 } else if (method == "sinkMarker" || method.endsWith("SinkMarker")) {
                     for (arg in value.args) {
                         for (node in rvalueNodes(flow, arg)) {
-                            flow.graph.touch(node, ExplicitSinkNode) { causes += "Sink marker" }
+                            flow.graph.touch(node, ExplicitSinkLocalNode) { causes += "Sink marker" }
                         }
                     }
                 } else {
@@ -132,7 +138,7 @@ data class LvalueResult(
     val rvalues: Set<LocalNode>,
 )
 
-fun lvalueNodes(flow: LocalFlow, value: Value, usage: LvalueUsage): LvalueResult {
+internal fun lvalueNodes(flow: LocalFlow, value: Value, usage: LvalueUsage): LvalueResult {
     val rvalues = mutableSetOf<LocalNode>()
     val lvalues = lvalueNodesImpl(flow, value, usage, rvalues).toSet()
     return LvalueResult(lvalues, rvalues)
@@ -146,7 +152,7 @@ private fun lvalueNodesImpl(flow: LocalFlow, value: Value, usage: LvalueUsage, r
         }
         is ThisRef -> {
             if (usage == LvalueUsage.ASSIGN) {
-                yield(ThisNode)
+                yield(ThisLocalNode)
             }
         }
         is ParameterRef -> {
@@ -167,7 +173,7 @@ private fun lvalueNodesImpl(flow: LocalFlow, value: Value, usage: LvalueUsage, r
         }
         is CaughtExceptionRef -> TODO()
         is StaticFieldRef -> {
-            yield(StaticNode)
+            yield(StaticLocalNode)
         }
         is InstanceFieldRef -> {
             when (usage) {

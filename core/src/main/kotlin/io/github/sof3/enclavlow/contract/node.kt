@@ -1,4 +1,4 @@
-package io.github.sof3.enclavlow
+package io.github.sof3.enclavlow.contract
 
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -19,7 +19,7 @@ sealed class ContractNode : LocalNode() {
 /**
  * Data to caller through return path
  */
-object ReturnNode : ContractNode() {
+object ReturnLocalNode : ContractNode() {
     override val name: String
         get() = "return"
 }
@@ -27,7 +27,7 @@ object ReturnNode : ContractNode() {
 /**
  * Data to caller through throw path
  */
-object ThrowNode : ContractNode() {
+object ThrowLocalNode : ContractNode() {
     override val name: String
         get() = "throw"
 }
@@ -37,7 +37,7 @@ object ThrowNode : ContractNode() {
  *
  * Data from static scope are always considered insensitive.
  */
-object StaticNode : ContractNode() {
+object StaticLocalNode : ContractNode() {
     override val name: String
         get() = "static"
 }
@@ -45,7 +45,7 @@ object StaticNode : ContractNode() {
 /**
  * Data from/to `this`
  */
-object ThisNode : ContractNode() {
+object ThisLocalNode : ContractNode() {
     override val name: String
         get() = "this"
 }
@@ -53,11 +53,11 @@ object ThisNode : ContractNode() {
 /**
  * Data source from a parameter
  */
-class ParamNode(private val index: Int) : ContractNode() {
+class ParamLocalNode(private val index: Int) : ContractNode() {
     override val name: String
         get() = "param$index"
 
-    override fun equals(other: Any?) = other is ParamNode && index == other.index
+    override fun equals(other: Any?) = other is ParamLocalNode && index == other.index
 
     override fun hashCode() = index.hashCode()
 }
@@ -65,7 +65,7 @@ class ParamNode(private val index: Int) : ContractNode() {
 /**
  * Data source from a local variable explicitly declared as `sourceMarker`
  */
-object ExplicitSourceNode : ContractNode() {
+object ExplicitSourceLocalNode : ContractNode() {
     override val name: String
         get() = "<source>"
 }
@@ -73,22 +73,22 @@ object ExplicitSourceNode : ContractNode() {
 /**
  * Data source from a local variable explicitly declared as `sinkMarker`
  */
-object ExplicitSinkNode : ContractNode() {
+object ExplicitSinkLocalNode : ContractNode() {
     override val name: String
         get() = "<sink>"
 }
 
-class ProxyNode(override val name: String) : ContractNode()
+class ProxyLocalNode(override val name: String) : ContractNode()
 
 /**
  * A private node only considered within method local analysis
  */
-sealed class PrivateNode : LocalNode()
+sealed class LocalOnlyNode : LocalNode()
 
 /**
  * Data from/to a variable with jimple name `name`
  */
-class LocalVarNode(val name: String) : PrivateNode() {
+class LocalVarNode(val name: String) : LocalOnlyNode() {
     override fun toString() = name
 
     override fun equals(other: Any?) = other is LocalVarNode && name == other.name
@@ -99,7 +99,7 @@ class LocalVarNode(val name: String) : PrivateNode() {
 /**
  * Flows to ControlFlow indicates the current control flow contains data
  */
-class ControlNode : PrivateNode() {
+class LocalControlNode : LocalOnlyNode() {
     private val id = count.getAndAdd(1)
 
     override fun toString(): String {

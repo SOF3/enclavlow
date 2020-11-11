@@ -1,9 +1,9 @@
 package io.github.sof3.enclavlow.tests
 
-import io.github.sof3.enclavlow.Contract
-import io.github.sof3.enclavlow.ContractFlowGraph
-import io.github.sof3.enclavlow.MethodNameType
-import io.github.sof3.enclavlow.analyzeMethod
+import io.github.sof3.enclavlow.contract.Contract
+import io.github.sof3.enclavlow.contract.ContractFlowGraph
+import io.github.sof3.enclavlow.contract.MethodNameType
+import io.github.sof3.enclavlow.contract.analyzeMethod
 import java.io.File
 import java.lang.management.ManagementFactory
 import kotlin.test.assertEquals
