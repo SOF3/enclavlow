@@ -5,7 +5,7 @@ import io.github.sof3.enclavlow.contract.ExplicitSourceLocalNode
 import io.github.sof3.enclavlow.contract.LocalNode
 import io.github.sof3.enclavlow.contract.StaticLocalNode
 import io.github.sof3.enclavlow.contract.ThisLocalNode
-import io.github.sof3.enclavlow.printDebug
+import io.github.sof3.enclavlow.util.printDebug
 import soot.Local
 import soot.Value
 import soot.jimple.AnyNewExpr

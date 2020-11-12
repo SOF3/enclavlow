@@ -1,4 +1,4 @@
-package io.github.sof3.enclavlow
+package io.github.sof3.enclavlow.util
 
 fun <T : Any> indexedSetOf(vararg values: T): IndexedSet<T> {
     val set = IndexedSet<T>()

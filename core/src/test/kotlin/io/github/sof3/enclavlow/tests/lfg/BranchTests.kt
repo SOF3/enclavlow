@@ -1,10 +1,10 @@
 package io.github.sof3.enclavlow.tests.lfg
 
+import io.github.sof3.enclavlow.cases.lfg.BranchCase
 import io.github.sof3.enclavlow.contract.CallTags
 import io.github.sof3.enclavlow.contract.ParamLocalNode
 import io.github.sof3.enclavlow.contract.ReturnLocalNode
 import io.github.sof3.enclavlow.contract.ThrowLocalNode
-import io.github.sof3.enclavlow.cases.lfg.BranchCase
 import io.github.sof3.enclavlow.contract.makeContract
 import io.github.sof3.enclavlow.tests.testMethod
 import kotlin.test.Test

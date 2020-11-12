@@ -1,28 +1,36 @@
-package io.github.sof3.enclavlow
+package io.github.sof3.enclavlow.util
 
-fun <T : Any, E : GraphEdge<E>> newDiGraph(
-    nodes: IndexedSet<T> = IndexedSet(),
+fun <N : Any, E : Edge<E, N>> newDiGraph(
+    nodes: IndexedSet<N> = IndexedSet(),
     newEdge: () -> E,
-): MutableDiGraph<T, E> {
+): MutableDiGraph<N, E> {
     val edges: MutableList<MutableList<E?>> = MutableList(nodes.size) { MutableList(nodes.size) { null } }
     return MutableDiGraph(nodes, edges, newEdge)
 }
 
-interface GraphEdge<Self> {
+interface Edge<Self: Edge<Self, N>, N : Any> {
+    /**
+     * Called from MutableDiGraph.merge()
+     */
     fun mergeEdge(other: Self): Self
+
+    /**
+     * Called from DiGraph.graphEquals()
+     */
     fun graphEqualsImpl(other: Any): Boolean
-    fun getGraphvizAttributes(): Iterable<Pair<String, String>>
+
+    fun getGraphvizAttributes(from: N, to: N): Iterable<Pair<String, String>>
 }
 
-infix fun <E : GraphEdge<E>> E?.graphEquals(other: Any?): Boolean {
+infix fun <N : Any, E : Edge<E, N>> E?.graphEquals(other: Any?): Boolean {
     if (this != null && other != null) {
         return graphEqualsImpl(other)
     }
     return this == null && other == null
 }
 
-sealed class DiGraph<T : Any, E : GraphEdge<E>>(
-    nodes: IndexedSet<T>,
+sealed class DiGraph<N : Any, E : Edge<E, N>>(
+    nodes: IndexedSet<N>,
     edges: MutableList<MutableList<E?>>,
 ) {
     open var nodes = nodes; protected set
@@ -54,15 +62,15 @@ sealed class DiGraph<T : Any, E : GraphEdge<E>>(
     inline fun toGraphviz(
         name: String,
         graphAttr: List<Pair<String, String>> = emptyList(),
-        nodeAttr: (T) -> List<Pair<String, String>> = {
+        nodeAttr: (N) -> List<Pair<String, String>> = {
             val ret = mutableListOf(
                 "label" to it.toString(),
                 "color" to ("#" + it.javaClass.hashCode().toString(16).padStart(6, '0').substring(0, 6))
             )
             ret
         },
-        edgeAttr: (T, T, E) -> Iterable<Pair<String, String>> = { _, _, edge ->
-            edge.getGraphvizAttributes()
+        edgeAttr: (N, N, E) -> Iterable<Pair<String, String>> = { from, to, edge ->
+            edge.getGraphvizAttributes(from, to)
         },
     ): String {
         val ret = StringBuilder()
@@ -75,20 +83,17 @@ sealed class DiGraph<T : Any, E : GraphEdge<E>>(
             val attrString = attrs.map { (k, v) -> "$k = \"$v\"" }
             ret.append("\t$i [${attrString.joinToString(",")}];\n")
         }
-        for ((i, iEdges) in edges.withIndex()) {
-            for ((j, edge) in iEdges.withIndex()) {
-                if (edge != null) {
-                    val attrs = edgeAttr(nodes[i], nodes[j], edge)
-                    val attrString = attrs.map { (k, v) -> "$k = \"$v\"" }
-                    ret.append("\t$i -> $j [${attrString.joinToString(",")}];\n")
-                }
-            }
+
+        forEachEdgeIndex { i, j, edge ->
+            val attrs = edgeAttr(nodes[i], nodes[j], edge)
+            val attrString = attrs.map { (k, v) -> "$k = \"$v\"" }
+            ret.append("\t$i -> $j [${attrString.joinToString(",")}];\n")
         }
         ret.append("}")
         return ret.toString()
     }
 
-    fun filterNodes(pred: (T) -> Boolean): MutableDiGraph<T, E> {
+    fun filterNodes(pred: (N) -> Boolean): MutableDiGraph<N, E> {
         val newOldMap = mutableListOf<Int>()
         for ((i, t) in nodes.withIndex()) {
             if (pred(t)) {
@@ -96,7 +101,7 @@ sealed class DiGraph<T : Any, E : GraphEdge<E>>(
             }
         }
 
-        val newNodes = IndexedSet<T>()
+        val newNodes = IndexedSet<N>()
         newNodes.addAll(newOldMap.map { nodes[it] })
         val newEdges = MutableList(newOldMap.size) { i ->
             MutableList(newOldMap.size) { j ->
@@ -106,18 +111,18 @@ sealed class DiGraph<T : Any, E : GraphEdge<E>>(
         return MutableDiGraph(newNodes, newEdges, edgeConstructor)
     }
 
-    fun indexOf(node: T): Int = nodes.find(node) ?: throw IllegalArgumentException("Nonexistent node $node")
+    fun indexOf(node: N): Int = nodes.find(node) ?: throw IllegalArgumentException("Nonexistent node $node")
 
-    fun flowsFrom(src: T): List<T> = flowsFromIndex(indexOf(src)).map { nodes[it] }
-    fun flowsFromEdges(src: T): List<Pair<T, E>> {
+    fun flowsFrom(src: N): List<N> = flowsFromIndex(indexOf(src)).map { nodes[it] }
+    fun flowsFromEdges(src: N): List<Pair<N, E>> {
         val i = indexOf(src)
         return flowsFromIndex(i).map { nodes[it] to edges[i][it]!! }
     }
 
     private fun flowsFromIndex(i: Int) = edges[i].mapIndexed { j, t -> if (t != null) j else null }.filterNotNull()
 
-    fun flowsTo(dest: T): List<T> = flowsToIndex(indexOf(dest)).map { nodes[it] }
-    fun flowsToEdges(dest: T): List<Pair<T, E>> {
+    fun flowsTo(dest: N): List<N> = flowsToIndex(indexOf(dest)).map { nodes[it] }
+    fun flowsToEdges(dest: N): List<Pair<N, E>> {
         val j = indexOf(dest)
         return flowsToIndex(j).map { nodes[it] to edges[it][j]!! }
     }
@@ -127,14 +132,14 @@ sealed class DiGraph<T : Any, E : GraphEdge<E>>(
         if (edge != null && edgeFilter(edge)) i else null
     }.filterNotNull()
 
-    fun visitAncestors(leaves: Set<T>, visitor: (T) -> Unit) {
+    fun visitAncestors(leaves: Set<N>, visitor: (N) -> Unit) {
         val visited = mutableSetOf<Int>()
         for (leaf in leaves) {
             visitAncestors(leaf, visited, visitor)
         }
     }
 
-    private fun visitAncestors(leaf: T, visited: MutableSet<Int>, visitor: (T) -> Unit) {
+    private fun visitAncestors(leaf: N, visited: MutableSet<Int>, visitor: (N) -> Unit) {
         val j = indexOf(leaf)
         for (i in 0 until nodes.size) {
             if (edges[i][j] != null && visited.add(i)) {
@@ -144,7 +149,7 @@ sealed class DiGraph<T : Any, E : GraphEdge<E>>(
         }
     }
 
-    fun deleteAllSources(dest: T) {
+    fun deleteAllSources(dest: N) {
         val j = indexOf(dest)
         for (i in 0 until nodes.size) {
             edges[i][j] = null
@@ -156,7 +161,7 @@ sealed class DiGraph<T : Any, E : GraphEdge<E>>(
      * there exists paths (a, ..., c), (b, ..., c) with all path elements satisfying filter,
      * with the smallest path length sums
      */
-    inline fun lca(a: T, b: T, nodeFilter: (T) -> Boolean, edgeFilter: (E) -> Boolean): T? {
+    inline fun lca(a: N, b: N, nodeFilter: (N) -> Boolean, edgeFilter: (E) -> Boolean): N? {
         printDebug("Finding LCA of $a and $b in $this")
         val index = lcaIndex(indexOf(a), indexOf(b), { nodeFilter(nodes[it]) }, edgeFilter) ?: return null
         return nodes[index]
@@ -184,20 +189,32 @@ sealed class DiGraph<T : Any, E : GraphEdge<E>>(
             right.addAll(rightEden)
         }
     }
+
+    inline fun forEachEdgeIndex(fn: (Int, Int, E) -> Unit) {
+        for ((i, iEdges) in edges.withIndex()) {
+            for ((j, edge) in iEdges.withIndex()) {
+                if (edge != null) fn(i, j, edge)
+            }
+        }
+    }
+
+    inline fun forEachEdge(fn: (N, N, E) -> Unit) = forEachEdgeIndex { from, to, edge ->
+        fn(nodes[from], nodes[to], edge)
+    }
 }
 
-class MutableDiGraph<T : Any, E : GraphEdge<E>>(
-    nodes: IndexedSet<T>,
+class MutableDiGraph<N : Any, E : Edge<E, N>>(
+    nodes: IndexedSet<N>,
     edges: MutableList<MutableList<E?>>,
     override var edgeConstructor: () -> E,
-) : DiGraph<T, E>(nodes, edges), Cloneable {
+) : DiGraph<N, E>(nodes, edges), Cloneable {
     override var edges: MutableList<MutableList<E?>>
         get() = super.edges
         public set(value) {
             super.edges = value
         }
 
-    fun addNodeIfMissing(node: T) {
+    fun addNodeIfMissing(node: N) {
         if (nodes.addIfMissing(node)) {
             for (edgeList in edges) {
                 edgeList.add(null)
@@ -206,7 +223,7 @@ class MutableDiGraph<T : Any, E : GraphEdge<E>>(
         }
     }
 
-    fun touch(from: T, to: T, config: E.() -> Unit = {}) {
+    fun touch(from: N, to: N, config: E.() -> Unit) {
         val a = nodes.find(from) ?: throw IllegalArgumentException("Nonexistent node $from")
         val b = nodes.find(to) ?: throw IllegalArgumentException("Nonexistent node $to")
 
@@ -219,12 +236,12 @@ class MutableDiGraph<T : Any, E : GraphEdge<E>>(
 
     public override fun clone() = MutableDiGraph(nodes.clone(), MutableList(nodes.size) { edges[it].toMutableList() }, edgeConstructor)
 
-    infix fun copyTo(target: MutableDiGraph<T, E>) {
+    infix fun copyTo(target: MutableDiGraph<N, E>) {
         target.nodes = nodes.clone()
         target.edges = MutableList(nodes.size) { edges[it].toMutableList() }
     }
 
-    inline fun merge(other: MutableDiGraph<T, E>, biMap: (E?, E?) -> E?): MutableDiGraph<T, E> {
+    inline fun merge(other: MutableDiGraph<N, E>, biMap: (E?, E?) -> E?): MutableDiGraph<N, E> {
         // L
         val out = clone()
 

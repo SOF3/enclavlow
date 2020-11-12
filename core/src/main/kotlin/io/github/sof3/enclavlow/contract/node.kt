@@ -17,22 +17,6 @@ sealed class ContractNode : LocalNode() {
 }
 
 /**
- * Data to caller through return path
- */
-object ReturnLocalNode : ContractNode() {
-    override val name: String
-        get() = "return"
-}
-
-/**
- * Data to caller through throw path
- */
-object ThrowLocalNode : ContractNode() {
-    override val name: String
-        get() = "throw"
-}
-
-/**
  * Data to static scope
  *
  * Data from static scope are always considered insensitive.
@@ -42,24 +26,59 @@ object StaticLocalNode : ContractNode() {
         get() = "static"
 }
 
+sealed class ScopedContractNode : ContractNode() {
+    abstract fun toOwned(): ScopedContractNode
+}
+
+/**
+ * Data to caller through return path
+ */
+object ReturnLocalNode : ScopedContractNode() {
+    override val name: String
+        get() = "return"
+
+    override fun toOwned() = this
+}
+
+/**
+ * Data to caller through throw path
+ */
+object ThrowLocalNode : ScopedContractNode() {
+    override val name: String
+        get() = "throw"
+
+    override fun toOwned() = this
+}
+
 /**
  * Data from/to `this`
  */
-object ThisLocalNode : ContractNode() {
+object ThisLocalNode : ScopedContractNode() {
     override val name: String
         get() = "this"
+
+    override fun toOwned() = this
 }
 
 /**
  * Data source from a parameter
  */
-class ParamLocalNode(private val index: Int) : ContractNode() {
+data class ParamLocalNode(private val index: Int) : ScopedContractNode() {
     override val name: String
         get() = "param$index"
 
     override fun equals(other: Any?) = other is ParamLocalNode && index == other.index
 
     override fun hashCode() = index.hashCode()
+
+    override fun toOwned() = copy()
+}
+
+object MethodControlNode : ScopedContractNode() {
+    override val name: String
+        get() = "methodCall"
+
+    override fun toOwned() = this
 }
 
 /**

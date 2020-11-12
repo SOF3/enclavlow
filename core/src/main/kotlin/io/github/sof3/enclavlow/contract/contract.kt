@@ -2,16 +2,16 @@ package io.github.sof3.enclavlow.contract
 
 import edu.hku.cs.uranus.IntelSGX
 import edu.hku.cs.uranus.IntelSGXOcall
-import io.github.sof3.enclavlow.DiGraph
-import io.github.sof3.enclavlow.GraphEdge
-import io.github.sof3.enclavlow.MutableDiGraph
-import io.github.sof3.enclavlow.block
-import io.github.sof3.enclavlow.indexedSetOf
 import io.github.sof3.enclavlow.local.FnCall
 import io.github.sof3.enclavlow.local.FnIden
 import io.github.sof3.enclavlow.local.SenFlow
-import io.github.sof3.enclavlow.newDiGraph
-import io.github.sof3.enclavlow.printDebug
+import io.github.sof3.enclavlow.util.DiGraph
+import io.github.sof3.enclavlow.util.Edge
+import io.github.sof3.enclavlow.util.MutableDiGraph
+import io.github.sof3.enclavlow.util.block
+import io.github.sof3.enclavlow.util.indexedSetOf
+import io.github.sof3.enclavlow.util.newDiGraph
+import io.github.sof3.enclavlow.util.printDebug
 import soot.Body
 import soot.BodyTransformer
 import soot.Scene
@@ -85,7 +85,11 @@ object SenTransformer : BodyTransformer() {
     }
 }
 
-data class Contract<G : ContractFlowGraph>(val graph: G, val callTags: CallTags, val calls: MutableList<FnCall>)
+data class Contract<G : ContractFlowGraph>(
+    val graph: G,
+    val callTags: CallTags,
+    val calls: MutableList<FnCall>,
+)
 
 fun makeContract(
     callTags: CallTags,
@@ -97,7 +101,7 @@ fun makeContract(
     nodes.addAll((0 until paramCount).map { ParamLocalNode(it) })
     nodes.addAll(extraNodes)
 
-    val graph = newDiGraph(nodes) { ContractEdge(ContractEdgeType.LOCAL) }
+    val graph = newDiGraph(nodes) { ContractEdge() }
     fn(MakeContractContext(graph))
     return Contract(graph, callTags, mutableListOf())
 }
@@ -105,37 +109,20 @@ fun makeContract(
 typealias ContractFlowGraph = DiGraph<ContractNode, ContractEdge>
 typealias MutableContractFlowGraph = MutableDiGraph<ContractNode, ContractEdge>
 
-class ContractEdge(var type: ContractEdgeType) : GraphEdge<ContractEdge> {
+class ContractEdge : Edge<ContractEdge, ContractNode> {
     override fun mergeEdge(other: ContractEdge) =
         throw UnsupportedOperationException("Contract graphs shall not be merged")
 
     override fun graphEqualsImpl(other: Any) = true
 
-    override fun getGraphvizAttributes(): Iterable<Pair<String, String>> {
+    override fun getGraphvizAttributes(from: ContractNode, to: ContractNode): Iterable<Pair<String, String>> {
         return emptyList() // TODO
     }
 }
 
-enum class ContractEdgeType {
-    /**
-     * Internal edge inferred from LFG
-     */
-    LOCAL,
-
-    /**
-     * Equivalence edge between functions
-     */
-    INVOKE,
-
-    /**
-     * Equivalence edge between functions, parameter/context backflow
-     */
-    INVOKE_BACKFLOW,
-}
-
-class MakeContractContext<T : Any, E : GraphEdge<E>>(private val graph: MutableDiGraph<T, E>) {
+class MakeContractContext<T : Any, E : Edge<E, T>>(private val graph: MutableDiGraph<T, E>) {
     infix fun T.into(other: T) {
-        graph.touch(this, other)
+        graph.touch(this, other) {}
     }
 }
 

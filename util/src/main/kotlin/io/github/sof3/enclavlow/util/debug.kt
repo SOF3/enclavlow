@@ -1,4 +1,4 @@
-package io.github.sof3.enclavlow
+package io.github.sof3.enclavlow.util
 
 var IS_DEBUG = true
 

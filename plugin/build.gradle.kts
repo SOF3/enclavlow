@@ -14,5 +14,7 @@ gradlePlugin {
 
 dependencies {
     implementation("org.jetbrains.kotlin", "kotlin-stdlib", "1.4.10")
+    implementation("org.jetbrains.kotlin", "kotlin-reflect", "1.4.10")
     implementation(project(":core"))
+
 }

@@ -1,30 +1,30 @@
 package io.github.sof3.enclavlow.local
 
+import io.github.sof3.enclavlow.contract.CallTags
+import io.github.sof3.enclavlow.contract.Contract
 import io.github.sof3.enclavlow.contract.ContractNode
 import io.github.sof3.enclavlow.contract.ExplicitSinkLocalNode
 import io.github.sof3.enclavlow.contract.ExplicitSourceLocalNode
-import io.github.sof3.enclavlow.GraphEdge
 import io.github.sof3.enclavlow.contract.LocalControlNode
 import io.github.sof3.enclavlow.contract.LocalNode
 import io.github.sof3.enclavlow.contract.LocalVarNode
-import io.github.sof3.enclavlow.MutableDiGraph
+import io.github.sof3.enclavlow.contract.MutableContractFlowGraph
 import io.github.sof3.enclavlow.contract.ParamLocalNode
 import io.github.sof3.enclavlow.contract.ProxyLocalNode
 import io.github.sof3.enclavlow.contract.ReturnLocalNode
 import io.github.sof3.enclavlow.contract.StaticLocalNode
 import io.github.sof3.enclavlow.contract.ThisLocalNode
 import io.github.sof3.enclavlow.contract.ThrowLocalNode
-import io.github.sof3.enclavlow.alwaysAssert
-import io.github.sof3.enclavlow.block
-import io.github.sof3.enclavlow.contract.CallTags
-import io.github.sof3.enclavlow.contract.Contract
-import io.github.sof3.enclavlow.contract.MutableContractFlowGraph
 import io.github.sof3.enclavlow.contract.makeContract
-import io.github.sof3.enclavlow.getOrFill
-import io.github.sof3.enclavlow.indexedSetOf
-import io.github.sof3.enclavlow.newDiGraph
-import io.github.sof3.enclavlow.notNull
-import io.github.sof3.enclavlow.printDebug
+import io.github.sof3.enclavlow.util.Edge
+import io.github.sof3.enclavlow.util.MutableDiGraph
+import io.github.sof3.enclavlow.util.alwaysAssert
+import io.github.sof3.enclavlow.util.block
+import io.github.sof3.enclavlow.util.getOrFill
+import io.github.sof3.enclavlow.util.indexedSetOf
+import io.github.sof3.enclavlow.util.newDiGraph
+import io.github.sof3.enclavlow.util.notNull
+import io.github.sof3.enclavlow.util.printDebug
 import soot.SootMethod
 import soot.Value
 import soot.jimple.BreakpointStmt
@@ -198,7 +198,7 @@ class SenFlow(
     private fun nodePostprocess(dest: ContractNode) = { node: LocalNode ->
         if (node is ContractNode && node !== dest) {
             outputContract.graph.addNodeIfMissing(node)
-            outputContract.graph.touch(node, dest)
+            outputContract.graph.touch(node, dest) {}
         }
     }
 }
@@ -309,7 +309,7 @@ fun makeLocalFlowGraph(vararg extraNodes: Iterable<LocalNode>): LocalFlowGraph {
     return newDiGraph(nodes) { LocalEdge(mutableSetOf()) }
 }
 
-data class LocalEdge(val causes: MutableSet<String>) : GraphEdge<LocalEdge> {
+data class LocalEdge(val causes: MutableSet<String>) : Edge<LocalEdge, LocalNode> {
     /**
      * Indicates that this flow is the back flow of `b -> a`
      * when `copyTo(a, b)` is called.
@@ -326,7 +326,7 @@ data class LocalEdge(val causes: MutableSet<String>) : GraphEdge<LocalEdge> {
 
     override fun graphEqualsImpl(other: Any) = true
 
-    override fun getGraphvizAttributes(): Iterable<Pair<String, String>> {
+    override fun getGraphvizAttributes(from: LocalNode, to: LocalNode): Iterable<Pair<String, String>> {
         return listOf(
             "label" to causes.joinToString(",\\n")
         )
@@ -339,7 +339,7 @@ data class FnIden(
 )
 
 data class FnCall(
-    val iden: FnIden,
+    val fn: FnIden,
     val params: List<ProxyLocalNode>,
     val thisNode: ProxyLocalNode?,
     val returnNode: ProxyLocalNode,
@@ -357,11 +357,11 @@ data class FnCall(
 }
 
 fun createFnCall(method: SootMethod): FnCall {
-    val iden = FnIden(method.declaringClass.name, method.subSignature)
-    val params = List(method.parameterCount) { ProxyLocalNode("<$iden>\nparam $it") }
-    val thisNode = if (method.isStatic) null else ProxyLocalNode("<$iden>\nthis")
-    val returnNode = ProxyLocalNode("<$iden>\nreturn")
-    val throwNode = ProxyLocalNode("<$iden>\nthrow")
-    val controlNode = ProxyLocalNode("<$iden>\ncontrol")
-    return FnCall(iden, params, thisNode, returnNode, throwNode, controlNode)
+    val fn = FnIden(method.declaringClass.name, method.subSignature)
+    val params = List(method.parameterCount) { ProxyLocalNode("<$fn>\nparam $it") }
+    val thisNode = if (method.isStatic) null else ProxyLocalNode("<$fn>\nthis")
+    val returnNode = ProxyLocalNode("<$fn>\nreturn")
+    val throwNode = ProxyLocalNode("<$fn>\nthrow")
+    val controlNode = ProxyLocalNode("<$fn>\ncontrol")
+    return FnCall(fn, params, thisNode, returnNode, throwNode, controlNode)
 }
