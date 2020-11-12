@@ -65,7 +65,7 @@ sealed class DiGraph<N : Any, E : Edge<E, N>>(
         nodeAttr: (N) -> List<Pair<String, String>> = {
             val ret = mutableListOf(
                 "label" to it.toString(),
-                "color" to ("#" + it.javaClass.hashCode().toString(16).padStart(6, '0').substring(0, 6))
+                "color" to randomColor(it.javaClass.name)
             )
             ret
         },
@@ -132,19 +132,21 @@ sealed class DiGraph<N : Any, E : Edge<E, N>>(
         if (edge != null && edgeFilter(edge)) i else null
     }.filterNotNull()
 
-    fun visitAncestors(leaves: Set<N>, visitor: (N) -> Unit) {
+    fun <R> visitAncestors(leaves: Set<N>, initial: R, reduce: (R, E) -> R, visitor: (R, N) -> Unit) {
         val visited = mutableSetOf<Int>()
         for (leaf in leaves) {
-            visitAncestors(leaf, visited, visitor)
+            visitAncestors(leaf, visited, initial, reduce, visitor)
         }
     }
 
-    private fun visitAncestors(leaf: N, visited: MutableSet<Int>, visitor: (N) -> Unit) {
+    private fun <R> visitAncestors(leaf: N, visited: MutableSet<Int>, initial: R, reduce: (R, E) -> R, visitor: (R, N) -> Unit) {
         val j = indexOf(leaf)
         for (i in 0 until nodes.size) {
-            if (edges[i][j] != null && visited.add(i)) {
-                visitor(nodes[i])
-                visitAncestors(nodes[i], visited, visitor)
+            val edge = edges[i][j]
+            if (edge != null && visited.add(i)) {
+                val step = reduce(initial, edge)
+                visitor(step, nodes[i])
+                visitAncestors(nodes[i], visited, step, reduce, visitor)
             }
         }
     }
@@ -223,15 +225,17 @@ class MutableDiGraph<N : Any, E : Edge<E, N>>(
         }
     }
 
-    fun touch(from: N, to: N, config: E.() -> Unit) {
+    fun touch(from: N, to: N, config: E.() -> Unit) : E? {
         val a = nodes.find(from) ?: throw IllegalArgumentException("Nonexistent node $from")
         val b = nodes.find(to) ?: throw IllegalArgumentException("Nonexistent node $to")
 
-        if (a == b) return // self-loops are not allowed
+        if (a == b) return null // self-loops are not allowed
 
         val edge = edges[a][b] ?: edgeConstructor()
         edge.config()
         edges[a][b] = edge
+
+        return edge
     }
 
     public override fun clone() = MutableDiGraph(nodes.clone(), MutableList(nodes.size) { edges[it].toMutableList() }, edgeConstructor)

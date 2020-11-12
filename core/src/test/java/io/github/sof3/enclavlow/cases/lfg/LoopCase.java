@@ -12,7 +12,7 @@ public class LoopCase {
 
     public static int loopDec(int i) {
         int a = 0;
-        while(i-- > 0) {
+        while (i-- > 0) {
             a += i;
         }
         return a;

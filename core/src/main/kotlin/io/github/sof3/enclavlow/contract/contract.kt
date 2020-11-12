@@ -101,7 +101,7 @@ fun makeContract(
     nodes.addAll((0 until paramCount).map { ParamLocalNode(it) })
     nodes.addAll(extraNodes)
 
-    val graph = newDiGraph(nodes) { ContractEdge() }
+    val graph = newDiGraph(nodes) { ContractEdge(false) }
     fn(MakeContractContext(graph))
     return Contract(graph, callTags, mutableListOf())
 }
@@ -109,20 +109,27 @@ fun makeContract(
 typealias ContractFlowGraph = DiGraph<ContractNode, ContractEdge>
 typealias MutableContractFlowGraph = MutableDiGraph<ContractNode, ContractEdge>
 
-class ContractEdge : Edge<ContractEdge, ContractNode> {
+data class ContractEdge(var refOnly: Boolean) : Edge<ContractEdge, ContractNode> {
     override fun mergeEdge(other: ContractEdge) =
         throw UnsupportedOperationException("Contract graphs shall not be merged")
 
     override fun graphEqualsImpl(other: Any) = true
 
     override fun getGraphvizAttributes(from: ContractNode, to: ContractNode): Iterable<Pair<String, String>> {
-        return emptyList() // TODO
+        return listOf(
+            "color" to if (refOnly) "grey" else "black",
+        )
     }
 }
 
 class MakeContractContext<T : Any, E : Edge<E, T>>(private val graph: MutableDiGraph<T, E>) {
-    infix fun T.into(other: T) {
-        graph.touch(this, other) {}
+    infix fun T.into(other: T): E? {
+        return graph.touch(this, other) {}
+    }
+
+    inline infix fun E?.with(fn: E.() -> Unit): E? {
+        this?.fn()
+        return this
     }
 }
 

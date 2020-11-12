@@ -1,5 +1,7 @@
 package io.github.sof3.enclavlow.util
 
+import kotlin.random.Random
+
 fun <T : Any> indexedSetOf(vararg values: T): IndexedSet<T> {
     val set = IndexedSet<T>()
     for (value in values) {
@@ -64,12 +66,14 @@ inline fun <K, V> MutableMap<K, V>.getOrFill(k: K, fill: () -> V): V {
     return value
 }
 
-inline fun <T : Any, R> T?.notNull(fn: (T) -> R) {
-    if (this != null) {
-        fn(this)
-    }
-}
-
 inline fun alwaysAssert(cond: Boolean, message: () -> String) {
     if (!cond) throw AssertionError(message())
+}
+
+fun <T> randomColor(t: T): String {
+    val random = Random(t.hashCode())
+    val sb = StringBuilder(7)
+    sb.append('#')
+    for (i in 0 until 6) sb.append(random.nextInt(16).toString(16))
+    return sb.toString()
 }

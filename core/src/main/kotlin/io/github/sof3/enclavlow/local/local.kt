@@ -23,7 +23,6 @@ import io.github.sof3.enclavlow.util.block
 import io.github.sof3.enclavlow.util.getOrFill
 import io.github.sof3.enclavlow.util.indexedSetOf
 import io.github.sof3.enclavlow.util.newDiGraph
-import io.github.sof3.enclavlow.util.notNull
 import io.github.sof3.enclavlow.util.printDebug
 import soot.SootMethod
 import soot.Value
@@ -119,13 +118,13 @@ class SenFlow(
 
                 // in 3AC, return statements are never followed by invocation calls
                 // so it is safe to just pass input to rvalueNodes
-                final.graph.visitAncestors(setOf(final.control) + rvalueNodes(final, stmt.op), nodePostprocess(ReturnLocalNode))
+                ancestorPostprocess(final, setOf(final.control) + rvalueNodes(final, stmt.op), ReturnLocalNode)
             }
             is ReturnVoidStmt -> {
                 val final = input.finalizedCopy()
                 nodePostprocessCommon(final)
 
-                final.graph.visitAncestors(setOf(final.control), nodePostprocess(ReturnLocalNode))
+                ancestorPostprocess(final, setOf(final.control), ReturnLocalNode)
             }
             is ThrowStmt -> {
                 val final = input.finalizedCopy()
@@ -133,7 +132,7 @@ class SenFlow(
 
                 // in 3AC, throw statements are never followed by invocation calls
                 // so it is safe to just pass input to rvalueNodes
-                final.graph.visitAncestors(setOf(final.control) + rvalueNodes(final, stmt.op), nodePostprocess(ThrowLocalNode))
+                ancestorPostprocess(final, setOf(final.control) + rvalueNodes(final, stmt.op), ThrowLocalNode)
 
                 // TODO handle try-catch
             }
@@ -183,22 +182,25 @@ class SenFlow(
     }
 
     private fun nodePostprocessCommon(flow: LocalFlow) {
-        flow.graph.visitAncestors(setOf(ThisLocalNode), nodePostprocess(ThisLocalNode))
-        flow.graph.visitAncestors(setOf(StaticLocalNode), nodePostprocess(StaticLocalNode))
-        flow.graph.visitAncestors(setOf(ExplicitSinkLocalNode), nodePostprocess(ExplicitSinkLocalNode))
+        ancestorPostprocess(flow, setOf(ThisLocalNode), ThisLocalNode)
+        ancestorPostprocess(flow, setOf(StaticLocalNode), StaticLocalNode)
+        ancestorPostprocess(flow, setOf(ExplicitSinkLocalNode), ExplicitSinkLocalNode)
         for (paramNode in flow.params) {
             println("Searching ancestors of $paramNode")
-            flow.graph.visitAncestors(setOf(paramNode)) {
-                println("Visited $it")
-                nodePostprocess(paramNode)(it)
-            }
+            ancestorPostprocess(flow, setOf(paramNode), paramNode)
         }
     }
 
-    private fun nodePostprocess(dest: ContractNode) = { node: LocalNode ->
+    private fun ancestorPostprocess(flow: LocalFlow, leaves: Set<LocalNode>, dest: ContractNode) {
+        flow.graph.visitAncestors(leaves, false, { b, e -> b || e.refOnly }, nodePostprocess(dest))
+    }
+
+    private fun nodePostprocess(dest: ContractNode) = { refOnly: Boolean, node: LocalNode ->
         if (node is ContractNode && node !== dest) {
             outputContract.graph.addNodeIfMissing(node)
-            outputContract.graph.touch(node, dest) {}
+            outputContract.graph.touch(node, dest) {
+                this@touch.refOnly = refOnly
+            }
         }
     }
 }
@@ -228,7 +230,10 @@ fun handleAssign(output: LocalFlow, left: Value, right: Value) {
 
     for (leftNode in rightLeft.lvalues) {
         for (rightNode in leftRight) {
-            output.graph.touch(rightNode, leftNode) { causes += "Assignment\\nBack flow" }
+            output.graph.touch(rightNode, leftNode) {
+                causes += "Assignment\\nBack flow"
+                refOnly = true
+            }
         }
     }
 }
@@ -324,11 +329,18 @@ data class LocalEdge(val causes: MutableSet<String>) : Edge<LocalEdge, LocalNode
         return ret
     }
 
-    override fun graphEqualsImpl(other: Any) = true
+    override fun graphEqualsImpl(other: Any): Boolean {
+        if (other !is LocalEdge) return false
+        if (copyFlow != other.copyFlow) return false
+        if (refOnly != other.refOnly) return false
+        return true
+    }
 
     override fun getGraphvizAttributes(from: LocalNode, to: LocalNode): Iterable<Pair<String, String>> {
         return listOf(
-            "label" to causes.joinToString(",\\n")
+            "label" to causes.joinToString(",\\n"),
+            "style" to if (copyFlow) "dotted" else "solid",
+            "color" to if (refOnly) "grey" else "black",
         )
     }
 }
@@ -348,7 +360,7 @@ data class FnCall(
 ) {
     fun allNodes() = sequence {
         yieldAll(params)
-        thisNode.notNull {
+        thisNode?.let {
             yield(it)
         }
         yield(returnNode)

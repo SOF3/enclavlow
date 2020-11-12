@@ -15,6 +15,7 @@ package io.github.sof3.enclavlow.api
  * @return the same value as `source`, but now always treated as a sensitive value
  */
 fun byteSourceMarker(source: Byte) = source
+
 /**
  * A blackbox that marks a value security-sensitive
  *
@@ -22,6 +23,7 @@ fun byteSourceMarker(source: Byte) = source
  * @return the same value as `source`, but now always treated as a sensitive value
  */
 fun shortSourceMarker(source: Short) = source
+
 /**
  * A blackbox that marks a value security-sensitive
  *
@@ -29,6 +31,7 @@ fun shortSourceMarker(source: Short) = source
  * @return the same value as `source`, but now always treated as a sensitive value
  */
 fun intSourceMarker(source: Int) = source
+
 /**
  * A blackbox that marks a value security-sensitive
  *
@@ -36,6 +39,7 @@ fun intSourceMarker(source: Int) = source
  * @return the same value as `source`, but now always treated as a sensitive value
  */
 fun longSourceMarker(source: Long) = source
+
 /**
  * A blackbox that marks a value security-sensitive
  *
@@ -43,6 +47,7 @@ fun longSourceMarker(source: Long) = source
  * @return the same value as `source`, but now always treated as a sensitive value
  */
 fun floatSourceMarker(source: Float) = source
+
 /**
  * A blackbox that marks a value security-sensitive
  *
@@ -50,6 +55,7 @@ fun floatSourceMarker(source: Float) = source
  * @return the same value as `source`, but now always treated as a sensitive value
  */
 fun doubleSourceMarker(source: Double) = source
+
 /**
  * A blackbox that marks a value security-sensitive
  *
@@ -57,6 +63,7 @@ fun doubleSourceMarker(source: Double) = source
  * @return the same value as `source`, but now always treated as a sensitive value
  */
 fun charSourceMarker(source: Char) = source
+
 /**
  * A blackbox that marks a value security-sensitive
  *
@@ -73,6 +80,7 @@ fun booleanSourceMarker(source: Boolean) = source
  */
 fun <T> sourceMarker(source: T) = source
 
+
 /**
  * A blackbox that marks a value security-insensitive.
  *
@@ -80,6 +88,7 @@ fun <T> sourceMarker(source: T) = source
  * @return the same value as `sink`, but now always treated as an insensitive value
  */
 fun byteSinkMarker(sink: Byte) = sink
+
 /**
  * A blackbox that marks a value security-insensitive.
  *
@@ -87,6 +96,7 @@ fun byteSinkMarker(sink: Byte) = sink
  * @return the same value as `sink`, but now always treated as an insensitive value
  */
 fun shortSinkMarker(sink: Short) = sink
+
 /**
  * A blackbox that marks a value security-insensitive.
  *
@@ -94,6 +104,7 @@ fun shortSinkMarker(sink: Short) = sink
  * @return the same value as `sink`, but now always treated as an insensitive value
  */
 fun intSinkMarker(sink: Int) = sink
+
 /**
  * A blackbox that marks a value security-insensitive.
  *
@@ -101,6 +112,7 @@ fun intSinkMarker(sink: Int) = sink
  * @return the same value as `sink`, but now always treated as an insensitive value
  */
 fun longSinkMarker(sink: Long) = sink
+
 /**
  * A blackbox that marks a value security-insensitive.
  *
@@ -108,6 +120,7 @@ fun longSinkMarker(sink: Long) = sink
  * @return the same value as `sink`, but now always treated as an insensitive value
  */
 fun floatSinkMarker(sink: Float) = sink
+
 /**
  * A blackbox that marks a value security-insensitive.
  *
@@ -115,6 +128,7 @@ fun floatSinkMarker(sink: Float) = sink
  * @return the same value as `sink`, but now always treated as an insensitive value
  */
 fun doubleSinkMarker(sink: Double) = sink
+
 /**
  * A blackbox that marks a value security-insensitive.
  *
@@ -122,6 +136,7 @@ fun doubleSinkMarker(sink: Double) = sink
  * @return the same value as `sink`, but now always treated as an insensitive value
  */
 fun charSinkMarker(sink: Char) = sink
+
 /**
  * A blackbox that marks a value security-insensitive.
  *
