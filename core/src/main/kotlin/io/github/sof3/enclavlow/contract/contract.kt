@@ -89,6 +89,7 @@ data class Contract<G : ContractFlowGraph>(
     val graph: G,
     val callTags: CallTags,
     val calls: MutableList<FnCall>,
+    val methodControl: MethodControlNode,
 )
 
 fun makeContract(
@@ -97,19 +98,29 @@ fun makeContract(
     extraNodes: Collection<ContractNode> = emptyList(),
     fn: MakeContractContext<ContractNode, ContractEdge>.() -> Unit = {},
 ): Contract<MutableContractFlowGraph> {
+    val methodControl = MethodControlNode
     val nodes = indexedSetOf(ThisLocalNode, StaticLocalNode, ReturnLocalNode, ThrowLocalNode, ExplicitSourceLocalNode, ExplicitSinkLocalNode)
     nodes.addAll((0 until paramCount).map { ParamLocalNode(it) })
+    nodes.addIfMissing(methodControl)
     nodes.addAll(extraNodes)
 
-    val graph = newDiGraph(nodes) { ContractEdge(false) }
+    val graph = newDiGraph(nodes) {
+        ContractEdge(
+            refOnly = false,
+            projectionBackflow = false,
+        )
+    }
     fn(MakeContractContext(graph))
-    return Contract(graph, callTags, mutableListOf())
+    return Contract(graph, callTags, mutableListOf(), methodControl)
 }
 
 typealias ContractFlowGraph = DiGraph<ContractNode, ContractEdge>
 typealias MutableContractFlowGraph = MutableDiGraph<ContractNode, ContractEdge>
 
-data class ContractEdge(var refOnly: Boolean) : Edge<ContractEdge, ContractNode> {
+data class ContractEdge(
+    var refOnly: Boolean,
+    var projectionBackflow: Boolean,
+) : Edge<ContractEdge, ContractNode> {
     override fun mergeEdge(other: ContractEdge) =
         throw UnsupportedOperationException("Contract graphs shall not be merged")
 
@@ -117,7 +128,11 @@ data class ContractEdge(var refOnly: Boolean) : Edge<ContractEdge, ContractNode>
 
     override fun getGraphvizAttributes(from: ContractNode, to: ContractNode): Iterable<Pair<String, String>> {
         return listOf(
-            "color" to if (refOnly) "grey" else "black",
+            "color" to when {
+                refOnly -> "grey"
+                projectionBackflow -> "blue"
+                else -> "black"
+            },
         )
     }
 }

@@ -70,6 +70,11 @@ inline fun alwaysAssert(cond: Boolean, message: () -> String) {
     if (!cond) throw AssertionError(message())
 }
 
+inline fun <T> onlyItem(list: List<T>, message: () -> String = { "Expected list to be singleton" }): T {
+    if (list.size != 1) throw IndexOutOfBoundsException(message())
+    return list[0]
+}
+
 fun <T> randomColor(t: T): String {
     val random = Random(t.hashCode())
     val sb = StringBuilder(7)

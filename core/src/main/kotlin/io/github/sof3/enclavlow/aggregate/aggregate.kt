@@ -3,6 +3,7 @@ package io.github.sof3.enclavlow.aggregate
 import io.github.sof3.enclavlow.contract.Contract
 import io.github.sof3.enclavlow.contract.ContractFlowGraph
 import io.github.sof3.enclavlow.contract.ContractNode
+import io.github.sof3.enclavlow.contract.ContractProjectionNode
 import io.github.sof3.enclavlow.contract.ExplicitSinkLocalNode
 import io.github.sof3.enclavlow.contract.ExplicitSourceLocalNode
 import io.github.sof3.enclavlow.contract.MethodControlNode
@@ -91,5 +92,6 @@ private fun contractNodeToAgg(fn: FnIden, node: ContractNode, proxyMap: Map<Prox
     is ExplicitSourceLocalNode -> ExplicitSourceAggNode
     is ExplicitSinkLocalNode -> ExplicitSinkAggNode
     is StaticLocalNode -> StaticAggNode
+    is ContractProjectionNode -> TODO()
     is ProxyLocalNode -> proxyMap[node] ?: throw IllegalArgumentException("Unknown ProxyLocalNode")
 }

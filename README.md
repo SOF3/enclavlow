@@ -9,3 +9,22 @@ A Java flow analysis tool for SGX data sensitivity
 - `doc-fig`: Module for generating image assets used in docs
 
 ![](build/reports/dependency-graph/dependency-graph.png)
+
+## API
+### `enclavlow-core`
+The `analyzeMethod` function returns a Contract Flow Graph (CFG) for a single method.
+The CFG detects whether the method is an ECall/OCall,
+and presents the information flow throughout the method.
+
+## Tests
+To run the test cases in the `enclavlow-core` module, use the gradle task:
+
+```
+./gradlew core:tests
+```
+
+For the sake of convenience, all test case classes are compiled together with the test runtime,
+and the test runtime classpath is used as the classpath for soot.
+
+The test case classes are located in `core/src/main/java`,
+and the test case results are checked in `core/src/main/kotlin`.

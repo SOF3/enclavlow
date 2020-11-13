@@ -63,7 +63,7 @@ object ThisLocalNode : ScopedContractNode() {
 /**
  * Data source from a parameter
  */
-data class ParamLocalNode(private val index: Int) : ScopedContractNode() {
+class ParamLocalNode(private val index: Int) : ScopedContractNode() {
     override val name: String
         get() = "param$index"
 
@@ -71,15 +71,9 @@ data class ParamLocalNode(private val index: Int) : ScopedContractNode() {
 
     override fun hashCode() = index.hashCode()
 
-    override fun toOwned() = copy()
+    override fun toOwned() = ParamLocalNode(index)
 }
 
-object MethodControlNode : ScopedContractNode() {
-    override val name: String
-        get() = "methodCall"
-
-    override fun toOwned() = this
-}
 
 /**
  * Data source from a local variable explicitly declared as `sourceMarker`
@@ -107,18 +101,16 @@ sealed class LocalOnlyNode : LocalNode()
 /**
  * Data from/to a variable with jimple name `name`
  */
-class LocalVarNode(val name: String) : LocalOnlyNode() {
+data class LocalVarNode(val name: String) : LocalOnlyNode() {
     override fun toString() = name
-
-    override fun equals(other: Any?) = other is LocalVarNode && name == other.name
-
-    override fun hashCode() = name.hashCode()
 }
+
+interface ControlNode
 
 /**
  * Flows to ControlFlow indicates the current control flow contains data
  */
-class LocalControlNode : LocalOnlyNode() {
+class LocalControlNode : LocalOnlyNode(), ControlNode {
     private val id = count.getAndAdd(1)
 
     override fun toString(): String {
@@ -128,4 +120,40 @@ class LocalControlNode : LocalOnlyNode() {
     companion object {
         private var count = AtomicInteger(0)
     }
+}
+
+object MethodControlNode : ScopedContractNode(), ControlNode {
+    override val name: String
+        get() = "methodCall"
+
+    override fun toOwned() = this
+}
+
+/**
+ * Field projection of another node
+ */
+interface ProjectionNode<out B : LocalNode> {
+    val base: B
+    val name: String
+
+    companion object {
+        fun create(base: LocalNode, name: String): ProjectionNode<LocalNode> = when (base) {
+            is LocalOnlyNode -> LocalOnlyProjectionNode(base, name)
+            is ContractNode -> ContractProjectionNode(base, name)
+        }
+    }
+}
+
+data class LocalOnlyProjectionNode(
+    override val base: LocalOnlyNode,
+    override val name: String,
+) : LocalOnlyNode(), ProjectionNode<LocalOnlyNode> {
+    override fun toString() = "<$base>.$name"
+}
+
+data class ContractProjectionNode(
+    override val base: ContractNode,
+    override val name: String,
+) : ContractNode(), ProjectionNode<ContractNode> {
+    override fun toString() = "<$base>.$name"
 }

@@ -5,6 +5,8 @@ import io.github.sof3.enclavlow.contract.ExplicitSourceLocalNode
 import io.github.sof3.enclavlow.contract.LocalNode
 import io.github.sof3.enclavlow.contract.StaticLocalNode
 import io.github.sof3.enclavlow.contract.ThisLocalNode
+import io.github.sof3.enclavlow.util.alwaysAssert
+import io.github.sof3.enclavlow.util.onlyItem
 import io.github.sof3.enclavlow.util.printDebug
 import soot.Local
 import soot.Value
@@ -33,9 +35,9 @@ import soot.jimple.UnopExpr
  *
  * `flow` is mutated when `value` is a method invocation.
  */
-internal fun rvalueNodes(flow: LocalFlow, value: Value): Set<LocalNode> = rvalueNodesImpl(flow, value).toSet()
+internal fun rvalueNodes(flow: LocalFlow, value: Value): Set<LocalNode> = rvalueNodesSeq(flow, value).toSet()
 
-private fun rvalueNodesImpl(flow: LocalFlow, value: Value): Sequence<LocalNode> = sequence {
+private fun rvalueNodesSeq(flow: LocalFlow, value: Value): Sequence<LocalNode> = sequence {
     when (value) {
         is Constant -> {
             // constant leaks no information
@@ -57,23 +59,26 @@ private fun rvalueNodesImpl(flow: LocalFlow, value: Value): Sequence<LocalNode> 
             // TODO: does this leak memory reads?
         }
         is InstanceFieldRef -> {
-            // TODO: double check logic
-            yieldAll(rvalueNodesImpl(flow, value.base))
+            val nodes = rvalueNodesSeq(flow, value.base).toList()
+            alwaysAssert(nodes.size == 1) { "InstanceFieldRef base has complex nodes" }
+            val node = nodes[0]
+            val projection = flow.getProjectionAsNode(node, value.field)
+            yield(projection)
         }
         is ArrayRef -> {
-            yieldAll(rvalueNodesImpl(flow, value.base))
-            yieldAll(rvalueNodesImpl(flow, value.index))
+            yieldAll(rvalueNodesSeq(flow, value.base))
+            yieldAll(rvalueNodesSeq(flow, value.index))
         }
         is UnopExpr -> {
-            yieldAll(rvalueNodesImpl(flow, value.op))
+            yieldAll(rvalueNodesSeq(flow, value.op))
         }
         is NewMultiArrayExpr -> {
             for (size in value.sizes) {
-                yieldAll(rvalueNodesImpl(flow, size))
+                yieldAll(rvalueNodesSeq(flow, size))
             }
         }
         is NewArrayExpr -> {
-            yieldAll(rvalueNodesImpl(flow, value.size))
+            yieldAll(rvalueNodesSeq(flow, value.size))
         }
         is NewExpr -> {
             // constructing an object without invoking the constructor does not leak anything
@@ -87,7 +92,7 @@ private fun rvalueNodesImpl(flow: LocalFlow, value: Value): Sequence<LocalNode> 
                 } else if (method == "sinkMarker" || method.endsWith("SinkMarker")) {
                     for (arg in value.args) {
                         for (node in rvalueNodes(flow, arg)) {
-                            flow.graph.touch(node, ExplicitSinkLocalNode) { causes += "Sink marker" }
+                            flow.graph.touch(node, ExplicitSinkLocalNode) { causes += LocalFlowCause.SINK_MARKER }
                         }
                     }
                 } else {
@@ -95,7 +100,7 @@ private fun rvalueNodesImpl(flow: LocalFlow, value: Value): Sequence<LocalNode> 
                 }
             } else if (value.method.isNative) {
                 for (arg in value.args) {
-                    yieldAll(rvalueNodesImpl(flow, arg))
+                    yieldAll(rvalueNodesSeq(flow, arg))
                 }
             } else {
                 val call = createFnCall(value.method) // TODO specialize for polymorphism
@@ -105,28 +110,28 @@ private fun rvalueNodesImpl(flow: LocalFlow, value: Value): Sequence<LocalNode> 
                 // TODO handle ThrowNode
                 for ((i, arg) in value.args.withIndex()) {
                     for (sourceNode in rvalueNodes(flow, arg)) {
-                        flow.graph.touch(sourceNode, call.params[i]) { causes += "Call param" }
+                        flow.graph.touch(sourceNode, call.params[i]) { causes += LocalFlowCause.CALL_PARAM }
                     }
                 }
                 if (value is InstanceInvokeExpr) {
                     for (sourceNode in rvalueNodes(flow, value.base)) {
-                        flow.graph.touch(sourceNode, call.thisNode!!) { causes += "Call context" }
+                        flow.graph.touch(sourceNode, call.thisNode!!) { causes += LocalFlowCause.CALL_CONTEXT }
                     }
                 }
                 // invokeDynamic and invokeStatic do not pass an objectRef
-                flow.graph.touch(flow.control, call.controlNode) { causes += "Call condition" }
+                flow.graph.touch(flow.control, call.controlNode) { causes += LocalFlowCause.CALL_CONDITION }
                 yield(call.returnNode)
             }
         }
         is CastExpr -> {
-            yieldAll(rvalueNodesImpl(flow, value.op))
+            yieldAll(rvalueNodesSeq(flow, value.op))
         }
         is InstanceOfExpr -> {
-            yieldAll(rvalueNodesImpl(flow, value.op))
+            yieldAll(rvalueNodesSeq(flow, value.op))
         }
         is BinopExpr -> {
-            yieldAll(rvalueNodesImpl(flow, value.op1))
-            yieldAll(rvalueNodesImpl(flow, value.op2))
+            yieldAll(rvalueNodesSeq(flow, value.op1))
+            yieldAll(rvalueNodesSeq(flow, value.op2))
         }
 
         else -> throw UnsupportedOperationException()
@@ -138,13 +143,18 @@ data class LvalueResult(
     val rvalues: Set<LocalNode>,
 )
 
+/**
+ * The nodes to be overwritten when a value is written into
+ *
+ * This returns the *receiver* nodes to be included with the secret.
+ */
 internal fun lvalueNodes(flow: LocalFlow, value: Value, usage: LvalueUsage): LvalueResult {
     val rvalues = mutableSetOf<LocalNode>()
-    val lvalues = lvalueNodesImpl(flow, value, usage, rvalues).toSet()
+    val lvalues = lvalueNodesSeq(flow, value, usage, rvalues).toSet()
     return LvalueResult(lvalues, rvalues)
 }
 
-private fun lvalueNodesImpl(flow: LocalFlow, value: Value, usage: LvalueUsage, rvalues: MutableSet<LocalNode>): Sequence<LocalNode> = sequence {
+private fun lvalueNodesSeq(flow: LocalFlow, value: Value, usage: LvalueUsage, rvalues: MutableSet<LocalNode>): Sequence<LocalNode> = sequence {
     printDebug("lvalueNodesImpl(${value.javaClass.simpleName} $value)")
     when (value) {
         // these expressions create new/constant values and can never be mutated in another expression
@@ -176,30 +186,28 @@ private fun lvalueNodesImpl(flow: LocalFlow, value: Value, usage: LvalueUsage, r
             yield(StaticLocalNode)
         }
         is InstanceFieldRef -> {
-            when (usage) {
-                LvalueUsage.ASSIGN -> {
-                    yieldAll(lvalueNodesImpl(flow, value.base, usage, rvalues))
-                }
-                LvalueUsage.DELETION -> {
-                    // assigning a.b does not remove sources of a.c
-                }
-            }
+            val base = onlyItem(rvalueNodesSeq(flow, value.base).toList())
+
+            // even if we overwrite this value again, it will still be passed to outside at some point
+            if (usage == LvalueUsage.ASSIGN) yield(base)
+
+            yield(flow.getProjectionAsNode(base, value.field))
         }
         is ArrayRef -> {
             when (usage) {
                 LvalueUsage.ASSIGN -> {
-                    yieldAll(lvalueNodesImpl(flow, value.base, usage, rvalues))
+                    yieldAll(lvalueNodesSeq(flow, value.base, usage, rvalues))
                 }
                 LvalueUsage.DELETION -> {
                     // assigning a[1] does not remove sources of a[0]
                 }
             }
-            for (rvalue in rvalueNodesImpl(flow, value.index)) {
+            for (rvalue in rvalueNodesSeq(flow, value.index)) {
                 rvalues.add(rvalue)
             }
         }
         is CastExpr -> {
-            yieldAll(lvalueNodesImpl(flow, value.op, usage, rvalues))
+            yieldAll(lvalueNodesSeq(flow, value.op, usage, rvalues))
         }
         else -> throw UnsupportedOperationException()
     }

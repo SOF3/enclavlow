@@ -8,7 +8,7 @@ fun <N : Any, E : Edge<E, N>> newDiGraph(
     return MutableDiGraph(nodes, edges, newEdge)
 }
 
-interface Edge<Self: Edge<Self, N>, N : Any> {
+interface Edge<Self : Edge<Self, N>, N : Any> {
     /**
      * Called from MutableDiGraph.merge()
      */
@@ -74,7 +74,7 @@ sealed class DiGraph<N : Any, E : Edge<E, N>>(
         },
     ): String {
         val ret = StringBuilder()
-        ret.append("digraph $name {\n")
+        ret.append("\ndigraph $name {\n")
         for ((k, v) in graphAttr) {
             ret.append("\t $k = \"$v\";\n")
         }
@@ -89,7 +89,7 @@ sealed class DiGraph<N : Any, E : Edge<E, N>>(
             val attrString = attrs.map { (k, v) -> "$k = \"$v\"" }
             ret.append("\t$i -> $j [${attrString.joinToString(",")}];\n")
         }
-        ret.append("}")
+        ret.append("}\n")
         return ret.toString()
     }
 
@@ -132,19 +132,23 @@ sealed class DiGraph<N : Any, E : Edge<E, N>>(
         if (edge != null && edgeFilter(edge)) i else null
     }.filterNotNull()
 
-    fun <R> visitAncestors(leaves: Set<N>, initial: R, reduce: (R, E) -> R, visitor: (R, N) -> Unit) {
+    inline fun visitAncestors(leaves: Set<N>, crossinline merge: (E, E) -> E?, crossinline visitor: (E, N) -> Unit) {
         val visited = mutableSetOf<Int>()
         for (leaf in leaves) {
-            visitAncestors(leaf, visited, initial, reduce, visitor)
+            visitAncestors(leaf, visited, null as E?, { a, b ->
+                if (a != null) merge(a, b)
+                else b
+            }, { edge, node -> visitor(edge, node) })
         }
     }
 
-    private fun <R> visitAncestors(leaf: N, visited: MutableSet<Int>, initial: R, reduce: (R, E) -> R, visitor: (R, N) -> Unit) {
+    fun <R: Any> visitAncestors(leaf: N, visited: MutableSet<Int>, initial: R?, reduce: (R?, E) -> R?, visitor: (R, N) -> Unit) {
         val j = indexOf(leaf)
         for (i in 0 until nodes.size) {
             val edge = edges[i][j]
-            if (edge != null && visited.add(i)) {
-                val step = reduce(initial, edge)
+            if (edge != null && i !in visited) {
+                val step = reduce(initial, edge) ?: continue // ignore this edge if null
+                visited.add(i)
                 visitor(step, nodes[i])
                 visitAncestors(nodes[i], visited, step, reduce, visitor)
             }
@@ -225,7 +229,7 @@ class MutableDiGraph<N : Any, E : Edge<E, N>>(
         }
     }
 
-    fun touch(from: N, to: N, config: E.() -> Unit) : E? {
+    fun touch(from: N, to: N, config: E.() -> Unit): E? {
         val a = nodes.find(from) ?: throw IllegalArgumentException("Nonexistent node $from")
         val b = nodes.find(to) ?: throw IllegalArgumentException("Nonexistent node $to")
 
