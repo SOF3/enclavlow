@@ -238,6 +238,7 @@ class SenFlow(
         val dot = File(dir, "$fileName.dot")
         dot.writeText(flow.graph.toGraphviz(fileName.replace(".", "_")))
         val command = listOf("dot", "-T", "svg", "-o", "${dot.path}.svg", dot.path)
+        printDebug("Rendering graph: ${command.joinToString(" ")}")
         ProcessBuilder(command)
             .redirectOutput(File("/dev/stderr"))
             .start()
@@ -253,8 +254,8 @@ fun handleAssign(output: LocalFlow, left: Value, right: Value) {
     val leftNodesDelete = lvalueNodes(output, left, LvalueUsage.DELETION)
 
     for (remove in leftNodesDelete.lvalues) {
-        printDebug("Deleting all edges into $remove due to overwrite")
-        output.graph.deleteAllSources(remove)
+        printDebug("NOT Deleting all edges into $remove due to overwrite")
+        // TODO improve
     }
 
     // precompute the nodes to avoid mutations on output from affecting node searches

@@ -104,7 +104,7 @@ fun makeContract(
     nodes.addIfMissing(methodControl)
     nodes.addAll(extraNodes)
 
-    val graph = newDiGraph(nodes) {
+    val graph = newDiGraph<ContractNode, ContractEdge>(nodes) {
         ContractEdge(
             refOnly = false,
             projectionBackFlow = false,

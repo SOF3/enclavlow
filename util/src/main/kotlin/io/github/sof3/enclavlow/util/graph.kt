@@ -2,7 +2,7 @@ package io.github.sof3.enclavlow.util
 
 fun <N : Any, E : Edge<E, N>> newDiGraph(
     nodes: IndexedSet<N> = IndexedSet(),
-    newEdge: () -> E,
+    newEdge: (MutableDiGraph<N, E>) -> E,
 ): MutableDiGraph<N, E> {
     val edges: MutableList<MutableList<E?>> = MutableList(nodes.size) { MutableList(nodes.size) { null } }
     return MutableDiGraph(nodes, edges, newEdge)
@@ -35,7 +35,7 @@ sealed class DiGraph<N : Any, E : Edge<E, N>>(
 ) {
     open var nodes = nodes; protected set
     open var edges = edges; protected set
-    protected abstract var edgeConstructor: () -> E
+    protected abstract var edgeConstructor: (MutableDiGraph<N, E>) -> E
 
     override fun equals(other: Any?): Boolean {
         if (other !is DiGraph<*, *>) return false
@@ -212,7 +212,7 @@ sealed class DiGraph<N : Any, E : Edge<E, N>>(
 class MutableDiGraph<N : Any, E : Edge<E, N>>(
     nodes: IndexedSet<N>,
     edges: MutableList<MutableList<E?>>,
-    override var edgeConstructor: () -> E,
+    override var edgeConstructor: (MutableDiGraph<N, E>) -> E,
 ) : DiGraph<N, E>(nodes, edges), Cloneable {
     override var edges: MutableList<MutableList<E?>>
         get() = super.edges
@@ -235,7 +235,7 @@ class MutableDiGraph<N : Any, E : Edge<E, N>>(
 
         if (a == b) return null // self-loops are not allowed
 
-        val edge = edges[a][b] ?: edgeConstructor()
+        val edge = edges[a][b] ?: edgeConstructor(this)
         edge.config()
         edges[a][b] = edge
 

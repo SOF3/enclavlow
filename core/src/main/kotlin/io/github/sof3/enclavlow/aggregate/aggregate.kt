@@ -57,7 +57,7 @@ fun computeAggregate(classpath: List<String>, entryClasses: List<String>): Mutab
         requests = swap.takeIf { it.isNotEmpty() }
     }
 
-    val aggregate = newDiGraph { AggEdge() }
+    val aggregate = newDiGraph<AggNode, AggEdge> { AggEdge() }
 
     for ((fn, contract) in contracts) {
         val proxyMap = mutableMapOf<ProxyLocalNode, FnAggNode>()
