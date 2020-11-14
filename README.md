@@ -28,8 +28,8 @@ This command requires the graphviz `dot` command to be in PATH.
 For the sake of convenience, all test case classes are compiled together with the test runtime,
 and the test runtime classpath is used as the classpath for soot.
 
-The test case classes are located in `core/src/main/java`,
-and the test case results are checked in `core/src/main/kotlin`.
+The test case classes are located in `core/src/test/java`,
+and the test case results are checked in `core/src/test/kotlin`.
 
 The JUnit test results can be found in `core/build/reports/test/test/index.html`.
 For each `testMethod` test case,
