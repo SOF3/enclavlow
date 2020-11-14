@@ -19,6 +19,15 @@ dependencies {
 }
 
 tasks.test {
+    doFirst {
+        File(buildDir, "lfgOutput").mkdirs()
+        val index = File(buildDir, "lfgOutput/index.html")
+        index.writeText("<ul>\n")
+    }
+    doLast {
+        val index = File(buildDir, "lfgOutput/index.html")
+        index.writeText("</ul>\n")
+    }
     useJUnit {
         maxParallelForks = Runtime.getRuntime().availableProcessors()
     }

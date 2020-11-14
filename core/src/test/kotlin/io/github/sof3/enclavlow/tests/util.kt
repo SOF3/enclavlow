@@ -4,6 +4,8 @@ import io.github.sof3.enclavlow.contract.Contract
 import io.github.sof3.enclavlow.contract.ContractFlowGraph
 import io.github.sof3.enclavlow.contract.MethodNameType
 import io.github.sof3.enclavlow.contract.analyzeMethod
+import io.github.sof3.enclavlow.local.PRINT_DOT
+import io.github.sof3.enclavlow.util.IS_DEBUG
 import java.io.File
 import java.lang.management.ManagementFactory
 import kotlin.test.assertEquals
@@ -14,6 +16,9 @@ internal inline fun <reified T> testMethod(method: String, contract: Contract<ou
     runImpl(T::class.java, method, contract)
 
 private fun <T> runImpl(clazz: Class<T>, method: String, expectedContract: Contract<out ContractFlowGraph>) = synchronized(allRuns) {
+    IS_DEBUG = true
+    PRINT_DOT = true
+
     val actual = analyzeMethod(clazz.name, method, MethodNameType.UNIQUE_NAME) {
         set_output_dir("build/sootOutput")
         val classPath = ManagementFactory.getRuntimeMXBean().classPath

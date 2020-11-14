@@ -2,6 +2,7 @@ package io.github.sof3.enclavlow.tests.lfg
 
 import io.github.sof3.enclavlow.cases.lfg.BranchCase
 import io.github.sof3.enclavlow.contract.CallTags
+import io.github.sof3.enclavlow.contract.MethodControlNode
 import io.github.sof3.enclavlow.contract.ParamLocalNode
 import io.github.sof3.enclavlow.contract.ReturnLocalNode
 import io.github.sof3.enclavlow.contract.ThrowLocalNode
@@ -12,11 +13,14 @@ import kotlin.test.Test
 class BranchTests {
     @Test
     fun conditionalAssign() = testMethod<BranchCase>("conditionalAssign", makeContract(CallTags.UNSPECIFIED, 1) {
+        MethodControlNode into ReturnLocalNode
         ParamLocalNode(0) into ReturnLocalNode
     })
 
     @Test
     fun conditionalThrow() = testMethod<BranchCase>("conditionalThrow", makeContract(CallTags.UNSPECIFIED, 2) {
+        MethodControlNode into ReturnLocalNode
+        MethodControlNode into ThrowLocalNode
         ParamLocalNode(0) into ReturnLocalNode
         ParamLocalNode(0) into ThrowLocalNode
         ParamLocalNode(1) into ThrowLocalNode
@@ -24,11 +28,13 @@ class BranchTests {
 
     @Test
     fun controlReset() = testMethod<BranchCase>("controlReset", makeContract(CallTags.UNSPECIFIED, 1) {
-        // there should be nothing leaked
+        MethodControlNode into ReturnLocalNode
+// there should be nothing leaked
     })
 
     @Test
     fun switchMux() = testMethod<BranchCase>("switchMux", makeContract(CallTags.UNSPECIFIED, 5) {
+        MethodControlNode into ReturnLocalNode
         ParamLocalNode(0) into ReturnLocalNode
         ParamLocalNode(1) into ReturnLocalNode
         ParamLocalNode(2) into ReturnLocalNode

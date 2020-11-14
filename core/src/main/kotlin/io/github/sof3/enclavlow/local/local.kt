@@ -34,13 +34,19 @@ import soot.jimple.SwitchStmt
 import soot.jimple.ThrowStmt
 import soot.toolkits.graph.UnitGraph
 import soot.toolkits.scalar.ForwardBranchedFlowAnalysis
+import java.io.File
+
+var PRINT_DOT = false
+val DOT_FILENAME_REGEX = Regex("[^A-Za-z0-9]+")
 
 class SenFlow(
     graph: UnitGraph,
     private val paramCount: Int,
+    private val fn: FnIden,
     callTags: CallTags,
 ) : ForwardBranchedFlowAnalysis<LocalFlow>(graph) {
     val outputContract: Contract<MutableContractFlowGraph> = makeContract(callTags, paramCount)
+    private var dotWrites: Int = 0
 
     override fun newInitialFlow() = newLocalFlow(paramCount, LocalControlNode())
     override fun merge(in1: LocalFlow, in2: LocalFlow, out: LocalFlow) = block("Merge") {
@@ -110,7 +116,8 @@ class SenFlow(
         when (stmt) {
             is ReturnStmt -> {
                 val final = input.finalizedCopy(outputContract.methodControl)
-                printDebug("Final: $final")
+                if (PRINT_DOT) writeDotFile(final)
+
                 ancestorPostprocessCommon(final)
 
                 // in 3AC, return statements are never followed by invocation calls
@@ -119,12 +126,16 @@ class SenFlow(
             }
             is ReturnVoidStmt -> {
                 val final = input.finalizedCopy(outputContract.methodControl)
+                if (PRINT_DOT) writeDotFile(final)
+
                 ancestorPostprocessCommon(final)
 
                 ancestorPostprocess(final, setOf(final.control), ReturnLocalNode)
             }
             is ThrowStmt -> {
                 val final = input.finalizedCopy(outputContract.methodControl)
+                if (PRINT_DOT) writeDotFile(final)
+
                 ancestorPostprocessCommon(final)
 
                 // in 3AC, throw statements are never followed by invocation calls
@@ -173,7 +184,7 @@ class SenFlow(
                 val branch = branchOutList[0]
                 input copyTo branch
             }
-            else -> throw UnsupportedOperationException("Unsupported operation ${stmt.javaClass}")
+            else -> throw UnsupportedOperationException("Unsupported statement ${stmt.javaClass} $stmt")
         }
         printDebug("Output: $fallOutList")
         printDebug("Branched Output: $branchOutList")
@@ -191,17 +202,49 @@ class SenFlow(
 
     private fun ancestorPostprocess(flow: LocalFlow, leaves: Set<LocalNode>, dest: ContractNode) {
         flow.graph.visitAncestors(leaves, { e1, e2 ->
+            // if e1 is a cut-edge but not all edges have refOnly, discard it
+
+            if (e1.causes.all { it.refOnly } != e2.causes.all { it.refOnly }) return@visitAncestors null
             LocalEdge((e1.causes + e2.causes).toMutableSet())
-        }, ancestorPostprocessCallback(dest))
+//            if (e1.hasRefOnlyCutEdge) {
+//                if (e2.causes.any { it.refOnly }) {
+//                    LocalEdge((e1.causes + e2.causes).toMutableSet()).apply { hasRefOnlyCutEdge = true }
+//                } else {
+//                    null
+//                }
+//            } else {
+//                if(e2.causes.all{it.refOnly})
+//                LocalEdge((e1.causes + e2.causes).toMutableSet()).apply {
+//                    hasRefOnlyCutEdge = e2.causes.all { it.refOnly }
+//                }
+//            }
+        }, { edge: LocalEdge, node: LocalNode ->
+            if (node is ContractNode && node !== dest) {
+                outputContract.graph.addNodeIfMissing(node)
+                outputContract.graph.touch(node, dest) {
+                    refOnly = edge.hasRefOnlyCutEdge
+                    projectionBackFlow = edge.causes.all { it.projectionBackFlow }
+                }
+            }
+        })
     }
 
-    private fun ancestorPostprocessCallback(dest: ContractNode) = { edge: LocalEdge, node: LocalNode ->
-        if (node is ContractNode && node !== dest) {
-            outputContract.graph.addNodeIfMissing(node)
-            outputContract.graph.touch(node, dest) {
-                refOnly = edge.causes.any { it.refOnly }
-                projectionBackflow = edge.causes.all { it.projectionBackFlow }
-            }
+
+    private fun writeDotFile(flow: LocalFlow) = block("Printing result LFG to dot") {
+        val dir = File("build/lfgOutput")
+        dir.mkdirs()
+        val fileName = fn.toString().replace(DOT_FILENAME_REGEX, ".")
+            .removeSuffix(".") + "_${dotWrites++}"
+        val dot = File(dir, "$fileName.dot")
+        dot.writeText(flow.graph.toGraphviz(fileName.replace(".", "_")))
+        val command = listOf("dot", "-T", "svg", "-o", "${dot.path}.svg", dot.path)
+        ProcessBuilder(command)
+            .redirectOutput(File("/dev/stderr"))
+            .start()
+            .waitFor()
+
+        synchronized(javaClass) { // prevent race conditions writing index.html
+            File(dir, "index.html").appendText("<li><a href=\"$fileName.dot.svg\">$fn (${dotWrites - 1})</a></li>\n")
         }
     }
 }
@@ -236,4 +279,3 @@ fun handleAssign(output: LocalFlow, left: Value, right: Value) {
         }
     }
 }
-

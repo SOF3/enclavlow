@@ -39,7 +39,7 @@ inline fun analyzeMethod(
     }
     val body = method.retrieveActiveBody()
     SenTransformer.transform(body)
-    return SenTransformer.contracts.get()[FnIden(className, method.subSignature)]!!
+    return SenTransformer.contracts.get()[FnIden(method)]!!
 }
 
 enum class MethodNameType {
@@ -73,12 +73,12 @@ object SenTransformer : BodyTransformer() {
             }
         }
 
-        val flow = SenFlow(ExceptionalUnitGraph(body), body.method.parameterCount, callTags)
+        val flow = SenFlow(ExceptionalUnitGraph(body), body.method.parameterCount, FnIden(body.method), callTags)
         printDebug(body.toString())
         block("Analyzing ${body.method.signature}") {
             flow.doAnalysis()
         }
-        contracts.get()[FnIden(body.method.declaringClass.name, body.method.subSignature)] = flow.outputContract
+        contracts.get()[FnIden(body.method)] = flow.outputContract
         block("Contract of ${flow.outputContract.callTags} ${body.method.subSignature}") {
             printDebug(flow.outputContract.graph)
         }
@@ -107,7 +107,7 @@ fun makeContract(
     val graph = newDiGraph(nodes) {
         ContractEdge(
             refOnly = false,
-            projectionBackflow = false,
+            projectionBackFlow = false,
         )
     }
     fn(MakeContractContext(graph))
@@ -119,7 +119,7 @@ typealias MutableContractFlowGraph = MutableDiGraph<ContractNode, ContractEdge>
 
 data class ContractEdge(
     var refOnly: Boolean,
-    var projectionBackflow: Boolean,
+    var projectionBackFlow: Boolean,
 ) : Edge<ContractEdge, ContractNode> {
     override fun mergeEdge(other: ContractEdge) =
         throw UnsupportedOperationException("Contract graphs shall not be merged")
@@ -128,11 +128,8 @@ data class ContractEdge(
 
     override fun getGraphvizAttributes(from: ContractNode, to: ContractNode): Iterable<Pair<String, String>> {
         return listOf(
-            "color" to when {
-                refOnly -> "grey"
-                projectionBackflow -> "blue"
-                else -> "black"
-            },
+            "style" to if (refOnly) "dotted" else "solid",
+            "color" to if (projectionBackFlow) "blue" else "black",
         )
     }
 }

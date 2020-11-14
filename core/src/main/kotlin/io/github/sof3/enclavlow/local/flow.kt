@@ -126,6 +126,11 @@ fun makeLocalFlowGraph(vararg extraNodes: Iterable<LocalNode>): LocalFlowGraph {
 }
 
 data class LocalEdge(val causes: MutableSet<LocalFlowCause>) : Edge<LocalEdge, LocalNode> {
+    /**
+     * This is a hack field only used in visitAncestors
+     */
+    var hasRefOnlyCutEdge: Boolean = false
+
     override fun mergeEdge(other: LocalEdge) = LocalEdge((causes + other.causes).toMutableSet())
 
     override fun graphEqualsImpl(other: Any): Boolean {
@@ -138,16 +143,17 @@ data class LocalEdge(val causes: MutableSet<LocalFlowCause>) : Edge<LocalEdge, L
         return listOf(
             "label" to causes.joinToString(",\\n") { it.label.replace("\n", "\\n") },
             "style" to if (causes.any { it.refOnly }) "dotted" else "solid",
-            "color" to when {
-                causes.any { it.projectionBackFlow } -> "blue"
-                else -> "black"
-            },
+            "color" to if (causes.any { it.projectionBackFlow }) "blue" else "black",
         )
     }
 }
 
 enum class LocalFlowCause(val label: String, val refOnly: Boolean = false, var projectionBackFlow: Boolean = false) {
     FIELD_PROJECTION("field projection"),
+
+    /**
+     * Edge from x.y to x
+     */
     FIELD_PROJECTION_BACK_FLOW("field projection", projectionBackFlow = true),
     METHOD_CONTROL("method control"),
     FLOW_MERGE("flow merge"),
@@ -156,6 +162,10 @@ enum class LocalFlowCause(val label: String, val refOnly: Boolean = false, var p
     ASSIGNMENT("assignment"),
     ASSIGNMENT_SIDE_EFFECT("assignment\nside effect"),
     ASSIGNMENT_CONDITION("assignment\ncondition"),
+
+    /**
+     * Projections in the source are propagated to projections in the destination
+     */
     REF_BACK_FLOW("reference\nback flow", refOnly = true),
     SINK_MARKER("sink marker"),
     CALL_PARAM("call param"),
@@ -166,7 +176,11 @@ enum class LocalFlowCause(val label: String, val refOnly: Boolean = false, var p
 data class FnIden(
     val clazz: String,
     val method: String,
-)
+) {
+    constructor(soot: SootMethod) : this(soot.declaringClass.name, soot.subSignature)
+
+    override fun toString() = "$clazz.$method"
+}
 
 data class FnCall(
     val fn: FnIden,
@@ -187,7 +201,7 @@ data class FnCall(
 }
 
 fun createFnCall(method: SootMethod): FnCall {
-    val fn = FnIden(method.declaringClass.name, method.subSignature)
+    val fn = FnIden(method)
     val params = List(method.parameterCount) { ProxyLocalNode("<$fn>\nparam $it") }
     val thisNode = if (method.isStatic) null else ProxyLocalNode("<$fn>\nthis")
     val returnNode = ProxyLocalNode("<$fn>\nreturn")

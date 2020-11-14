@@ -23,8 +23,16 @@ To run the test cases in the `enclavlow-core` module, use the gradle task:
 ./gradlew core:tests
 ```
 
+This command requires the graphviz `dot` command to be in PATH.
+
 For the sake of convenience, all test case classes are compiled together with the test runtime,
 and the test runtime classpath is used as the classpath for soot.
 
 The test case classes are located in `core/src/main/java`,
 and the test case results are checked in `core/src/main/kotlin`.
+
+The JUnit test results can be found in `core/build/reports/test/test/index.html`.
+For each `testMethod` test case,
+the final Local Flow Graphs that contribute to output contract graph
+are rendered by `dot` in the `core/build/lfgOutput` directory (see `index.html`).
+(Due to use of parallel tests, the order in `index.html` is highly inconsistent)

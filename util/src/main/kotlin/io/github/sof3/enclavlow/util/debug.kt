@@ -1,6 +1,6 @@
 package io.github.sof3.enclavlow.util
 
-var IS_DEBUG = true
+var IS_DEBUG = false
 
 object DebugOutput {
     private val EPOCH = System.nanoTime()
