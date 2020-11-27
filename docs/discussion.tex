@@ -1,6 +1,9 @@
 \section{Results and Discussion}\label{sec:results-and-discussion}
 
 \subsection{Difficulties and Limitations}\label{subsec:difficulties-and-limitations}
+\IncludeCode{lst:oop-subst-attack}{./OopSubstAttack.java}
+{Example attack through OOP substitution}{.6}
+
 The principles of \ac{OOP} imply that a method called may be swapped with another subclass
 that performs different actions than the current one.
 Although Uranus prevents the adversary
@@ -16,9 +19,6 @@ To correctly solve the vulnerability of \ac{OOP} substitution,
 it is necessary to perform call graph analysis on the actual classes passed to the method,
 which involves more complex framework level work.
 
-\IncludeCode{lst:oop-subst-attack}{./OopSubstAttack.java}
-{Example attack through OOP substitution}
-
 Despite optimizations and simplifications,
 it is still not possible to perform 100\% accurate information flow analysis
 within efficient time complexity~\cite{SmithGeoffrey2007PoSI}.
@@ -30,7 +30,7 @@ incorrectly identified by \pname{},
 which are not going to be fixed because of the unlikeness of use.
 
 \IncludeCode{lst:known-false-positives}{./KnownFalsePositives.java}
-{Known false positives}
+{Known false positives}{.6}
 
 It is also impossible to analyze further than the \ac{JNI} level,
 since analyzing across \ac{JNI} boundary implies
@@ -48,13 +48,7 @@ However, \ac{JLS} 9.6.1.2 explicitly stated that
 is never retained in the binary representation}~\cite{jls},
 so a method call based approach is used instead.
 
-At the technical aspect,
-multiple technical challenges were encountered when using Soot.
-Since Soot was designed to be a command line tool,
-it does not support direct calling from other environments very well.
-In particular, the entrypoint of Soot API is the \code{soot.Main.main()} method,
-which is the standard \ac{CLI} interface in Java.
-As a result, extra time is spent on clearing global states used by Soot.
-Furthermore, due to restrictions in the Soot framework,
-each tested Java method must be run in a separate JVM,
-resulting in poor testing performance.
+\subsection{Recommended future research}\label{subsec:recommended-future-research}
+There are multiple areas in this project to be extended.
+
+

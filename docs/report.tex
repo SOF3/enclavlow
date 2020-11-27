@@ -1,5 +1,5 @@
 \documentclass[a4paper, 12pt]{article}
-\usepackage[top=0.5in, bottom=0.6in, left=0.3in, right=0.3in]{geometry}
+\usepackage[top=1.0in, bottom=1.0in, left=0.6in, right=0.6in]{geometry}
 \usepackage[utf8]{inputenc}
 \usepackage[english]{babel}
 \usepackage[document]{ragged2e}
@@ -12,16 +12,16 @@
 
 \usepackage{cite}
 \usepackage{acro}
-\acsetup{first-style=long-short}
 
 \newcommand{\acdef}[2]{
 	\DeclareAcronym{#1}{
 		short = #1,
-		long = #2
+		long = #2,
 	}
 }
 \input{abbr}
 
+\usepackage{wrapfig}
 \usepackage{listings}
 \lstdefinestyle{j}{
 	keywordstyle=\textbf,
@@ -51,10 +51,14 @@
 \date{28 October 2020}
 
 
-\newcommand{\IncludeCode}[3]{
-	% \begin{minipage}{\linewidth}
-		\lstinputlisting[style=j, language=java, float,label={#1}, caption={#3}]{#2}
-	% \end{minipage}
+\newcommand{\IncludeCode}[4]{
+	\begin{wrapfigure}{r}{#4\textwidth}
+		\vspace{-3em}
+		\begin{center}
+			\lstinputlisting[style=j, language=java, label={#1}, caption={#3}]{#2}
+		\end{center}
+		\vspace{-2em}
+	\end{wrapfigure}
 }
 
 \newcommand{\q}[1]{\enquote{#1}}

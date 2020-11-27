@@ -16,6 +16,7 @@ IagoAttack.class: IagoAttack.java
 
 sootOutput/IagoAttack.jimple: IagoAttack.class soot.jar
 	java -jar soot.jar -f jimple -cp VIRTUAL_FS_FOR_JDK:. IagoAttack
+	sed -i '/^$$/d' sootOutput/IagoAttack.jimple
 
 soot.jar:
 	wget https://repo1.maven.org/maven2/org/soot-oss/soot/4.2.1/soot-4.2.1-jar-with-dependencies.jar -O soot.jar

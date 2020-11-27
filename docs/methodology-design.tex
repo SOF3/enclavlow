@@ -1,5 +1,6 @@
 \subsection{Design}\label{subsec:design}
-Since the adversary has arbitrary access to any untrusted memory and instruction,
+Since the adversary in the threat model
+has arbitrary access to any untrusted memory and instruction,
 the security policies of \pname{} differ slightly from typical information flow analysis.
 For instance, the statement \code{a.b.c = d;} usually
 does not propagte the effect of \code{d} to \code{a},
@@ -112,6 +113,9 @@ and continues following each branch with its clone.
 The \emph{merge} operation pops the uppermost control flow node from the graph,
 and takes the union of all flows from each branched graph.
 
+\IncludeCode{lst:iago-attack}{./IagoAttack.java}
+{Iago attack}{.6}
+
 The control flow stack is always pushed from a conditional instruction
 before splitting into branches,
 which is important for attacks that count the number of times a method was called,
@@ -155,8 +159,7 @@ hence inferring the sensitive value that determined the branch halting problem.
 		\\ \hline
 		Binary operations & unreachable & union of rvalues from operands
 		\\ \hline
-		Array literal \code{new int[a]} & unreachable
-		& union of rvalues from count or literal elements
+		Array literal \code{new int[a]} & unreachable & union of rvalues from count
 		\\ \hline
 		Array access \code{a[b]} & lvalues of \code a & rvalues of \code a and \code b
 		\\ \hline
@@ -187,6 +190,11 @@ as it does not separate the internal structure used by instance fields and array
 For example, consider Listing~\ref{lst:iago-attack}
 (Jimple code in Listing~\ref{lst:iago-attack-jimple}).
 At return point, the \ac{LFG} becomes as shown in Figure~\ref{fig:tfp-graph}.
+
+\IncludeCode{lst:iago-attack-jimple}
+{./sootOutput/IagoAttack.jimple}
+{Iago attack (Jimple output)}{.5}
+
 Intuitively, this appears incorrect;
 param \#0 does not flow to \code{return}
 since it is just used for \code{this.bar} but not \code{this.qux}.
@@ -201,7 +209,8 @@ hence leaking into the return value.
 Recall the definition of an edge in the \ac{LFG} used in this project,
 where $a \to b$ implies $b$ must to be protected if $a$ is protected.
 
-\begin{figure}
+\begin{wrapfigure}{r}{.6\textwidth}
+	\vspace{-2em}
 	\caption{\ac{LFG} of \code{IagoAttack.foo(int)} in Listing~\ref{lst:iago-attack}}
 	\begin{center}
 		\digraph[scale=0.5]{local}{
@@ -215,12 +224,6 @@ where $a \to b$ implies $b$ must to be protected if $a$ is protected.
 			r2 -> Return;
 		}
 	\end{center}
+	\vspace{-2em}
 	\label{fig:tfp-graph}
-\end{figure}
-
-\IncludeCode{lst:iago-attack}{./IagoAttack.java}
-{Iago attack}
-
-\IncludeCode{lst:iago-attack-jimple}
-{./sootOutput/IagoAttack.jimple}
-{Iago attack (Jimple output)}
+\end{wrapfigure}

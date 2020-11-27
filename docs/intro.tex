@@ -2,7 +2,7 @@
 
 \subsection{Background}\label{subsec:background}
 With the rise of third-party public cloud servics
-such as AWS~\cite{aws} and Microsoft Azure~\cite{azure},
+such as \ac{AWS}~\cite{aws} and Microsoft Azure~\cite{azure},
 there is increasing demand for trusted execution where
 applications are protected from
 attackers with privileged access to the hardware or software.
@@ -71,7 +71,7 @@ providing a Gradle task that
 takes the \code{*.class} files compiled in the \code{classes} task
 and generates the report for the analysis from those classes.
 
-\subsection{Prior art}\label{subsec:prior-art}
+\subsection{Prior work}\label{subsec:prior-art}
 Information flow analysis is not a new technology in the field.
 While this project analyzes \ac{JVM} code using \ac{SGX} enclaves,
 prior research on \emph{native} code \emph{automatic partition} was found.
@@ -93,4 +93,11 @@ this project prefers a static analysis approach,
 which enables developers to identify sensitive regions at compile time
 without the need to feed concrete data into methods.
 
-Civet~\cite{civet} % TODO
+Civet~\cite{civet} is a partitioning framework also for Java code partitioning.
+Similar to Glamdring, it automatically selects the minimal enclave boundaries.
+It is also similar to the goal of this project,
+except that Uranus provides additional protection at the native level,
+allowing further optimizations compared to Civet.
+
+This report will focus on the algorithm used to detect data leaks,
+as well as performance concerns and limitations from the \ac{JVM} design.
