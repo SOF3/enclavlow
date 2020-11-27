@@ -51,13 +51,15 @@
 \date{28 October 2020}
 
 
-\newcommand{\IncludeCode}[4]{
+\newcommand{\IncludeCode}[5]{
 	\begin{wrapfigure}{r}{#4\textwidth}
-		\vspace{-3em}
-		\begin{center}
-			\lstinputlisting[style=j, language=java, label={#1}, caption={#3}]{#2}
-		\end{center}
-		\vspace{-2em}
+		\begin{minipage}{#4\textwidth}
+			\vspace{-#5 em}
+			\begin{center}
+				\lstinputlisting[style=j, language=java, label={#1}, caption={#3}]{#2}
+			\end{center}
+			\vspace{-#5 em}
+		\end{minipage}
 	\end{wrapfigure}
 }
 

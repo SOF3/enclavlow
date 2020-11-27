@@ -1,7 +1,7 @@
 \section{Introduction}\label{sec:introduction}
 
 \subsection{Background}\label{subsec:background}
-With the rise of third-party public cloud servics
+With the rise of third-party public cloud services
 such as \ac{AWS}~\cite{aws} and Microsoft Azure~\cite{azure},
 there is increasing demand for trusted execution where
 applications are protected from
@@ -10,13 +10,13 @@ Modern hardware offer \ac{TEE} technologies,
 such as \ac{SGX} in Intel CPUs,
 with which trusted execution code and sensitive data
 are processed in secure \q{enclaves},
-which is protected at hardware level to prevent access
+protected at hardware level to prevent access
 from other hardware or software layers.
 
 One significant application of \ac{TEE} is in big data processing,
 where confidential user data are processed,
 and protection from cloud providers may be necessary
-for complianc with privacy regulations such as GDPR~\cite{gdpr}.
+for compliance with privacy regulations such as GDPR~\cite{gdpr}.
 However, a significant subset of such applications are written
 using languages that use \ac{JVM} as the runtime,
 such as Hadoop~\cite{apachehadoop} and Spark~\cite{apachespark}
@@ -35,11 +35,11 @@ the tools applicable for native applications are mostly incompatible with \ac{JV
 introducing the corresponding new research areas.
 
 Running the whole application within an \ac{SGX} enclave is undesirable for two reasons.
-First, this violates the principle of least privilege,
+First, this violates the Principle of Least Privilege,
 where the whole application becomes possible attack surface
 for adversaries to compromise protected data~\cite{glamdring}.
 Second, this implies all memory used by the application
-are placed in the enclave memory (the \ac{EPC}),
+is placed in the enclave memory (the \ac{EPC}),
 which is restricted to 100 MB before significant performance degrading
 (\q{1,000X slowdown compared to regular OS paging})~\cite{uranus}.
 On the other hand, if the enclave is smaller than necessary,
@@ -93,7 +93,7 @@ this project prefers a static analysis approach,
 which enables developers to identify sensitive regions at compile time
 without the need to feed concrete data into methods.
 
-Civet~\cite{civet} is a partitioning framework also for Java code partitioning.
+Civet~\cite{civet} is a framework for Java code partitioning.
 Similar to Glamdring, it automatically selects the minimal enclave boundaries.
 It is also similar to the goal of this project,
 except that Uranus provides additional protection at the native level,

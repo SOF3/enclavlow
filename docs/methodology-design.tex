@@ -3,7 +3,7 @@ Since the adversary in the threat model
 has arbitrary access to any untrusted memory and instruction,
 the security policies of \pname{} differ slightly from typical information flow analysis.
 For instance, the statement \code{a.b.c = d;} usually
-does not propagte the effect of \code{d} to \code{a},
+does not propagate the effect of \code{d} to \code{a},
 but since the adversary is capable of changing \code{b} to any memory location of its favour,
 the security of this statement depends on whether \code{a} is trusted.
 
@@ -23,27 +23,58 @@ In the usual definition, only adversary read access to $y$ is concerned,
 while in our definition, the adversary possesses write access to $x$.
 
 \subsubsection{\acf{CFG}}
-\pname{} adopts an approach where a \ac{CFG} is constructed for each method analyzed.
-The \ac{CFG} contains the nodes listed in Table \ref{tab:cfg-nodes}.
-
 \begin{table}
 	\caption{Nodes in \ac{CFG}}
 	\centering
 	\begin{tabular}{|c|c|}
 		\hline
-		Static & Represents data located in static class fields \\ \hline
-		This & Represents the object on which a method was invoked \\ \hline
-		Param $x$ & Each parameter is represented by a node \\ \hline
-		Return & Represents data flow through the return path \\ \hline
-		Throw & Represents data flow through the return path \\ \hline
-		Source & Represents variables in the method explicitly wrapped in \code{sourceMarker} \\ \hline
-		Sink & Represents locals in the method explicitly declared as \code{sinkMarker} \\ \hline
-		Control & This is a special node representing how many times the function is called. \\ \hline
-		This & \q{Param $y$}, \q{Return}, \q{Throw} and \q{Control}
+		\underline{Static} & Represents data located in static class fields \\ \hline
+		\underline{This} & Represents the object on which a method was invoked \\ \hline
+		\underline{Param} $x$ & Each parameter is represented by a node \\ \hline
+		\underline{Return} & Represents data flow through the return path \\ \hline
+		\underline{Throw} & Represents data flow through the return path \\ \hline
+		\underline{Source} & Represents variables in the method explicitly wrapped in \code{sourceMarker} \\ \hline
+		\underline{Sink} & Represents locals in the method explicitly declared as \code{sinkMarker} \\ \hline
+		\underline{Control} & This is a special node representing how many times the function is called. \\ \hline
+		\underline{This} & \underline{Param $y$}, \underline{Return}, \underline{Throw} and \underline{Control}
 		from each function called from the current node \\ \hline
 	\end{tabular}
 	\label{tab:cfg-nodes}
 \end{table}
+
+\begin{wrapfigure}{r}{0.5\textwidth}
+	\vspace{-3em}
+	\begin{minipage}{0.5\textwidth}
+		\caption{Example \ac{CFG} for Listing~\ref{lst:SourceSinkExample}}
+		\begin{center}
+			\digraph[scale=0.5]{contract}{
+				getSumParam0[label = "getSum\noexpand\n param \#0"];
+				getSumControl[label = "getSum\noexpand\n control"];
+				parseParam0[label = "parse\noexpand\n param \#0"];
+				parseReturn[label = "parse\noexpand\n return"];
+				parseControl[label = "parse\noexpand\n control"];
+				computeSumParam0[label = "computeSum\noexpand\n param \#0"];
+				computeSumReturn[label = "computeSum\noexpand\n return"];
+				computeSumControl[label = "computeSum\noexpand\n control"];
+				Source -> parseReturn [color = "red"];
+				parseReturn -> computeSumParam0 [color = "red"];
+				computeSumParam0 -> computeSumReturn [color = "red"];
+				computeSumReturn -> Sink [color = "red"];
+				getSumParam0 -> parseParam0;
+				parseParam0 -> parseReturn;
+				parseControl -> parseReturn;
+				computeSumControl -> computeSumReturn;
+				getSumControl -> parseControl;
+				getSumControl -> computeSumControl;
+			}
+		\end{center}
+		\label{fig:SourceSinkContract}
+	\end{minipage}
+\end{wrapfigure}
+
+\pname{} constructs a \ac{CFG} for each method analyzed.
+The \ac{CFG} contains the nodes listed in Table \ref{tab:cfg-nodes}.
+In this article, all flow graph nodes are \underline{underlined}.
 
 After all methods in a class are evaluated,
 the CFGs of child methods called from the analyzed methods
@@ -60,34 +91,6 @@ their contract graphs are merged by taking the union of all flow edges.
 See Figure~\ref{fig:SourceSinkContract} for an example of \ac{AFG}.
 Unconnected nodes are omitted for brevity.
 
-\begin{figure}
-	\caption{Example \ac{CFG} for Listing~\ref{lst:SourceSinkExample}}
-	\begin{center}
-		\digraph[scale=0.5]{contract}{
-			rankdir = "LR";
-			getSumParam0[label = "getSum\noexpand\n param \#0"];
-			getSumControl[label = "getSum\noexpand\n control"];
-			parseParam0[label = "parse\noexpand\n param \#0"];
-			parseReturn[label = "parse\noexpand\n return"];
-			parseControl[label = "parse\noexpand\n control"];
-			computeSumParam0[label = "computeSum\noexpand\n param \#0"];
-			computeSumReturn[label = "computeSum\noexpand\n return"];
-			computeSumControl[label = "computeSum\noexpand\n control"];
-			Source -> parseReturn [color = "red"];
-			parseReturn -> computeSumParam0 [color = "red"];
-			computeSumParam0 -> computeSumReturn [color = "red"];
-			computeSumReturn -> Sink [color = "red"];
-			getSumParam0 -> parseParam0;
-			parseParam0 -> parseReturn;
-			parseControl -> parseReturn;
-			computeSumControl -> computeSumReturn;
-			getSumControl -> parseControl;
-			getSumControl -> computeSumControl;
-			}
-	\end{center}
-	\label{fig:SourceSinkContract}
-\end{figure}
-
 \subsubsection{\acf{LFG}}
 To construct the \ac{CFG},
 a local graph is constructed.
@@ -98,7 +101,7 @@ The \ac{LFG} extends the \ac{CFG} with the following additions:
 \begin{itemize}
 	\item Each local variable (some may exist as intermediate values in source code)
 		is allocated a node.
-	\item Each branch has its own \q{control} node.
+	\item Each branch has its own \underline{Control} node.
 \end{itemize}
 
 The \emph{consume} operation consumes statements in form of \acf{3AC}~\cite{sootsurvivor}.
@@ -107,20 +110,6 @@ as described exhaustively in Table~\ref{tab:tac}.
 The relationship between the graph and the \q{lvalue}s and \q{rvalue}s
 mentioned in Table~\ref{tab:tac} are explained in Table~\ref{tab:lrvalue}.
 
-The \emph{branch} operation performs a deep clone of the \ac{LFG}
-and continues following each branch with its clone.
-
-The \emph{merge} operation pops the uppermost control flow node from the graph,
-and takes the union of all flows from each branched graph.
-
-\IncludeCode{lst:iago-attack}{./IagoAttack.java}
-{Iago attack}{.6}
-
-The control flow stack is always pushed from a conditional instruction
-before splitting into branches,
-which is important for attacks that count the number of times a method was called,
-hence inferring the sensitive value that determined the branch halting problem.
-
 \begin{table}
 	\caption{\ac{3AC} instructions affecting \ac{LFG}}
 	\centering
@@ -128,21 +117,21 @@ hence inferring the sensitive value that determined the branch halting problem.
 		\hline
 		\textbf{Instruction type} & \textbf{Effects on \ac{LFG}}
 		\\ \hline
-		\multirow4*{Assignment} & \q{Control} flows to lvalue nodes of destination. \\
+		\multirow4*{Assignment} & \underline{Control} flows to lvalue nodes of destination. \\
 		& Erases current connections to lvalue nodes of destination. \\
 		& rvalue nodes of source flow to lvalue nodes of destination. \\
 		& lvalue nodes of source flow to rvalue nodes of destination.
 		\\ \hline
-		\multirow2*{Return} & \q{Control} flows to \q{Return} node. \\
-		& rvalue nodes of returned value flow to \q{Return} node.
+		\multirow2*{Return} & \underline{Control} flows to \underline{Return} node. \\
+		& rvalue nodes of returned value flow to \underline{Return} node.
 		\\ \hline
-		\multirow2*{Throw} & \q{Control} flows to \q{Throw} node. \\
-		& rvalue nodes of thrown value leaks to \q{Throw} node.
+		\multirow2*{Throw} & \underline{Control} flows to \underline{Throw} node. \\
+		& rvalue nodes of thrown value leaks to \underline{Throw} node.
 		\\ \hline
 		\multirow3*{Conditional (If/Switch)}
-		& A new \q{Control} node is pushed to the control stack. \\
-		& Previous \q{Control} flows to the new \q{Control}. \\
-		& rvalue nodes of predicate leaks to the new \q{Control}.
+		& A new \underline{Control} node is pushed to the control stack. \\
+		& Previous \underline{Control} flows to the new \underline{Control}. \\
+		& rvalue nodes of predicate leaks to the new \underline{Control}.
 		\\ \hline
 		Method call & Same effect as assigning call result to a sink variable.
 		\\ \hline
@@ -165,17 +154,17 @@ hence inferring the sensitive value that determined the branch halting problem.
 		\\ \hline
 		Instance field access \code{a.b} & lvalues of \code a & rvalues of \code a
 		\\ \hline
-		Static field access \code{Class.field} & \q{Static} & none
+		Static field access \code{Class.field} & \underline{Static} & none
 		\\ \hline
 		Parameter & the parameter node \footnotemark{} & the parameter node
 		\\ \hline
 		Local variable & its own dedicated node & its own dedicated node
 		\\ \hline
-		\code{this} & \q{This} & \q{This}
+		\code{this} & \underline{This} & \underline{This}
 		\\ \hline
 		Class cast and instanceof & lvalues of the underlying value & rvalues of the underlying value
 		\\ \hline
-		Method/constructor call & \q{Return} of the called method & \q{Return} of the called method
+		Method/constructor call & \underline{Return} of the called method & \underline{Return} of the called method
 		\\ \hline
 	\end{tabular}
 	\label{tab:lrvalue}
@@ -184,17 +173,29 @@ hence inferring the sensitive value that determined the branch halting problem.
 \footnotetext{Jimple always first assigns parameters to a local variable,
 so direct assignments to the parameter variable will not overwrite it}
 
+The \emph{branch} operation performs a deep clone of the \ac{LFG}
+and continues following each branch with its clone.
+
+The \emph{merge} operation pops the uppermost control flow node from the graph,
+and takes the union of all flows from each branched graph.
+
+\IncludeCode{lst:iago-attack-jimple}{./sootOutput/IagoAttack.jimple}
+{Iago attack (Jimple output)}{.5}{2}
+
+\IncludeCode{lst:iago-attack}{./IagoAttack.java}
+{Iago attack}{.3}{2}
+
+The control flow stack is always pushed from a conditional instruction
+before splitting into branches,
+which is important for attacks that count the number of times a method was called,
+hence inferring the sensitive value that determined the branch halting problem.
+
 In traditional information flow analysis,
 this naive approach described in the table appears to result in high false positive rate
 as it does not separate the internal structure used by instance fields and arrays.
 For example, consider Listing~\ref{lst:iago-attack}
 (Jimple code in Listing~\ref{lst:iago-attack-jimple}).
 At return point, the \ac{LFG} becomes as shown in Figure~\ref{fig:tfp-graph}.
-
-\IncludeCode{lst:iago-attack-jimple}
-{./sootOutput/IagoAttack.jimple}
-{Iago attack (Jimple output)}{.5}
-
 Intuitively, this appears incorrect;
 param \#0 does not flow to \code{return}
 since it is just used for \code{this.bar} but not \code{this.qux}.

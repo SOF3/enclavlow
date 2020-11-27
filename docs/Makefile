@@ -20,7 +20,3 @@ sootOutput/IagoAttack.jimple: IagoAttack.class soot.jar
 
 soot.jar:
 	wget https://repo1.maven.org/maven2/org/soot-oss/soot/4.2.1/soot-4.2.1-jar-with-dependencies.jar -O soot.jar
-
-# DOCFIG := $(shell find ../doc-fig)
-# ../doc-fig/build/IagoAttack.dot: $(DOCFIG)
-	# cd .. && ./gradlew doc-fig:run
