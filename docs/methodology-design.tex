@@ -13,7 +13,10 @@ where each node represents an element that may be leaked.
 \begin{defin}
 	Given a flow graph $(V, E)$, for all $x, y \in V$,
 	$(x, y) \in E$ if and only if
-	allocating $y$ outside an enclave reduces the indistinguishability of $x$.
+	allocating $y$ outside an enclave reduces the indistinguishability of $x$
+	even if all other nodes are removed.
+
+	If the \q{even if} condition is removed, this is a transitive relation.
 \end{defin}
 
 Note that this definition (\q{our definition}) differs slightly from
@@ -21,6 +24,8 @@ the usual definition of flow graphs (especially in \ac{DTA}),
 where an edge $(x, y)$ represents the flow of information from $x$ to $y$~\cite{YinHeng2007Pcsi}.
 In the usual definition, only adversary read access to $y$ is concerned,
 while in our definition, the adversary possesses write access to $x$.
+\pname{} constructs flow graphs in three stages
+to reduce local opcodes to a cross-method flow graph.
 
 \subsubsection{\acf{CFG}}
 \begin{table}
@@ -42,9 +47,27 @@ while in our definition, the adversary possesses write access to $x$.
 	\label{tab:cfg-nodes}
 \end{table}
 
-\begin{wrapfigure}{r}{0.5\textwidth}
-	\vspace{-3em}
-	\begin{minipage}{0.5\textwidth}
+\pname{} constructs a \ac{CFG} for each method analyzed.
+The \ac{CFG} contains the nodes listed in Table \ref{tab:cfg-nodes}.
+In this article, all flow graph nodes are \underline{underlined}.
+
+The CFG is computed by contracting the \ac{LFG},
+as described in the next subsection.
+After all methods in a class are evaluated,
+the CFGs of child methods called from the analyzed methods
+are lazily evaluated as well.
+All CFGs are merged into an \ac{AFG},
+joined using the function call nodes.
+
+For the case of polymorphism in \ac{OOP},
+the CFGs of all overrides in scope are merged by taking the union of all flow edges.
+While it is possible to improve precision by performing call graph analysis
+to identify the exact subclasses passed to the method,
+it is not implemented in this project due to time constraints.
+
+\begin{wrapfigure}{r}{0.45\textwidth}
+	% \vspace{-2em}
+	\begin{minipage}{0.45\textwidth}
 		\caption{Example \ac{CFG} for Listing~\ref{lst:SourceSinkExample}}
 		\begin{center}
 			\digraph[scale=0.5]{contract}{
@@ -72,34 +95,18 @@ while in our definition, the adversary possesses write access to $x$.
 	\end{minipage}
 \end{wrapfigure}
 
-\pname{} constructs a \ac{CFG} for each method analyzed.
-The \ac{CFG} contains the nodes listed in Table \ref{tab:cfg-nodes}.
-In this article, all flow graph nodes are \underline{underlined}.
-
-After all methods in a class are evaluated,
-the CFGs of child methods called from the analyzed methods
-are lazily evaluated as well.
-All CFGs are merged into an \ac{AFG},
-joined using the function call nodes.
-
-For the case of \ac{OOP} polymorphism,
-call graph analysis is performed to identify
-the exact subclasses that could be passed.
-In case multiple subclasses are possible,
-their contract graphs are merged by taking the union of all flow edges.
-
-See Figure~\ref{fig:SourceSinkContract} for an example of \ac{AFG}.
+Figure~\ref{fig:SourceSinkContract} shows an example of \ac{AFG}.
 Unconnected nodes are omitted for brevity.
 
 \subsubsection{\acf{LFG}}
-To construct the \ac{CFG},
-a local graph is constructed.
+To construct the \ac{CFG}, a local flow graph is constructed
+to identify the information flow between temporary variables.
 The analysis follows along the control flow of the program,
 performing the \emph{consume}, \emph{branch} and \emph{merge} operations.
 
 The \ac{LFG} extends the \ac{CFG} with the following additions:
 \begin{itemize}
-	\item Each local variable (some may exist as intermediate values in source code)
+	\item Each local variable (some may only exist as intermediate values in source code)
 		is allocated a node.
 	\item Each branch has its own \underline{Control} node.
 \end{itemize}
@@ -171,7 +178,7 @@ mentioned in Table~\ref{tab:tac} are explained in Table~\ref{tab:lrvalue}.
 \end{table}
 
 \footnotetext{Jimple always first assigns parameters to a local variable,
-so direct assignments to the parameter variable will not overwrite it}
+so direct assignments to the parameter variable will not overwrite it.}
 
 The \emph{branch} operation performs a deep clone of the \ac{LFG}
 and continues following each branch with its clone.
@@ -179,16 +186,17 @@ and continues following each branch with its clone.
 The \emph{merge} operation pops the uppermost control flow node from the graph,
 and takes the union of all flows from each branched graph.
 
-\IncludeCode{lst:iago-attack-jimple}{./sootOutput/IagoAttack.jimple}
-{Iago attack (Jimple output)}{.5}{2}
-
 \IncludeCode{lst:iago-attack}{./IagoAttack.java}
-{Iago attack}{.3}{2}
+{Iago attack}{.3}{3}
 
 The control flow stack is always pushed from a conditional instruction
 before splitting into branches,
-which is important for attacks that count the number of times a method was called,
-hence inferring the sensitive value that determined the branch halting problem.
+which is the source of information leak for attacks
+that count the number of times a method was called.
+
+Each node representing an object may contain subnodes that represent its fields. 
+Edges to field nodes do not directly affect the parent object
+despite the intuitive belief that \code{a.b = c;} leaks \code c to \code a.
 
 In traditional information flow analysis,
 this naive approach described in the table appears to result in high false positive rate
@@ -208,7 +216,7 @@ if the \code{IagoAttack} context was allocated outside the enclave,
 (even if they belong to different classes),
 hence leaking into the return value.
 Recall the definition of an edge in the \ac{LFG} used in this project,
-where $a \to b$ implies $b$ must to be protected if $a$ is protected.
+where $(a, b) \in E$ implies $b$ must to be protected if $a$ is protected.
 
 \begin{wrapfigure}{r}{.6\textwidth}
 	\vspace{-2em}
@@ -228,3 +236,6 @@ where $a \to b$ implies $b$ must to be protected if $a$ is protected.
 	\vspace{-2em}
 	\label{fig:tfp-graph}
 \end{wrapfigure}
+
+\IncludeCode{lst:iago-attack-jimple}{./sootOutput/IagoAttack.jimple}
+{Iago attack (Jimple output)}{.5}{2}

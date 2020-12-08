@@ -19,7 +19,7 @@ and protection from cloud providers may be necessary
 for compliance with privacy regulations such as GDPR~\cite{gdpr}.
 However, a significant subset of such applications are written
 using languages that use \ac{JVM} as the runtime,
-such as Hadoop~\cite{apachehadoop} and Spark~\cite{apachespark}
+such as Hadoop~\cite{apachehadoop} and Spark~\cite{apachespark}.
 Recently, Uranus, a system for
 writing \ac{SGX} applications in Java languages, was released~\cite{uranus}.
 It provides simple interface for \ac{SGX},
@@ -28,13 +28,12 @@ to move control flow into or out of enclaves.
 It is the responsibility of the user to determine the correct positions
 for the \code{@JECall} and \code{@JOCall} annotations,
 namely the enclave boundary partitioning.
-Since \ac{JVM}, compared to native applications running on the CPU,
-involves an entirely different approach
-with regard to software development and distribution,
-the tools applicable for native applications are mostly incompatible with \ac{JVM},
-introducing the corresponding new research areas.
+Since \ac{JVM} involves a different approach compared to native applications
+with software development and distribution,
+the tools applicable for native applications are mostly incompatible with \ac{JVM}.
 
-Running the whole application within an \ac{SGX} enclave is undesirable for two reasons.
+This project focuses on the dilemma of enclave boundary selection:
+running the whole application within an \ac{SGX} enclave is undesirable for two reasons.
 First, this violates the Principle of Least Privilege,
 where the whole application becomes possible attack surface
 for adversaries to compromise protected data~\cite{glamdring}.
@@ -45,6 +44,7 @@ which is restricted to 100 MB before significant performance degrading
 On the other hand, if the enclave is smaller than necessary,
 adversaries can either obtain sensitive data directly or
 infer sensitive characteristics of them indirectly.
+An enclave boundary is to be selected with high precision to avoid either downside.
 
 This project presents \pname{}
 \footnote{\q{enclavlow} is a new term coined from the words \q{enclave} and \q{flow}.},
@@ -74,7 +74,7 @@ and generates the report for the analysis from those classes.
 \subsection{Prior work}\label{subsec:prior-art}
 Information flow analysis is not a new technology in the field.
 While this project analyzes \ac{JVM} code using \ac{SGX} enclaves,
-prior research on \emph{native} code \emph{automatic partition} was found.
+prior research on \emph{automatic partition} and non-SGX dynamic analysis was found.
 
 Glamdring~\cite{glamdring} is a C framework that
 automatically selects the minimal \ac{SGX} enclave boundaries
@@ -98,6 +98,7 @@ Similar to Glamdring, it automatically selects the minimal enclave boundaries.
 It is also similar to the goal of this project,
 except that Uranus provides additional protection at the native level,
 allowing further optimizations compared to Civet.
+Challenges found in this project, such as polymorphism complexity, were also observed with Civet.
 
 This report will focus on the algorithm used to detect data leaks,
 as well as performance concerns and limitations from the \ac{JVM} design.

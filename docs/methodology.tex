@@ -11,7 +11,7 @@ are not focus areas of this project, and hence will not be discussed further.
 \subsection{System Requirements}\label{subsec:system-requirements}
 The logical code of this project is mostly implemented in Kotlin,
 a \ac{JVM} language with more concise syntax than Java.
-However, to ensure that he behaviour analyzed
+However, to ensure that the behaviour analyzed
 is as explicit as possible,
 all test cases are written in Java.
 
@@ -21,7 +21,7 @@ Furthermore, due to classpath detection difficulties,
 only OpenJDK Version 8 and 11 are supported currently.
 Nevertheless, since \pname{} is just a developer tool,
 its runtime is actually independent of that targeted by Uranus,
-so it is possible to test support for those frameworks in the future.
+so it is possible to test support for other platforms in the future.
 
 \pname{} is packaged as a Gradle plugin,
 allowing developers to use it in projects with a Gradle toolchain.
@@ -30,14 +30,14 @@ such as Maven plugins, IDE plugins, etc.
 
 \subsection{Flow analysis framework}\label{subsec:flow-analysis-framework}
 Soot~\cite{sootsurvivor} was selected as the framework for conducting flow analysis.
-Although multiple existing flow analysis systems using Soot already exist,
+Although multiple flow analysis systems using Soot already exist,
 they are not designed against \ac{SGX} enclave protection,
 but \pname{} adopts more strict security policies
 to prevent attacks from more privileged attackers,
 unlike traditional information flow analysis
 that mostly detects user input as the source of insecurity.
 
-Soot takes Java bytecode files (\code{*.class}) as input
+Soot accepts Java bytecode files (\code{*.class}) as input
 and compiles them into a \ac{3AC} language called Jimple,
 which simplifies analysis work.
 The consume-branch-merge approach mentioned in the last subsection

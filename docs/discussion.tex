@@ -1,19 +1,22 @@
 \section{Results and Discussion}\label{sec:results-and-discussion}
+There have been multiple unsolved difficulties and unimplemented features in this project,
+which can be tackled in future research.
 
 \subsection{Difficulties and Limitations}\label{subsec:difficulties-and-limitations}
 \IncludeCode{lst:oop-subst-attack}{./OopSubstAttack.java}
 {Example attack through OOP substitution}{.6}{2.5}
 
-The principles of \ac{OOP} imply that a method called may be swapped with another subclass
+The principles of \ac{OOP} imply that the receiver of a method call
+may be swapped with a compatible implementation in another subclass
 that performs different actions than the current one.
 Although Uranus prevents the adversary
 from passing arbitrary malicious code into the enclave memory,
-it is still possible to pass objects of unexpected subclass
-through the \code{@JEcall} boundary.
+it is still possible to pass objects of unexpected trusted subclass
+through the \code{@JECall} boundary.
 Consider Listing~\ref{lst:oop-subst-attack} for example.
 If \code{cs} is passed with a \code{substr} implementation
 that writes its parameters to a static variable,
-the function would leak the length of the security-sensitive secret,
+the function would leak the length of the security-sensitive \code{secret},
 which is not desirable.
 To correctly solve the vulnerability of \ac{OOP} substitution,
 it is necessary to perform call graph analysis on the actual classes passed to the method,
@@ -28,8 +31,12 @@ within efficient time complexity~\cite{SmithGeoffrey2007PoSI}.
 For example, this project merges conditional branches together
 by taking the union of flow graphs,
 resulting in easy false positive rates.
-Listing~\ref{lst:known-false-positives} is an example of this,
-where 
+Listing~\ref{lst:known-false-positives} is an example of this  due to multiple return arms.
+The CFG contains an edge (\code{secret} $\to$ \underline{Return}),
+but the returned value is in fact always 1.
+This is not to be fixed since it is a minor use case;
+duplicated code in multiple return arms
+is typically regarded as an antipattern anyway.
 
 It is also impossible to analyze further than the \ac{JNI} level,
 since analyzing across \ac{JNI} boundary implies
@@ -40,7 +47,7 @@ and platform-specific support (defeating the purpose of using \ac{JVM}),
 Since Uranus effectively denies system calls,
 the contract is always assumed to be
 $\left\{ (p, \text{return}) : p \in \text{params} \right\}$.
-This signature might miss some special cases,
+This assumption might miss some special cases,
 such as the \code{System.arraycopy} method in the Java \ac{SDK},
 which leaks information about its bounds parameters to an array.
 
@@ -51,6 +58,8 @@ However, \ac{JLS} 9.6.1.2 explicitly stated that
 \q{an annotation on a local variable declaration
 is never retained in the binary representation}~\cite{jls},
 so a method call based approach is used instead.
+It is expected that JIT optimization removes the cost
+involved from an extra method call at JIT compile time.
 
 \subsection{Recommended future research}\label{subsec:recommended-future-research}
 There are multiple areas in which this project can be extended.
@@ -69,4 +78,5 @@ use Uranus's untrusted-memory \ac{API}
 like \code{SafeGetField} and \code{SafeWriteField}\cite{uranus},
 which checks the memory address against enclave bounds at runtime.
 The static analysis in \pname{} allows Uranus to validate these bounds at compile time,
-
+hence avoiding the runtime bounds-checking cost and improve performance.
+Note that JIT optimization is not able to detect unnecessary bounds checking.
