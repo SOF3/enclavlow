@@ -41,6 +41,7 @@ class AssignTests {
     @Test
     fun thisToStatic() = testMethod<AssignCase>("thisToStatic", makeContract(CallTags.UNSPECIFIED, 0) {
         MethodControlNode into ReturnLocalNode
+        MethodControlNode into StaticLocalNode
         ThisLocalNode into StaticLocalNode
     })
 
