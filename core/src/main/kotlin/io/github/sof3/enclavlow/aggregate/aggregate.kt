@@ -1,5 +1,6 @@
 package io.github.sof3.enclavlow.aggregate
 
+import io.github.sof3.enclavlow.contract.CallTags
 import io.github.sof3.enclavlow.contract.Contract
 import io.github.sof3.enclavlow.contract.ContractFlowGraph
 import io.github.sof3.enclavlow.contract.ContractNode
@@ -18,9 +19,12 @@ import io.github.sof3.enclavlow.contract.ThrowLocalNode
 import io.github.sof3.enclavlow.contract.analyzeMethod
 import io.github.sof3.enclavlow.local.FnIden
 import io.github.sof3.enclavlow.util.MutableDiGraph
+import io.github.sof3.enclavlow.util.block
 import io.github.sof3.enclavlow.util.newDiGraph
 
-fun computeAggregate(classpath: List<String>, entryClasses: List<String>): MutableDiGraph<AggNode, AggEdge> {
+typealias AggGraph = MutableDiGraph<AggNode, AggEdge>
+
+fun computeAggregate(classpath: List<String>, entryClasses: List<String>): Pair<AggGraph, Set<Pair<AggNode, AggNode>>> {
     soot.G.reset()
 
     val optionsConfig: soot.options.Options.() -> Unit = {
@@ -29,10 +33,11 @@ fun computeAggregate(classpath: List<String>, entryClasses: List<String>): Mutab
     }
     soot.options.Options.v().apply(optionsConfig)
     val scene = soot.Scene.v()
-    scene.loadNecessaryClasses()
+    // scene.loadNecessaryClasses()
 
     val initial = mutableSetOf<FnIden>()
     for (className in entryClasses) {
+        // scene.addBasicClass(className, SootClass.SIGNATURES)
         val clazz = scene.loadClassAndSupport(className)
         for (method in clazz.methodIterator()) {
             initial.add(FnIden(className, method.subSignature))
@@ -42,49 +47,74 @@ fun computeAggregate(classpath: List<String>, entryClasses: List<String>): Mutab
     var requests = initial.takeIf { it.isNotEmpty() }
     val contracts = mutableMapOf<FnIden, Contract<out ContractFlowGraph>>()
 
+    var rounds = 0
     while (requests != null) {
-        val swap = mutableSetOf<FnIden>()
-        for (request in requests) {
-            val contract = analyzeMethod(request.clazz, request.method, MethodNameType.SUB_SIGNATURE, optionsConfig)
-            contracts[request] = contract
-            for (call in contract.calls) {
-                val fn = FnIden(call.fn.clazz, call.fn.method)
-                if (fn !in contracts && fn !in requests) {
-                    swap.add(fn)
+        block("BFS round ${++rounds}") {
+            val requestsCopy = requests!!
+            val swap = mutableSetOf<FnIden>()
+            for (request in requestsCopy) {
+                val contract = analyzeMethod(request.clazz, request.method, MethodNameType.SUB_SIGNATURE, optionsConfig)
+                contracts[request] = contract
+                for (call in contract.calls) {
+                    val fn = FnIden(call.fn.clazz, call.fn.method)
+                    if (fn !in contracts && fn !in requestsCopy) {
+                        swap.add(fn)
+                    }
                 }
             }
+            requests = swap.takeIf { it.isNotEmpty() }
         }
-        requests = swap.takeIf { it.isNotEmpty() }
     }
 
     val aggregate = newDiGraph<AggNode, AggEdge> { AggEdge() }
+    val crossEdges = mutableSetOf<Pair<AggNode, AggNode>>()
 
-    for ((fn, contract) in contracts) {
-        val proxyMap = mutableMapOf<ProxyLocalNode, FnAggNode>()
-        for (call in contract.calls) {
-            // just construct a new object; FnAggNode will delegate equality and hashCode
-            proxyMap[call.controlNode] = FnAggNode(call.fn, MethodControlNode)
-            proxyMap[call.returnNode] = FnAggNode(call.fn, ReturnLocalNode)
-            proxyMap[call.throwNode] = FnAggNode(call.fn, ThrowLocalNode)
-            val thisNode = call.thisNode
-            if (thisNode != null) {
-                proxyMap[thisNode] = FnAggNode(call.fn, ThisLocalNode)
+    block("Merging AFG") {
+        for ((fn, contract) in contracts) {
+            val proxyMap = mutableMapOf<ProxyLocalNode, FnAggNode>()
+            for (call in contract.calls) {
+                // just construct a new object; FnAggNode will delegate equality and hashCode
+                proxyMap[call.controlNode] = FnAggNode(call.fn, MethodControlNode)
+                proxyMap[call.returnNode] = FnAggNode(call.fn, ReturnLocalNode)
+                proxyMap[call.throwNode] = FnAggNode(call.fn, ThrowLocalNode)
+                val thisNode = call.thisNode
+                if (thisNode != null) {
+                    proxyMap[thisNode] = FnAggNode(call.fn, ThisLocalNode)
+                }
+                for ((i, param) in call.params.withIndex()) {
+                    proxyMap[param] = FnAggNode(call.fn, ParamLocalNode(i))
+                }
             }
-            for ((i, param) in call.params.withIndex()) {
-                proxyMap[param] = FnAggNode(call.fn, ParamLocalNode(i))
-            }
-        }
 
-        contract.graph.forEachEdge { from, to, _ ->
-            val left = contractNodeToAgg(fn, from, proxyMap)
-            val right = contractNodeToAgg(fn, to, proxyMap)
-            aggregate.addNodeIfMissing(left)
-            aggregate.addNodeIfMissing(right)
-            aggregate.touch(left, right) {}
+            contract.graph.forEachEdge { from, to, _ ->
+                val left = contractNodeToAgg(fn, from, proxyMap)
+                val right = contractNodeToAgg(fn, to, proxyMap)
+                aggregate.addNodeIfMissing(left)
+                aggregate.addNodeIfMissing(right)
+                aggregate.touch(left, right) {}
+
+                fun aggToTags(agg: FnAggNode) = contracts[agg.fn]?.callTags ?: CallTags.UNSPECIFIED
+
+                if (right == StaticAggNode) crossEdges.add(left to right)
+                if (right is FnAggNode) {
+                    val tags = aggToTags(right)
+                    if (tags == CallTags.OUTSIDE_CALL) {
+                        when (right.variant) {
+                            is ParamLocalNode, is ThisLocalNode -> crossEdges.add(left to right)
+                            else -> Unit
+                        }
+                    } else if (tags == CallTags.ENCLAVE_CALL) {
+                        when (right.variant) {
+                            is ParamLocalNode, is ThisLocalNode, is ReturnLocalNode, is ThrowLocalNode -> crossEdges.add(left to right)
+                            else -> Unit
+                        }
+                    }
+                }
+            }
         }
     }
 
-    return aggregate
+    return Pair(aggregate, crossEdges)
 }
 
 private fun contractNodeToAgg(fn: FnIden, node: ContractNode, proxyMap: Map<ProxyLocalNode, FnAggNode>): AggNode = when (node) {
@@ -93,5 +123,5 @@ private fun contractNodeToAgg(fn: FnIden, node: ContractNode, proxyMap: Map<Prox
     is ExplicitSinkLocalNode -> ExplicitSinkAggNode
     is StaticLocalNode -> StaticAggNode
     is ContractProjectionNode -> TODO()
-    is ProxyLocalNode -> proxyMap[node] ?: throw IllegalArgumentException("Unknown ProxyLocalNode")
+    is ProxyLocalNode -> proxyMap[node] ?: throw IllegalArgumentException("Unknown ProxyLocalNode $node")
 }

@@ -5,23 +5,25 @@ import guru.nidi.graphviz.attribute.Style
 import guru.nidi.graphviz.model.MutableNode
 import kotlin.random.Random
 
-group = "io.github.sof3"
+group = "io.github.sof3.enclavlow"
 version = "1.0-SNAPSHOT"
 
 allprojects {
     repositories {
+        mavenLocal()
         mavenCentral()
         maven("https://repo1.maven.org/maven2")
     }
 }
 
 subprojects {
-    group = "io.github.sof3"
+    group = "io.github.sof3.enclavlow"
     version = "1.0-SNAPSHOT"
 }
 
 buildscript {
     repositories {
+        mavenLocal()
         jcenter()
     }
 }

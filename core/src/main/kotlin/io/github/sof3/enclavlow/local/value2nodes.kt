@@ -104,6 +104,7 @@ private fun rvalueNodesSeq(flow: LocalFlow, value: Value): Sequence<LocalNode> =
                 }
             } else {
                 val call = createFnCall(value.method) // TODO specialize for polymorphism
+                flow.addCall(call)
                 for (node in call.allNodes()) {
                     flow.graph.addNodeIfMissing(node)
                 }

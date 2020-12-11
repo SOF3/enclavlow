@@ -1,0 +1,300 @@
+BFS round 1
+  [224 +171.143]     public void <init>()
+                     {
+                         io.github.sof3.enclavlow.example.Entry r0;
+                 
+                         r0 := @this: io.github.sof3.enclavlow.example.Entry;
+                 
+                         specialinvoke r0.<java.lang.Object: void <init>()>();
+                 
+                         return;
+                     }
+                 
+  Analyzing <io.github.sof3.enclavlow.example.Entry: void <init>()>
+    Copy
+      [224 +173.279] control1 copyTo control7
+    Node r0 := @this: io.github.sof3.enclavlow.example.Entry
+      [224 +173.516] JIdentityStmt: r0 := @this: io.github.sof3.enclavlow.example.Entry
+      [224 +173.877] Input: LocalFlow(control=control5, locals={}, params=[], calls=[], graph=
+                     digraph DiGraph2128363169 {
+                     	0 [label = "this",color = "#def717"];
+                     	1 [label = "static",color = "#abac43"];
+                     	2 [label = "return",color = "#19071f"];
+                     	3 [label = "throw",color = "#8210d0"];
+                     	4 [label = "<source>",color = "#c520ad"];
+                     	5 [label = "<sink>",color = "#f9766c"];
+                     	6 [label = "control5",color = "#ac8603"];
+                     }
+                     )
+      [224 +174.147] control5 copyTo control1
+      [224 +175.464] lvalueNodesImpl(JimpleLocal r0)
+      [224 +175.900] lvalueNodesImpl(JimpleLocal r0)
+      [224 +176.658] lvalueNodesImpl(ThisRef @this: io.github.sof3.enclavlow.example.Entry)
+      [224 +178.158] Output: [LocalFlow(control=control5, locals={r0=r0}, params=[], calls=[], graph=
+                     digraph DiGraph2108551300 {
+                     	0 [label = "this",color = "#def717"];
+                     	1 [label = "static",color = "#abac43"];
+                     	2 [label = "return",color = "#19071f"];
+                     	3 [label = "throw",color = "#8210d0"];
+                     	4 [label = "<source>",color = "#c520ad"];
+                     	5 [label = "<sink>",color = "#f9766c"];
+                     	6 [label = "control5",color = "#ac8603"];
+                     	7 [label = "r0",color = "#0e882b"];
+                     	0 -> 7 [label = "assignment",style = "solid",color = "black"];
+                     	6 -> 7 [label = "assignment\ncondition",style = "solid",color = "black"];
+                     	7 -> 0 [label = "reference\nback flow",style = "dotted",color = "black"];
+                     }
+                     )]
+      [224 +178.493] Branched Output: []
+    Copy
+      [224 +178.585] control5 copyTo control6
+    Copy
+      [224 +179.186] control3 copyTo control1
+    Copy
+      [224 +179.290] control5 copyTo control2
+    Node specialinvoke r0.<java.lang.Object: void <init>()>()
+      [224 +179.444] JInvokeStmt: specialinvoke r0.<java.lang.Object: void <init>()>()
+      [224 +179.593] Input: LocalFlow(control=control5, locals={r0=r0}, params=[], calls=[], graph=
+                     digraph DiGraph2024151566 {
+                     	0 [label = "this",color = "#def717"];
+                     	1 [label = "static",color = "#abac43"];
+                     	2 [label = "return",color = "#19071f"];
+                     	3 [label = "throw",color = "#8210d0"];
+                     	4 [label = "<source>",color = "#c520ad"];
+                     	5 [label = "<sink>",color = "#f9766c"];
+                     	6 [label = "control5",color = "#ac8603"];
+                     	7 [label = "r0",color = "#0e882b"];
+                     	0 -> 7 [label = "assignment",style = "solid",color = "black"];
+                     	6 -> 7 [label = "assignment\ncondition",style = "solid",color = "black"];
+                     	7 -> 0 [label = "reference\nback flow",style = "dotted",color = "black"];
+                     }
+                     )
+      [224 +180.071] control5 copyTo control3
+      [224 +181.660] Output: [LocalFlow(control=control5, locals={r0=r0}, params=[], calls=[FnCall(fn=java.lang.Object.void <init>(), params=[], thisNode=<java.lang.Object.void <init>()>
+                     this, returnNode=<java.lang.Object.void <init>()>
+                     return, throwNode=<java.lang.Object.void <init>()>
+                     throw, controlNode=<java.lang.Object.void <init>()>
+                     control)], graph=
+                     digraph DiGraph1109989695 {
+                     	0 [label = "this",color = "#def717"];
+                     	1 [label = "static",color = "#abac43"];
+                     	2 [label = "return",color = "#19071f"];
+                     	3 [label = "throw",color = "#8210d0"];
+                     	4 [label = "<source>",color = "#c520ad"];
+                     	5 [label = "<sink>",color = "#f9766c"];
+                     	6 [label = "control5",color = "#ac8603"];
+                     	7 [label = "r0",color = "#0e882b"];
+                     	8 [label = "<java.lang.Object.void <init>()>
+                     this",color = "#a6aa12"];
+                     	9 [label = "<java.lang.Object.void <init>()>
+                     return",color = "#a6aa12"];
+                     	10 [label = "<java.lang.Object.void <init>()>
+                     throw",color = "#a6aa12"];
+                     	11 [label = "<java.lang.Object.void <init>()>
+                     control",color = "#a6aa12"];
+                     	0 -> 7 [label = "assignment",style = "solid",color = "black"];
+                     	6 -> 7 [label = "assignment\ncondition",style = "solid",color = "black"];
+                     	6 -> 11 [label = "call condition",style = "solid",color = "black"];
+                     	7 -> 0 [label = "reference\nback flow",style = "dotted",color = "black"];
+                     	7 -> 8 [label = "call context",style = "solid",color = "black"];
+                     }
+                     )]
+      [224 +182.241] Branched Output: []
+    Copy
+      [224 +182.337] control5 copyTo control5
+    Copy
+      [224 +182.525] control5 copyTo control4
+    Node return
+      [224 +182.622] JReturnVoidStmt: return
+      [224 +182.797] Input: LocalFlow(control=control5, locals={r0=r0}, params=[], calls=[FnCall(fn=java.lang.Object.void <init>(), params=[], thisNode=<java.lang.Object.void <init>()>
+                     this, returnNode=<java.lang.Object.void <init>()>
+                     return, throwNode=<java.lang.Object.void <init>()>
+                     throw, controlNode=<java.lang.Object.void <init>()>
+                     control)], graph=
+                     digraph DiGraph1396443752 {
+                     	0 [label = "this",color = "#def717"];
+                     	1 [label = "static",color = "#abac43"];
+                     	2 [label = "return",color = "#19071f"];
+                     	3 [label = "throw",color = "#8210d0"];
+                     	4 [label = "<source>",color = "#c520ad"];
+                     	5 [label = "<sink>",color = "#f9766c"];
+                     	6 [label = "control5",color = "#ac8603"];
+                     	7 [label = "r0",color = "#0e882b"];
+                     	8 [label = "<java.lang.Object.void <init>()>
+                     this",color = "#a6aa12"];
+                     	9 [label = "<java.lang.Object.void <init>()>
+                     return",color = "#a6aa12"];
+                     	10 [label = "<java.lang.Object.void <init>()>
+                     throw",color = "#a6aa12"];
+                     	11 [label = "<java.lang.Object.void <init>()>
+                     control",color = "#a6aa12"];
+                     	0 -> 7 [label = "assignment",style = "solid",color = "black"];
+                     	6 -> 7 [label = "assignment\ncondition",style = "solid",color = "black"];
+                     	6 -> 11 [label = "call condition",style = "solid",color = "black"];
+                     	7 -> 0 [label = "reference\nback flow",style = "dotted",color = "black"];
+                     	7 -> 8 [label = "call context",style = "solid",color = "black"];
+                     }
+                     )
+      [224 +183.371] control5 copyTo control5
+      [224 +184.650] Output: []
+      [224 +184.729] Branched Output: []
+  Contract of UNSPECIFIED void <init>()
+    [224 +184.934] 
+                   digraph DiGraph1921720444 {
+                   	0 [label = "this",color = "#def717"];
+                   	1 [label = "static",color = "#abac43"];
+                   	2 [label = "return",color = "#19071f"];
+                   	3 [label = "throw",color = "#8210d0"];
+                   	4 [label = "<source>",color = "#c520ad"];
+                   	5 [label = "<sink>",color = "#f9766c"];
+                   	6 [label = "methodCall",color = "#bb15d3"];
+                   	7 [label = "<java.lang.Object.void <init>()>
+                   this",color = "#a6aa12"];
+                   	8 [label = "<java.lang.Object.void <init>()>
+                   control",color = "#a6aa12"];
+                   	0 -> 7 [style = "solid",color = "black"];
+                   	6 -> 2 [style = "solid",color = "black"];
+                   	6 -> 7 [style = "solid",color = "black"];
+                   	6 -> 8 [style = "solid",color = "black"];
+                   }
+                   
+  [224 +261.579]     public static void main(java.lang.String[])
+                     {
+                         java.lang.String[] r0;
+                 
+                         r0 := @parameter0: java.lang.String[];
+                 
+                         return;
+                     }
+                 
+  Analyzing <io.github.sof3.enclavlow.example.Entry: void main(java.lang.String[])>
+    Copy
+      [224 +262.027] control9 copyTo control13
+    Node r0 := @parameter0: java.lang.String[]
+      [224 +262.159] JIdentityStmt: r0 := @parameter0: java.lang.String[]
+      [224 +262.304] Input: LocalFlow(control=control11, locals={}, params=[param0], calls=[], graph=
+                     digraph DiGraph615491973 {
+                     	0 [label = "this",color = "#def717"];
+                     	1 [label = "static",color = "#abac43"];
+                     	2 [label = "return",color = "#19071f"];
+                     	3 [label = "throw",color = "#8210d0"];
+                     	4 [label = "<source>",color = "#c520ad"];
+                     	5 [label = "<sink>",color = "#f9766c"];
+                     	6 [label = "param0",color = "#4800e4"];
+                     	7 [label = "control11",color = "#ac8603"];
+                     }
+                     )
+      [224 +262.566] control11 copyTo control9
+      [224 +262.648] lvalueNodesImpl(JimpleLocal r0)
+      [224 +262.728] lvalueNodesImpl(JimpleLocal r0)
+      [224 +262.836] lvalueNodesImpl(ParameterRef @parameter0: java.lang.String[])
+      [224 +263.040] Output: [LocalFlow(control=control11, locals={r0=r0}, params=[param0], calls=[], graph=
+                     digraph DiGraph713536750 {
+                     	0 [label = "this",color = "#def717"];
+                     	1 [label = "static",color = "#abac43"];
+                     	2 [label = "return",color = "#19071f"];
+                     	3 [label = "throw",color = "#8210d0"];
+                     	4 [label = "<source>",color = "#c520ad"];
+                     	5 [label = "<sink>",color = "#f9766c"];
+                     	6 [label = "param0",color = "#4800e4"];
+                     	7 [label = "control11",color = "#ac8603"];
+                     	8 [label = "r0",color = "#0e882b"];
+                     	6 -> 8 [label = "assignment",style = "solid",color = "black"];
+                     	7 -> 8 [label = "assignment\ncondition",style = "solid",color = "black"];
+                     	8 -> 6 [label = "reference\nback flow",style = "dotted",color = "black"];
+                     }
+                     )]
+      [224 +263.362] Branched Output: []
+    Copy
+      [224 +263.439] control11 copyTo control12
+    Copy
+      [224 +263.594] control11 copyTo control10
+    Node return
+      [224 +263.679] JReturnVoidStmt: return
+      [224 +273.474] Input: LocalFlow(control=control11, locals={r0=r0}, params=[param0], calls=[], graph=
+                     digraph DiGraph675434851 {
+                     	0 [label = "this",color = "#def717"];
+                     	1 [label = "static",color = "#abac43"];
+                     	2 [label = "return",color = "#19071f"];
+                     	3 [label = "throw",color = "#8210d0"];
+                     	4 [label = "<source>",color = "#c520ad"];
+                     	5 [label = "<sink>",color = "#f9766c"];
+                     	6 [label = "param0",color = "#4800e4"];
+                     	7 [label = "control11",color = "#ac8603"];
+                     	8 [label = "r0",color = "#0e882b"];
+                     	6 -> 8 [label = "assignment",style = "solid",color = "black"];
+                     	7 -> 8 [label = "assignment\ncondition",style = "solid",color = "black"];
+                     	8 -> 6 [label = "reference\nback flow",style = "dotted",color = "black"];
+                     }
+                     )
+      [224 +274.193] control11 copyTo control11
+      [224 +274.365] Searching ancestors of param0
+      [224 +274.486] Output: []
+      [224 +274.566] Branched Output: []
+  Contract of UNSPECIFIED void main(java.lang.String[])
+    [224 +274.811] 
+                   digraph DiGraph1492175425 {
+                   	0 [label = "this",color = "#def717"];
+                   	1 [label = "static",color = "#abac43"];
+                   	2 [label = "return",color = "#19071f"];
+                   	3 [label = "throw",color = "#8210d0"];
+                   	4 [label = "<source>",color = "#c520ad"];
+                   	5 [label = "<sink>",color = "#f9766c"];
+                   	6 [label = "param0",color = "#4800e4"];
+                   	7 [label = "methodCall",color = "#bb15d3"];
+                   	7 -> 2 [style = "solid",color = "black"];
+                   }
+                   
+BFS round 2
+  [224 +404.084]     public void <init>()
+                     {
+                         java.lang.Object r0;
+                 
+                         r0 := @this: java.lang.Object;
+                 
+                         return;
+                     }
+                 
+  Analyzing <java.lang.Object: void <init>()>
+    Copy
+      [224 +404.767] control15 copyTo control19
+    Node r0 := @this: java.lang.Object
+      [224 +404.940] JIdentityStmt: r0 := @this: java.lang.Object
+      [224 +405.119] Input: LocalFlow(control=control17, locals={}, params=[], calls=[], graph=
+                     digraph DiGraph215744365 {
+                     	0 [label = "this",color = "#def717"];
+                     	1 [label = "static",color = "#abac43"];
+                     	2 [label = "return",color = "#19071f"];
+                     	3 [label = "throw",color = "#8210d0"];
+                     	4 [label = "<source>",color = "#c520ad"];
+                     	5 [label = "<sink>",color = "#f9766c"];
+                     	6 [label = "control17",color = "#ac8603"];
+                     }
+                     )
+      [224 +405.491] control17 copyTo control15
+      [224 +405.619] lvalueNodesImpl(JimpleLocal r0)
+      [224 +405.718] lvalueNodesImpl(JimpleLocal r0)
+      [224 +405.847] lvalueNodesImpl(ThisRef @this: java.lang.Object)
+      [224 +406.106] Output: [LocalFlow(control=control17, locals={r0=r0}, params=[], calls=[], graph=
+                     digraph DiGraph1908595651 {
+                     	0 [label = "this",color = "#def717"];
+                     	1 [label = "static",color = "#abac43"];
+                     	2 [label = "return",color = "#19071f"];
+                     	3 [label = "throw",color = "#8210d0"];
+                     	4 [label = "<source>",color = "#c520ad"];
+                     	5 [label = "<sink>",color = "#f9766c"];
+                     	6 [label = "control17",color = "#ac8603"];
+                     	7 [label = "r0",color = "#0e882b"];
+                     	0 -> 7 [label = "assignment",style = "solid",color = "black"];
+                     	6 -> 7 [label = "assignment\ncondition",style = "solid",color = "black"];
+                     	7 -> 0 [label = "reference\nback flow",style = "dotted",color = "black"];
+                     }
+                     )]
+      [224 +406.573] Branched Output: []
+    Copy
+      [224 +406.692] control17 copyTo control18
+    Copy
+      [224 +406.934] control17 copyTo control16
+    Node return
+      [224 +407.074] JReturnVoidStmt: return
+      [22

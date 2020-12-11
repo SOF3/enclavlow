@@ -1,6 +1,7 @@
 package io.github.sof3.enclavlow.util
 
 var IS_DEBUG = false
+var ENCLAVLOW_DEBUG_LOGGER: (String) -> Unit = { println(it) }
 
 object DebugOutput {
     private val EPOCH = System.nanoTime()
@@ -11,8 +12,7 @@ object DebugOutput {
 
     fun pushTag(tag: String) = synchronized(this) {
         if (!IS_DEBUG) return@synchronized
-        print(getIndent())
-        println("{$tag}")
+        ENCLAVLOW_DEBUG_LOGGER(getIndent() + tag)
         tags.add("  ".repeat(tags.size + 1))
         return@synchronized
     }
@@ -30,9 +30,14 @@ object DebugOutput {
 
         val time = "[${Thread.currentThread().id} %+.3f] ".format((System.nanoTime() - EPOCH) / 1e6f)
         for ((i, line) in message.split("\n").withIndex()) {
-            print(getIndent())
-            print(if (i == 0) time else " ".repeat(time.length))
-            println(line)
+            val sb = StringBuilder(getIndent())
+            if (i == 0) {
+                sb.append(time)
+            } else {
+                sb.append(" ".repeat(time.length))
+            }
+            sb.append(line)
+            ENCLAVLOW_DEBUG_LOGGER(sb.toString())
         }
 
         counter++

@@ -13,7 +13,9 @@ object ExplicitSinkAggNode : AggNode()
 object StaticAggNode : AggNode()
 
 class AggEdge : Edge<AggEdge, AggNode> {
-    override fun mergeEdge(other: AggEdge) = throw java.lang.UnsupportedOperationException("AFGs should not be merged")
+    var leak = false
+
+    override fun mergeEdge(other: AggEdge) = throw UnsupportedOperationException("AFGs should not be merged")
 
     override fun graphEqualsImpl(other: Any) = this == other
 

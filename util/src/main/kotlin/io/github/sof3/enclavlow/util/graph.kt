@@ -111,7 +111,7 @@ sealed class DiGraph<N : Any, E : Edge<E, N>>(
         return MutableDiGraph(newNodes, newEdges, edgeConstructor)
     }
 
-    fun indexOf(node: N): Int = nodes.find(node) ?: throw IllegalArgumentException("Nonexistent node $node")
+    fun indexOf(node: N): Int = nodes.find(node) ?: throw IllegalArgumentException("Nonexistent node ${node.toString().replace("\n", "[LF]")} in $this")
 
     fun flowsFrom(src: N): List<N> = flowsFromIndex(indexOf(src)).map { nodes[it] }
     fun flowsFromEdges(src: N): List<Pair<N, E>> {
@@ -152,13 +152,6 @@ sealed class DiGraph<N : Any, E : Edge<E, N>>(
                 visitor(step, nodes[i])
                 visitAncestors(nodes[i], visited, step, reduce, visitor)
             }
-        }
-    }
-
-    fun deleteAllSources(dest: N) {
-        val j = indexOf(dest)
-        for (i in 0 until nodes.size) {
-            edges[i][j] = null
         }
     }
 
@@ -230,8 +223,8 @@ class MutableDiGraph<N : Any, E : Edge<E, N>>(
     }
 
     fun touch(from: N, to: N, config: E.() -> Unit): E? {
-        val a = nodes.find(from) ?: throw IllegalArgumentException("Nonexistent node $from")
-        val b = nodes.find(to) ?: throw IllegalArgumentException("Nonexistent node $to")
+        val a = indexOf(from)
+        val b = indexOf(to)
 
         if (a == b) return null // self-loops are not allowed
 

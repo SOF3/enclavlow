@@ -23,10 +23,10 @@ import io.github.sof3.enclavlow.util.printDebug
 import soot.SootField
 import soot.SootMethod
 
-fun newLocalFlow(paramCount: Int, control: ControlNode): LocalFlow {
+fun newLocalFlow(paramCount: Int, control: ControlNode, flow: SenFlow): LocalFlow {
     val params = List(paramCount) { ParamLocalNode(it) }
     val graph = makeLocalFlowGraph(params + (control as LocalNode))
-    return LocalFlow(graph, control, mutableMapOf(), mutableListOf(), mutableSetOf(), params)
+    return LocalFlow(graph, control, mutableMapOf(), mutableListOf(), mutableSetOf(), params, flow)
 }
 
 class LocalFlow(
@@ -36,6 +36,7 @@ class LocalFlow(
     var calls: MutableList<FnCall>,
     var projections: MutableSet<ProjectionNode<*>>,
     var params: List<ParamLocalNode>,
+    private val flow: SenFlow
 ) {
     var control: LocalNode = _control
         set(value) {
@@ -56,6 +57,11 @@ class LocalFlow(
         return local
     }
 
+    fun addCall(call: FnCall) {
+        calls.add(call)
+        flow.outputContract.calls.add(call)
+    }
+
     fun getProjection(base: LocalNode, field: SootField): ProjectionNode<LocalNode> {
         val fieldNode = ProjectionNode.create(base, field.declaration)
         if (fieldNode !in projections) {
@@ -72,7 +78,7 @@ class LocalFlow(
     fun getProjectionAsNode(base: LocalNode, field: SootField) = getProjection(base, field) as LocalNode
 
     fun finalizedCopy(methodControl: MethodControlNode): LocalFlow {
-        val copy = newLocalFlow(params.size, control as ControlNode)
+        val copy = newLocalFlow(params.size, control as ControlNode, flow)
         this copyTo copy
         copy.graph.addNodeIfMissing(methodControl)
         for (node in copy.graph.nodes) {
@@ -192,11 +198,10 @@ data class FnCall(
 ) {
     fun allNodes() = sequence {
         yieldAll(params)
-        thisNode?.let {
-            yield(it)
-        }
+        thisNode?.let { yield(it) }
         yield(returnNode)
         yield(throwNode)
+        yield(controlNode)
     }
 }
 
@@ -207,5 +212,6 @@ fun createFnCall(method: SootMethod): FnCall {
     val returnNode = ProxyLocalNode("<$fn>\nreturn")
     val throwNode = ProxyLocalNode("<$fn>\nthrow")
     val controlNode = ProxyLocalNode("<$fn>\ncontrol")
-    return FnCall(fn, params, thisNode, returnNode, throwNode, controlNode)
+    val ret = FnCall(fn, params, thisNode, returnNode, throwNode, controlNode)
+    return ret
 }

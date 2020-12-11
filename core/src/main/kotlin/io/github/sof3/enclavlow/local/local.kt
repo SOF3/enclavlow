@@ -48,7 +48,7 @@ class SenFlow(
     val outputContract: Contract<MutableContractFlowGraph> = makeContract(callTags, paramCount)
     private var dotWrites: Int = 0
 
-    override fun newInitialFlow() = newLocalFlow(paramCount, LocalControlNode())
+    override fun newInitialFlow() = newLocalFlow(paramCount, LocalControlNode(), this)
     override fun merge(in1: LocalFlow, in2: LocalFlow, out: LocalFlow) = block("Merge") {
         printDebug("in1: $in1")
         printDebug("in2: $in2")
@@ -111,7 +111,7 @@ class SenFlow(
         printDebug("${stmt.javaClass.simpleName}: $stmt")
         printDebug("Input: $input")
         val output = fallOutList.getOrNull(0)
-        if (fallOutList.size > 1) throw java.lang.AssertionError("Unsupported fallOutList non-singleton")
+        if (fallOutList.size > 1) throw AssertionError("Unsupported fallOutList non-singleton")
 
         when (stmt) {
             is ReturnStmt -> {
@@ -163,7 +163,6 @@ class SenFlow(
                 for (flow in listOf(fallOutList, branchOutList).flatten()) {
                     input copyTo flow
                     for (node in nodes) {
-
                         flow.graph.touch(node, flow.control) { causes += LocalFlowCause.BRANCH }
                     }
                 }
@@ -198,8 +197,17 @@ class SenFlow(
             printDebug("Searching ancestors of $paramNode")
             ancestorPostprocess(flow, setOf(paramNode), paramNode)
         }
+        for(call in flow.calls){
+            for(node in call.allNodes()){
+                ancestorPostprocess(flow, setOf(node), node)
+            }
+        }
     }
 
+    /**
+     * Mark each node in `leaves` as a `dest` node
+     * and search the corresponding flow.
+     */
     private fun ancestorPostprocess(flow: LocalFlow, leaves: Set<LocalNode>, dest: ContractNode) {
         flow.graph.visitAncestors(leaves, { e1, e2 ->
             // if e1 is a cut-edge but not all edges have refOnly, discard it
@@ -221,6 +229,7 @@ class SenFlow(
         }, { edge: LocalEdge, node: LocalNode ->
             if (node is ContractNode && node !== dest) {
                 outputContract.graph.addNodeIfMissing(node)
+                outputContract.graph.addNodeIfMissing(dest)
                 outputContract.graph.touch(node, dest) {
                     refOnly = edge.hasRefOnlyCutEdge
                     projectionBackFlow = edge.causes.all { it.projectionBackFlow }
