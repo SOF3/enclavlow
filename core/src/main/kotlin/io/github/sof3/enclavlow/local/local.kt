@@ -50,9 +50,9 @@ class SenFlow(
 
     override fun newInitialFlow() = newLocalFlow(paramCount, LocalControlNode(), this)
     override fun merge(in1: LocalFlow, in2: LocalFlow, out: LocalFlow) = block("Merge") {
-        printDebug("in1: $in1")
-        printDebug("in2: $in2")
-        printDebug("out: ${out.control}")
+        printDebug { "in1: $in1" }
+        printDebug { "in2: $in2" }
+        printDebug { "out: ${out.control}" }
 
         in1.graph.merge(in2.graph) { a, b ->
             // TODO handle ControlFlow
@@ -108,8 +108,8 @@ class SenFlow(
         fallOutList: List<LocalFlow>,
         branchOutList: List<LocalFlow>,
     ) = block("Node $stmt") {
-        printDebug("${stmt.javaClass.simpleName}: $stmt")
-        printDebug("Input: $input")
+        printDebug { "${stmt.javaClass.simpleName}: $stmt" }
+        printDebug { "Input: $input" }
         val output = fallOutList.getOrNull(0)
         if (fallOutList.size > 1) throw AssertionError("Unsupported fallOutList non-singleton")
 
@@ -185,8 +185,8 @@ class SenFlow(
             }
             else -> throw UnsupportedOperationException("Unsupported statement ${stmt.javaClass} $stmt")
         }
-        printDebug("Output: $fallOutList")
-        printDebug("Branched Output: $branchOutList")
+        printDebug { "Output: $fallOutList" }
+        printDebug { "Branched Output: $branchOutList" }
     }
 
     private fun ancestorPostprocessCommon(flow: LocalFlow) {
@@ -194,11 +194,11 @@ class SenFlow(
         ancestorPostprocess(flow, setOf(StaticLocalNode), StaticLocalNode)
         ancestorPostprocess(flow, setOf(ExplicitSinkLocalNode), ExplicitSinkLocalNode)
         for (paramNode in flow.params) {
-            printDebug("Searching ancestors of $paramNode")
+            printDebug { "Searching ancestors of $paramNode" }
             ancestorPostprocess(flow, setOf(paramNode), paramNode)
         }
-        for(call in flow.calls){
-            for(node in call.allNodes()){
+        for (call in flow.calls) {
+            for (node in call.allNodes()) {
                 ancestorPostprocess(flow, setOf(node), node)
             }
         }
@@ -247,7 +247,7 @@ class SenFlow(
         val dot = File(dir, "$fileName.dot")
         dot.writeText(flow.graph.toGraphviz(fileName.replace(".", "_")))
         val command = listOf("dot", "-T", "svg", "-o", "${dot.path}.svg", dot.path)
-        printDebug("Rendering graph: ${command.joinToString(" ")}")
+        printDebug { "Rendering graph: ${command.joinToString(" ")}" }
         ProcessBuilder(command)
             .redirectOutput(File("/dev/stderr"))
             .start()
@@ -263,7 +263,7 @@ fun handleAssign(output: LocalFlow, left: Value, right: Value) {
     val leftNodesDelete = lvalueNodes(output, left, LvalueUsage.DELETION)
 
     for (remove in leftNodesDelete.lvalues) {
-        printDebug("NOT Deleting all edges into $remove due to overwrite")
+        printDebug { "NOT Deleting all edges into $remove due to overwrite" }
         // TODO improve
     }
 

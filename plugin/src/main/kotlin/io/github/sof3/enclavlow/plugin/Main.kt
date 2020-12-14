@@ -4,14 +4,15 @@ import io.github.sof3.enclavlow.aggregate.AggGraph
 import io.github.sof3.enclavlow.aggregate.AggNode
 import io.github.sof3.enclavlow.aggregate.ExplicitSourceAggNode
 import io.github.sof3.enclavlow.aggregate.computeAggregate
+import io.github.sof3.enclavlow.local.PRINT_DOT
 import io.github.sof3.enclavlow.util.ENCLAVLOW_DEBUG_LOGGER
 import io.github.sof3.enclavlow.util.IS_DEBUG
-import io.github.sof3.enclavlow.util.printDebug
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.plugins.JavaPluginConvention
 import org.slf4j.LoggerFactory
+import java.io.File
 import java.io.FileWriter
 import java.util.*
 
@@ -23,6 +24,12 @@ class Main : Plugin<Project> {
             task.dependsOn("classes")
             task.doLast {
                 IS_DEBUG = project.gradle.startParameter.logLevel == LogLevel.DEBUG
+                if(IS_DEBUG){
+                    PRINT_DOT = IS_DEBUG
+                    val index = File(project.buildDir, "lfgOutput/index.html")
+                    index.writeText("<ul>\n")
+                }
+
                 val writer by lazy { FileWriter("plugin.log") }
                 ENCLAVLOW_DEBUG_LOGGER = {
                     writer.append(it).append('\n')
@@ -46,7 +53,7 @@ class Main : Plugin<Project> {
 
                 logger.info("Computing AFG from $entryClasses")
 
-                val (afg, crossEdges) = computeAggregate(classpath.map { it.absolutePath }, entryClasses)
+                val (afg, crossEdges) = computeAggregate(classpath.filter { it.exists() }.map { it.absolutePath }, entryClasses)
 
                 afg.addNodeIfMissing(ExplicitSourceAggNode)
 

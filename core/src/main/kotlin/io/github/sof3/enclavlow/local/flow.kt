@@ -36,7 +36,7 @@ class LocalFlow(
     var calls: MutableList<FnCall>,
     var projections: MutableSet<ProjectionNode<*>>,
     var params: List<ParamLocalNode>,
-    private val flow: SenFlow
+    private val flow: SenFlow,
 ) {
     var control: LocalNode = _control
         set(value) {
@@ -91,7 +91,7 @@ class LocalFlow(
     }
 
     infix fun copyTo(dest: LocalFlow) {
-        printDebug("$control copyTo ${dest.control}")
+        printDebug { "$control copyTo ${dest.control}" }
 
         graph copyTo dest.graph
         dest.locals = locals
@@ -206,12 +206,12 @@ data class FnCall(
 }
 
 fun createFnCall(method: SootMethod): FnCall {
-    val fn = FnIden(method)
+    val fnIden = FnIden(method)
+    val fn = fnIden.toString().replace(" ", "\n")
     val params = List(method.parameterCount) { ProxyLocalNode("<$fn>\nparam $it") }
     val thisNode = if (method.isStatic) null else ProxyLocalNode("<$fn>\nthis")
     val returnNode = ProxyLocalNode("<$fn>\nreturn")
     val throwNode = ProxyLocalNode("<$fn>\nthrow")
     val controlNode = ProxyLocalNode("<$fn>\ncontrol")
-    val ret = FnCall(fn, params, thisNode, returnNode, throwNode, controlNode)
-    return ret
+    return FnCall(fnIden, params, thisNode, returnNode, throwNode, controlNode)
 }

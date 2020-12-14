@@ -74,13 +74,13 @@ object SenTransformer : BodyTransformer() {
         }
 
         val flow = SenFlow(ExceptionalUnitGraph(body), body.method.parameterCount, FnIden(body.method), callTags)
-        printDebug(body.toString())
+        printDebug { body.toString() }
         block("Analyzing ${body.method.signature}") {
             flow.doAnalysis()
         }
         contracts.get()[FnIden(body.method)] = flow.outputContract
         block("Contract of ${flow.outputContract.callTags} ${body.method.subSignature}") {
-            printDebug(flow.outputContract.graph)
+            printDebug { flow.outputContract.graph }
         }
     }
 }

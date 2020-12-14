@@ -53,7 +53,7 @@ private fun rvalueNodesSeq(flow: LocalFlow, value: Value): Sequence<LocalNode> =
         is ParameterRef -> {
             yield(flow.params[value.index])
         }
-        is CaughtExceptionRef -> TODO()
+        is CaughtExceptionRef -> Unit // TODO: track exception throws
         is StaticFieldRef -> {
             // static leaks no information
             // TODO: does this leak memory reads?
@@ -156,7 +156,7 @@ internal fun lvalueNodes(flow: LocalFlow, value: Value, usage: LvalueUsage): Lva
 }
 
 private fun lvalueNodesSeq(flow: LocalFlow, value: Value, usage: LvalueUsage, rvalues: MutableSet<LocalNode>): Sequence<LocalNode> = sequence {
-    printDebug("lvalueNodesImpl(${value.javaClass.simpleName} $value)")
+    printDebug { "lvalueNodesImpl(${value.javaClass.simpleName} $value)" }
     when (value) {
         // these expressions create new/constant values and can never be mutated in another expression
         is Constant, is InstanceOfExpr, is UnopExpr, is BinopExpr, is AnyNewExpr, is InvokeExpr -> {
@@ -182,7 +182,7 @@ private fun lvalueNodesSeq(flow: LocalFlow, value: Value, usage: LvalueUsage, rv
                 }
             }
         }
-        is CaughtExceptionRef -> TODO()
+        is CaughtExceptionRef -> Unit // TODO
         is StaticFieldRef -> {
             yield(StaticLocalNode)
         }

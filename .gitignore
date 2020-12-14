@@ -13,3 +13,4 @@ sootOutput
 !.idea/scopes
 !/build/reports/dependency-graph/dependency-graph.png
 repos/
+*.log
