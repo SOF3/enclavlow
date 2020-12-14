@@ -11,3 +11,9 @@
 *.lot
 *.toc
 !report.pdf
+
+prst.nav
+prst.out
+prst.snm
+prst.vrb
+!prst.pdf

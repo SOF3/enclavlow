@@ -11,6 +11,13 @@ report.pdf: report.tex \
 	true | xelatex -halt-on-error -shell-escape report
 	true | xelatex -halt-on-error -shell-escape report
 
+prst.pdf: prst.tex \
+	cite.bib
+	true | xelatex -halt-on-error -shell-escape prst
+	true | bibtex prst
+	true | xelatex -halt-on-error -shell-escape prst
+	true | xelatex -halt-on-error -shell-escape prst
+
 IagoAttack.class: IagoAttack.java
 	javac IagoAttack.java
 

@@ -1,0 +1,267 @@
+\documentclass{beamer}
+\usetheme{Frankfurt}
+\usecolortheme{seahorse}
+\setbeamercolor{background canvas}{bg=}
+
+\usepackage[utf8]{inputenc}
+
+\usepackage{sourcecodepro}
+\usepackage[pdf]{graphviz}
+
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage{soul}
+\definecolor{code}{rgb}{0.95, 0.95, 0.95}
+\sethlcolor{code}
+\newcommand{\code}[1]{\colorbox{code}{\texttt{\footnotesize #1}}}
+
+\usepackage{csquotes}
+\newcommand{\q}[1]{\enquote{#1}}
+
+\usepackage{listings}
+\usepackage{ifthen}
+\tikzstyle{highlighter} = [
+  lime,
+  line width = \baselineskip-0.3em,
+]
+\newcounter{highlight}[page]
+\newcommand{\tikzhighlightanchor}[1]{\ensuremath{\vcenter{\hbox{\tikz[remember picture, overlay]{\coordinate (#1 highlight \arabic{highlight});}}}}}
+\newcommand{\bh}[0]{\stepcounter{highlight}\tikzhighlightanchor{begin}}
+\newcommand{\eh}[0]{\tikzhighlightanchor{end}}
+\AtBeginShipout{\AtBeginShipoutUpperLeft{\ifthenelse{\value{highlight} > 0}{\tikz[remember picture, overlay]{\foreach \stroke in {1,...,\arabic{highlight}} \draw[highlighter] (begin highlight \stroke) -- (end highlight \stroke);}}{}}}
+\lstdefinestyle{j}{
+  keywordstyle=\textbf,
+  basicstyle=\ttfamily\scriptsize,
+  tabsize=4,
+  numbers=left,
+  escapechar=`,
+}
+\newcommand{\IncludeCode}[2]{
+  \lstinputlisting[style=j, language=java, caption={#2}]{#1}
+}
+
+\usepackage{cite}
+
+\AtBeginSection[]{
+  \begin{frame}
+    \begin{beamercolorbox}[sep=0.5em, center, shadow=true]{title}
+      \usebeamerfont{title}\insertsectionhead\par
+    \end{beamercolorbox}
+  \end{frame}
+}
+
+\title{Data flow analysis for Uranus applications}
+\author{Chan Kwan Yin}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\begin{frame}
+  \frametitle{Outline}
+  \tableofcontents
+\end{frame}
+
+\section{Background}
+
+\begin{frame}
+  \frametitle{SGX Enclaves}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item Servers outsourced to third-party cloud providers
+        \item Threat model: Adversaries with privileged access to OS, BIOS or hardware
+        \item Enclave protects both code and memory from these adversaries
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \digraph[scale=0.35]{EnclaveExample}{
+        compound = true;
+        %
+        subgraph cluster_enclave {
+          label = "enclave";
+          color = "red";
+          %
+          secret_key [label = "secret key"];
+          decrypted [label = "decrypted input"];
+          decryption [shape = "box";]
+          anonymization [shape = "box"];
+          secret_key -> decryption;
+          decryption -> decrypted;
+          decrypted -> anonymization;
+        }
+        %
+        encrypted_input [label = "encrypted input"];
+        output [label = "output"];
+        encrypted_input -> decryption;
+        anonymization -> output;
+        %
+        adversary [label = "Adversary", shape="diamond"];
+        adversary -> decrypted [lhead = cluster_enclave, color = "red", dir = "none"];
+        adversary -> output [dir = "none", color = "forestgreen"];
+        encrypted_input -> adversary [dir = "none", color = "forestgreen"];
+      }
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Uranus \cite{uranus}}
+  \begin{itemize}
+    \item OpenJDK fork that supports Intel SGX
+    \item Methods marked as \code{@JECall} enters enclaves until return
+    \item Methods marked as \code{@JOCall} exits enclaves until return
+    \item Useful for integration with libraries like Hadoop and Spark
+    \item Question: Where should \code{@JECall} and \code{@JOCall} be placed?
+    \item Question: Is code in these libraries safe as enclave code?
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[t]
+  \frametitle{The problem: Performanc/Security Tradeoff}
+  \begin{itemize}
+    \item More code outside enclave:
+      \begin{itemize}
+        \item Increased risk of leaking protected data
+        \item Some leaks may come from unexpected side channels
+      \end{itemize}
+    \item More code into enclave:
+      \begin{itemize}
+        \item Limited EPC (Enclave Page Cache)
+          \begin{itemize}
+            \item Up to 100 MB of EPC
+            \item Out of memory $\implies$ extremely slow swap
+            \item JVM applications especially memory-greedy
+          \end{itemize}
+        \item Principle of Least Privilege
+          \begin{itemize}
+            \item Vulnerabilities in enclave code bypass enclave protection
+            \item Vulnerabilities in code outside must only use specific entry points
+            \item Reduce attack surface
+          \end{itemize}
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{The solution}
+  \begin{itemize}
+    \item \textit{enclavlow} \footnote{coined from the words "enclave" and "flow"}:
+      an information flow analysis tool
+    \item Sources of sensitive data marked with \code{sourceMarker}
+    \item Anonymization marked with \code{sinkMarker}
+    \item Identity functions; expected to be optimized them away by JIT
+  \end{itemize}
+
+  \begin{lstlisting}[style=j, language=java]
+  @JECall
+  static int process(byte[] encrypted) {
+    byte sum = 0;
+    byte[] password = `\bh`sourceMarker`\eh`(new byte[]{1, 2, 3, 4, 5, 6});
+    byte[] decrypted = decrypt(password, encrypted);
+    for(byte b : decrypted) sum ^= b;
+    return `\bh`sinkMarker`\eh`(sum);
+  }
+  \end{lstlisting}
+\end{frame}
+
+\section{Approach}
+\begin{frame}
+  \frametitle{Intuition: Trivial ways of leaking data}
+  \begin{itemize}
+    \item Returning/throwing out of a \code{@JECall}
+    \item Passing into a \code{@JOCall}
+    \item Assigning to a static field
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Intuition: Non-trivial ways of leaking data}
+  \begin{itemize}
+    \item Assigning to an outside-enclave object:\\
+      \code{@JECall void x(Manager m) \{} \\
+      \code{~~m.value = sourceMarker(secret); \} } \\
+    \item Leaking control flow into variables:\\
+      \code{for(int i=0; i < sourceMarker(secret); i++) outside++;}
+    \item Implicit exceptions:\\
+      \code{int[3] array; array[sourceMarker(secret)] = 1;}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Flow analysis}
+  \begin{itemize}
+    \item Analysis framework: Soot \cite{sootsurvivor}
+    \item Each method is analyzed independently
+      \begin{itemize}
+        \item Function calls treated as blackboxes
+        \item 
+      \end{itemize}
+    \item 
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Flow graph}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      (missing graphic)
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      (missing graphic)
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\section{Limitations \& Future Work}
+\begin{frame}
+  \frametitle{Detecting implicit exceptions}
+  \begin{itemize}
+    \item Conditional runtime errors leaks data
+    \item Extensively researched in both academia and industry
+    \item Solutions usually achieved at the language level,
+      e.g. \code{@NonNull}, \code{@Size}
+    \item Good practices: all exceptions should be caught at enclave boundary anyway!
+    \item Similar: \code{x + secret - secret}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Tackling polymorphism}
+  \begin{itemize}
+    \item Computing all combinations of instance classes takes exponential time.
+    \item \textit{\q{Java workloads don't fit into enclave programming paradigms}} \cite{civet}
+    \item Detecting possible paths subclasses reduces complexity,
+      but still not perfect.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Integration into Uranus}
+  \begin{itemize}
+    \item Uranus disallows reads/writes of objects outside enclave
+      without \code{SafeGetField} etc
+    \item Runtime overhead of checking object location
+    \item \textit{enclavlow} to perform this analysis at compile-time
+  \end{itemize}
+\end{frame}
+
+\section{Conclusion}
+\begin{frame}
+  \begin{itemize}
+    \item Assist with decisions on performance/security tradeoff
+    \item Incorporated into Uranus
+    \item Applications in big data industry
+    \item Room for improvement on specialization cases
+  \end{itemize}
+\end{frame}
+
+\section{Appendix}
+\begin{frame}
+  \frametitle{References}
+  \scriptsize
+  \bibliographystyle{acm}
+  \bibliography{cite}
+\end{frame}
+
+\end{document}
