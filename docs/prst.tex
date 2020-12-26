@@ -126,7 +126,7 @@
 \end{frame}
 
 \begin{frame}[t]
-  \frametitle{The problem: Performanc/Security Tradeoff}
+  \frametitle{The problem: Performance/Security Tradeoff}
   \begin{itemize}
     \item More code outside enclave:
       \begin{itemize}
@@ -204,7 +204,6 @@
         \item Reads are cloned into enclave
         \item Writing enclave-local data may not be expected behaviour
         \item Assumed immediate leak
-        \item Proposed \code{EnclaveLocal} wrapper type
       \end{itemize}
     \item Expected to integrate into Uranus for compile-time checking/optimization
   \end{itemize}
@@ -245,7 +244,7 @@
       \end{lstlisting}
     \item Implicit exceptions:\\
       \begin{lstlisting}[language=java, style=j, gobble=8, tabsize=2]
-        int[3] array = new int[3];
+        int[] array = new int[3];
         array`\bh`[`\eh`secret()`\bh`]`\eh` = 1;
       \end{lstlisting}
     \item Transitive application of above
@@ -353,7 +352,7 @@
       the branch represented by CTRL executes if and only if $p(x)$
     \item $(\text{CTRL}_1, \text{CTRL}_2) \in E$ when
       $\text{CTRL}_2$ is a subbranch of $\text{CTRL}_1$
-    \item $(\text{CTRL}, y) \in E \implies$ leaking $y$ may distinguish hether CTRL was run
+    \item $(\text{CTRL}, y) \in E \implies$ leaking $y$ may distinguish whether CTRL was run
     \item Merging states: select Lowest Common Ancestor
   \end{itemize}
 \end{frame}
@@ -372,7 +371,25 @@
   \end{itemize}
 \end{frame}
 
+\begin{frame}
+  \frametitle{Contraction and aggregation}
+  \begin{itemize}
+    \item At each return point, track flow from "public" nodes into the following nodes:
+      \begin{itemize}
+        \item \code{this}
+        \item \code{static}
+        \item explicit sink
+        \item parameters
+        \item method calls (proxy nodes)
+      \end{itemize}
+    \item At aggregation, connect each proxy node to the actual implementation
+      \begin{itemize}
+        \item Polymorphism?
+      \end{itemize}
+  \end{itemize}
+\end{frame}
 
+\section{Case study}
 
 \begin{frame}[fragile, t]
   \frametitle{Case study: Branching (tableswitch)}
@@ -450,24 +467,6 @@
   \end{columns}
 \end{frame}
 
-\begin{frame}
-  \frametitle{Contraction and aggregation}
-  \begin{itemize}
-    \item At each return point, track flow from "public" nodes into the following nodes:
-      \begin{itemize}
-        \item \code{this}
-        \item \code{static}
-        \item explicit sink
-        \item parameters
-        \item method calls (proxy nodes)
-      \end{itemize}
-    \item At aggregation, connect each proxy node to the actual implementation
-      \begin{itemize}
-        \item Polymorphism?
-      \end{itemize}
-  \end{itemize}
-\end{frame}
-
 \begin{frame}[fragile]
   \frametitle{AFG: Full Example}
   \begin{columns}
@@ -475,10 +474,10 @@
       \begin{lstlisting}[language=java, style=j, gobble=6, tabsize=2, basicstyle=\ttfamily\tiny]
       @JECall
       int getSum(byte[] enc) {
-        byte[] dec = decrypt(enc);
+        byte[] dec = parse(enc);
         return sinkMarker(computeSum(dec)); }
 
-      byte[] decrypt(byte[] enc) {
+      byte[] parse(byte[] enc) {
         byte[] otp = sourceMarker(PRIVATE_KEY);
         byte[] result = new byte[enc.length];
         for(int i = 0; i < buf.length; i++)
@@ -585,23 +584,13 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}
-  \frametitle{Integration into Uranus}
-  \begin{itemize}
-    \item Uranus disallows reads/writes of objects outside enclave
-      without \code{SafeGetField} etc
-    \item Runtime overhead of checking object location
-    \item \textit{enclavlow} to perform this analysis at compile-time
-  \end{itemize}
-\end{frame}
-
 \section{Conclusion}
 \begin{frame}
   \begin{itemize}
     \item Assist with decisions on performance/security tradeoff
     \item Incorporated into Uranus
-    \item Applications in big data industry
-    \item Room for improvement
+    \item Room for improvement on false negative cases
+    \item Integration with source level analysis
   \end{itemize}
 \end{frame}
 
