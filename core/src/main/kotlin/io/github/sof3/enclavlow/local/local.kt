@@ -3,6 +3,7 @@ package io.github.sof3.enclavlow.local
 import io.github.sof3.enclavlow.contract.CallTags
 import io.github.sof3.enclavlow.contract.Contract
 import io.github.sof3.enclavlow.contract.ContractNode
+import io.github.sof3.enclavlow.contract.ContractProjectionNode
 import io.github.sof3.enclavlow.contract.ControlNode
 import io.github.sof3.enclavlow.contract.ExplicitSinkLocalNode
 import io.github.sof3.enclavlow.contract.LocalControlNode
@@ -194,7 +195,6 @@ class SenFlow(
         ancestorPostprocess(flow, setOf(StaticLocalNode), StaticLocalNode)
         ancestorPostprocess(flow, setOf(ExplicitSinkLocalNode), ExplicitSinkLocalNode)
         for (paramNode in flow.params) {
-            printDebug { "Searching ancestors of $paramNode" }
             ancestorPostprocess(flow, setOf(paramNode), paramNode)
         }
         for (call in flow.calls) {
@@ -211,31 +211,23 @@ class SenFlow(
     private fun ancestorPostprocess(flow: LocalFlow, leaves: Set<LocalNode>, dest: ContractNode) {
         flow.graph.visitAncestors(leaves, { e1, e2 ->
             // if e1 is a cut-edge but not all edges have refOnly, discard it
-
-            if (e1.causes.all { it.refOnly } != e2.causes.all { it.refOnly }) return@visitAncestors null
+            if (e1.causes.all { it.projectionBackFlow } != e2.causes.all { it.projectionBackFlow }) return@visitAncestors null
             LocalEdge((e1.causes + e2.causes).toMutableSet())
-//            if (e1.hasRefOnlyCutEdge) {
-//                if (e2.causes.any { it.refOnly }) {
-//                    LocalEdge((e1.causes + e2.causes).toMutableSet()).apply { hasRefOnlyCutEdge = true }
-//                } else {
-//                    null
-//                }
-//            } else {
-//                if(e2.causes.all{it.refOnly})
-//                LocalEdge((e1.causes + e2.causes).toMutableSet()).apply {
-//                    hasRefOnlyCutEdge = e2.causes.all { it.refOnly }
-//                }
-//            }
         }, { edge: LocalEdge, node: LocalNode ->
             if (node is ContractNode && node !== dest) {
                 outputContract.graph.addNodeIfMissing(node)
                 outputContract.graph.addNodeIfMissing(dest)
                 outputContract.graph.touch(node, dest) {
-                    refOnly = edge.hasRefOnlyCutEdge
                     projectionBackFlow = edge.causes.all { it.projectionBackFlow }
                 }
             }
         })
+
+        for(projection in flow.projections) {
+            if(projection.base == dest && projection is ContractNode){
+                ancestorPostprocess(flow, setOf(projection), projection)
+            }
+        }
     }
 
 
@@ -259,13 +251,13 @@ class SenFlow(
     }
 }
 
-fun handleAssign(output: LocalFlow, left: Value, right: Value) {
-    val leftNodesDelete = lvalueNodes(output, left, LvalueUsage.DELETION)
+private fun handleAssign(output: LocalFlow, left: Value, right: Value) {
+    // TODO improve mechanism with loops
+    // val leftNodesDelete = lvalueNodes(output, left, LvalueUsage.DELETION)
 
-    for (remove in leftNodesDelete.lvalues) {
-        printDebug { "NOT Deleting all edges into $remove due to overwrite" }
-        // TODO improve
-    }
+    // for (remove in leftNodesDelete.lvalues) {
+        // printDebug { "NOT Deleting all edges into $remove due to overwrite" }
+    // }
 
     // precompute the nodes to avoid mutations on output from affecting node searches
     val leftNodes = lvalueNodes(output, left, LvalueUsage.ASSIGN)
@@ -285,7 +277,7 @@ fun handleAssign(output: LocalFlow, left: Value, right: Value) {
 
     for (leftNode in rightLeft.lvalues) {
         for (rightNode in leftRight) {
-            output.graph.touch(rightNode, leftNode) { causes += LocalFlowCause.REF_BACK_FLOW; }
+            // output.graph.touch(rightNode, leftNode) { causes += LocalFlowCause.REF_BACK_FLOW; }
         }
     }
 }

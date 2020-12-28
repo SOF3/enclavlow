@@ -4,6 +4,7 @@ import io.github.sof3.enclavlow.cases.lfg.AssignCase
 import io.github.sof3.enclavlow.contract.CallTags
 import io.github.sof3.enclavlow.contract.MethodControlNode
 import io.github.sof3.enclavlow.contract.ParamLocalNode
+import io.github.sof3.enclavlow.contract.ProjectionNode
 import io.github.sof3.enclavlow.contract.ReturnLocalNode
 import io.github.sof3.enclavlow.contract.StaticLocalNode
 import io.github.sof3.enclavlow.contract.ThisLocalNode
@@ -35,14 +36,15 @@ class AssignTests {
     @Test
     fun paramToThis() = testMethod<AssignCase>("paramToThis", makeContract(CallTags.UNSPECIFIED, 1) {
         MethodControlNode into ReturnLocalNode
-        ParamLocalNode(0) into ThisLocalNode
+        MethodControlNode into projection(ThisLocalNode, "int b")
+        ParamLocalNode(0) into projection(ThisLocalNode, "int b")
     })
 
     @Test
     fun thisToStatic() = testMethod<AssignCase>("thisToStatic", makeContract(CallTags.UNSPECIFIED, 0) {
         MethodControlNode into ReturnLocalNode
         MethodControlNode into StaticLocalNode
-        ThisLocalNode into StaticLocalNode
+        projection(ThisLocalNode, "int b") into StaticLocalNode
     })
 
     @Test
@@ -54,7 +56,8 @@ class AssignTests {
     @Test
     fun paramToParam() = testMethod<AssignCase>("paramToParam", makeContract(CallTags.UNSPECIFIED, 2) {
         MethodControlNode into ReturnLocalNode
-        ParamLocalNode(0) into ParamLocalNode(1)
+        MethodControlNode into projection(ParamLocalNode(1), "public java.lang.Object inner")
+        ParamLocalNode(0) into projection(ParamLocalNode(1), "public java.lang.Object inner")
     })
 
     @Test

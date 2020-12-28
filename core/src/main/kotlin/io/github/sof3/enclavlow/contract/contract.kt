@@ -136,12 +136,21 @@ data class ContractEdge(
 
 class MakeContractContext<T : Any, E : Edge<E, T>>(private val graph: MutableDiGraph<T, E>) {
     infix fun T.into(other: T): E? {
+        graph.addNodeIfMissing(this)
+        graph.addNodeIfMissing(other)
         return graph.touch(this, other) {}
     }
 
     inline infix fun E?.with(fn: E.() -> Unit): E? {
         this?.fn()
         return this
+    }
+
+    fun projection(base: T, name: String): T {
+        @Suppress("UNCHECKED_CAST")
+        val node = ProjectionNode.create(base as LocalNode, name) as T
+        node into base
+        return node
     }
 }
 

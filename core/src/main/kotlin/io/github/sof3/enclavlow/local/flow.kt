@@ -62,14 +62,26 @@ class LocalFlow(
         flow.outputContract.calls.add(call)
     }
 
-    fun getProjection(base: LocalNode, field: SootField): ProjectionNode<LocalNode> {
+    private fun getProjection(base: LocalNode, field: SootField): ProjectionNode<LocalNode> {
         val fieldNode = ProjectionNode.create(base, field.declaration)
         if (fieldNode !in projections) {
             projections.add(fieldNode)
             graph.addNodeIfMissing(fieldNode as LocalNode)
-            graph.touch(base, fieldNode) { causes += LocalFlowCause.FIELD_PROJECTION }
-            graph.touch(fieldNode, base) {
-                causes += LocalFlowCause.FIELD_PROJECTION_BACK_FLOW
+            // graph.touch(base, fieldNode) { causes += LocalFlowCause.FIELD_PROJECTION }
+            graph.touch(fieldNode, base) { causes += LocalFlowCause.FIELD_PROJECTION_BACK_FLOW }
+
+            for ((original, edge) in graph.flowsToEdges(base)) {
+                if ((edge.causes intersect listOf(
+                        LocalFlowCause.ASSIGNMENT,
+                        LocalFlowCause.FIELD_ASSIGNMENT,
+                        LocalFlowCause.FIELD_ASSIGNMENT_BACK_FLOW)
+                        ).isNotEmpty()) {
+                    val originalField = getProjectionAsNode(original, field)
+                    graph.touch(originalField, fieldNode) {
+                        causes += LocalFlowCause.FIELD_ASSIGNMENT
+                    }
+                    graph.touch(fieldNode, originalField) { causes += LocalFlowCause.FIELD_ASSIGNMENT_BACK_FLOW }
+                }
             }
         }
         return fieldNode
@@ -107,6 +119,7 @@ class LocalFlow(
 //        }
 ////        dest.graph.touch(dest.control, control, "Flow copy\\nBackward")
 //        dest.finalizers = ArrayDeque(finalizers)
+        dest.projections = projections
     }
 
     override fun equals(other: Any?): Boolean {
@@ -132,11 +145,6 @@ fun makeLocalFlowGraph(vararg extraNodes: Iterable<LocalNode>): LocalFlowGraph {
 }
 
 data class LocalEdge(val causes: MutableSet<LocalFlowCause>) : Edge<LocalEdge, LocalNode> {
-    /**
-     * This is a hack field only used in visitAncestors
-     */
-    var hasRefOnlyCutEdge: Boolean = false
-
     override fun mergeEdge(other: LocalEdge) = LocalEdge((causes + other.causes).toMutableSet())
 
     override fun graphEqualsImpl(other: Any): Boolean {
@@ -156,11 +164,7 @@ data class LocalEdge(val causes: MutableSet<LocalFlowCause>) : Edge<LocalEdge, L
 
 enum class LocalFlowCause(val label: String, val refOnly: Boolean = false, var projectionBackFlow: Boolean = false) {
     FIELD_PROJECTION("field projection"),
-
-    /**
-     * Edge from x.y to x
-     */
-    FIELD_PROJECTION_BACK_FLOW("field projection", projectionBackFlow = true),
+    FIELD_PROJECTION_BACK_FLOW("field projection backflow", projectionBackFlow = true),
     METHOD_CONTROL("method control"),
     FLOW_MERGE("flow merge"),
     FLOW_MERGE_HACK("flow merge\nhack"),
@@ -168,6 +172,8 @@ enum class LocalFlowCause(val label: String, val refOnly: Boolean = false, var p
     ASSIGNMENT("assignment"),
     ASSIGNMENT_SIDE_EFFECT("assignment\nside effect"),
     ASSIGNMENT_CONDITION("assignment\ncondition"),
+    FIELD_ASSIGNMENT("field assignment"),
+    FIELD_ASSIGNMENT_BACK_FLOW("field assignment backflow"),
 
     /**
      * Projections in the source are propagated to projections in the destination

@@ -158,8 +158,8 @@ internal fun lvalueNodes(flow: LocalFlow, value: Value, usage: LvalueUsage): Lva
 private fun lvalueNodesSeq(flow: LocalFlow, value: Value, usage: LvalueUsage, rvalues: MutableSet<LocalNode>): Sequence<LocalNode> = sequence {
     printDebug { "lvalueNodesImpl(${value.javaClass.simpleName} $value)" }
     when (value) {
-        // these expressions create new/constant values and can never be mutated in another expression
         is Constant, is InstanceOfExpr, is UnopExpr, is BinopExpr, is AnyNewExpr, is InvokeExpr -> {
+            // these expressions create new/constant values and can never be mutated in another expression
         }
         is ThisRef -> {
             if (usage == LvalueUsage.ASSIGN) {
@@ -189,8 +189,8 @@ private fun lvalueNodesSeq(flow: LocalFlow, value: Value, usage: LvalueUsage, rv
         is InstanceFieldRef -> {
             val base = onlyItem(rvalueNodesSeq(flow, value.base).toList())
 
-            // even if we overwrite this value again, it will still be passed to outside at some point
-            if (usage == LvalueUsage.ASSIGN) yield(base)
+            // // not covered in deletion: even if we overwrite this value again, it will still be passed to outside at some point
+            // if (usage == LvalueUsage.ASSIGN) yield(base)
 
             yield(flow.getProjectionAsNode(base, value.field))
         }
