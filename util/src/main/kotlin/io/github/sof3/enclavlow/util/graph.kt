@@ -145,7 +145,7 @@ sealed class DiGraph<N : Any, E : Edge<E, N>>(
         }
     }
 
-    fun <R : Any> visitAncestors(leaf: N, visited: MutableSet<Int>, initial: R?, reduce: (R?, E) -> R?, visitor: (R, N) -> Unit) {
+    private fun <R : Any> visitAncestors(leaf: N, visited: MutableSet<Int>, initial: R?, reduce: (R?, E) -> R?, visitor: (R, N) -> Unit) {
         val j = indexOf(leaf)
         for (i in 0 until nodes.size) {
             val edge = edges[i][j]
@@ -215,6 +215,16 @@ class MutableDiGraph<N : Any, E : Edge<E, N>>(
         public set(value) {
             super.edges = value
         }
+
+    fun <R: Comparable<R>> sortNodes(selector: (N) -> R?) {
+        val indexMap = nodes.sortIndexedBy(selector)
+        val newEdges = MutableList(nodes.size) { i ->
+            MutableList(nodes.size) { j ->
+                edges[indexMap[i]][indexMap[j]]
+            }
+        }
+        edges = newEdges
+    }
 
     fun addNodeIfMissing(node: N) {
         if (nodes.addIfMissing(node)) {

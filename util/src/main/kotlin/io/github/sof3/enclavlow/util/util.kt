@@ -55,6 +55,19 @@ class IndexedSet<T : Any> internal constructor(
 
     override fun toString() = "{$values}"
 
+    fun <R: Comparable<R>> sortIndexedBy(selector: (T) -> R?): MutableList<Int> {
+        val indexMap = (0 until size).toMutableList()
+        indexMap.sortBy { selector(values[it]) }
+        val newList = MutableList(size){values[indexMap[it]]}
+        for(i in 0 until size) {
+            values[i] = newList[i]
+        }
+        for((key, value) in index.entries) {
+            index[key] = indexMap[value]
+        }
+        return indexMap
+    }
+
     public override fun clone() = IndexedSet(values.toMutableList(), index.toMutableMap())
 }
 
