@@ -111,7 +111,10 @@ sealed class DiGraph<N : Any, E : Edge<E, N>>(
         return MutableDiGraph(newNodes, newEdges, edgeConstructor)
     }
 
-    fun indexOf(node: N): Int = nodes.find(node) ?: throw IllegalArgumentException("Nonexistent node ${node.toString().replace("\n", "[LF]")} in $this")
+    fun indexOf(node: N): Int = nodes.find(node)
+        ?: throw IllegalArgumentException("Nonexistent node " +
+            "${node.toString().replace("\n", "[LF]")} in " +
+            nodes.joinToString(",\n") { "\t" + it.toString().replace("\n", "\\n") })
 
     fun flowsFrom(src: N): List<N> = flowsFromIndex(indexOf(src)).map { nodes[it] }
     fun flowsFromEdges(src: N): List<Pair<N, E>> {
@@ -132,7 +135,7 @@ sealed class DiGraph<N : Any, E : Edge<E, N>>(
         if (edge != null && edgeFilter(edge)) i else null
     }.filterNotNull()
 
-    inline fun visitAncestors(leaves: Set<N>, crossinline merge: (E, E) -> E?, crossinline visitor: (E, N) -> Unit) {
+    fun visitAncestors(leaves: Set<N>, merge: (E, E) -> E?, visitor: (E, N) -> Unit) {
         val visited = mutableSetOf<Int>()
         for (leaf in leaves) {
             visitAncestors(leaf, visited, null as E?, { a, b ->
@@ -142,7 +145,7 @@ sealed class DiGraph<N : Any, E : Edge<E, N>>(
         }
     }
 
-    fun <R: Any> visitAncestors(leaf: N, visited: MutableSet<Int>, initial: R?, reduce: (R?, E) -> R?, visitor: (R, N) -> Unit) {
+    fun <R : Any> visitAncestors(leaf: N, visited: MutableSet<Int>, initial: R?, reduce: (R?, E) -> R?, visitor: (R, N) -> Unit) {
         val j = indexOf(leaf)
         for (i in 0 until nodes.size) {
             val edge = edges[i][j]
@@ -161,7 +164,7 @@ sealed class DiGraph<N : Any, E : Edge<E, N>>(
      * with the smallest path length sums
      */
     inline fun lca(a: N, b: N, nodeFilter: (N) -> Boolean, edgeFilter: (E) -> Boolean): N? {
-        printDebug{"Finding LCA of $a and $b in $this"}
+        printDebug { "Finding LCA of $a and $b" }
         val index = lcaIndex(indexOf(a), indexOf(b), { nodeFilter(nodes[it]) }, edgeFilter) ?: return null
         return nodes[index]
     }
@@ -242,13 +245,12 @@ class MutableDiGraph<N : Any, E : Edge<E, N>>(
         target.edges = MutableList(nodes.size) { edges[it].toMutableList() }
     }
 
-    inline fun merge(other: MutableDiGraph<N, E>, biMap: (E?, E?) -> E?): MutableDiGraph<N, E> {
+    fun merge(other: MutableDiGraph<N, E>, biMap: (E?, E?) -> E?): MutableDiGraph<N, E> {
         // L
         val out = clone()
 
         // L intersect R (overwrites the intersection part in the first clone)
         val intersect = nodes.filter { it in other.nodes }
-        printDebug { "Intersection: $intersect" }
         for (node1 in intersect) {
             for (node2 in intersect) {
                 if (node1 != node2) {

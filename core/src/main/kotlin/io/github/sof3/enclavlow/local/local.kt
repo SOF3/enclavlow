@@ -50,10 +50,6 @@ class SenFlow(
 
     override fun newInitialFlow() = newLocalFlow(paramCount, LocalControlNode(), this)
     override fun merge(in1: LocalFlow, in2: LocalFlow, out: LocalFlow) = block("Merge") {
-        printDebug { "in1: $in1" }
-        printDebug { "in2: $in2" }
-        printDebug { "out: ${out.control}" }
-
         in1.graph.merge(in2.graph) { a, b ->
             // if flow is detected from either side
             if (a != null) {
@@ -108,7 +104,7 @@ class SenFlow(
         branchOutList: List<LocalFlow>,
     ) = block("Node $stmt") {
         printDebug { "${stmt.javaClass.simpleName}: $stmt" }
-        printDebug { "Input: $input" }
+        // printDebug { "Input: $input" }
         val output = fallOutList.getOrNull(0)
         if (fallOutList.size > 1) throw AssertionError("Unsupported fallOutList non-singleton")
 
@@ -184,8 +180,8 @@ class SenFlow(
             }
             else -> throw UnsupportedOperationException("Unsupported statement ${stmt.javaClass} $stmt")
         }
-        printDebug { "Output: $fallOutList" }
-        printDebug { "Branched Output: $branchOutList" }
+        // printDebug { "Output: $fallOutList" }
+        // printDebug { "Branched Output: $branchOutList" }
     }
 
     private fun ancestorPostprocessCommon(flow: LocalFlow) {
@@ -197,7 +193,7 @@ class SenFlow(
         }
         for (call in flow.calls) {
             for (node in call.allNodes()) {
-                ancestorPostprocess(flow, setOf(node), node)
+                if (node in flow.graph.nodes) ancestorPostprocess(flow, setOf(node), node)
             }
         }
     }
@@ -260,22 +256,22 @@ private fun handleAssign(output: LocalFlow, left: Value, right: Value) {
     // precompute the nodes to avoid mutations on output from affecting node searches
     val leftNodes = lvalueNodes(output, left, LvalueUsage.ASSIGN)
     val rightNodes = rvalueNodes(output, right)
-    val leftRight = rvalueNodes(output, left)
-    val rightLeft = lvalueNodes(output, right, LvalueUsage.ASSIGN)
 
     for (leftNode in leftNodes.lvalues) {
         for (rightNode in rightNodes) {
             output.graph.touch(rightNode, leftNode) { causes += LocalFlowCause.ASSIGNMENT }
         }
+
+        // side effects like array index
         for (rightNode in leftNodes.rvalues) {
             output.graph.touch(rightNode, leftNode) { causes += LocalFlowCause.ASSIGNMENT_SIDE_EFFECT }
         }
         output.graph.touch(output.control, leftNode) { causes += LocalFlowCause.ASSIGNMENT_CONDITION }
     }
 
-    for (leftNode in rightLeft.lvalues) {
-        for (rightNode in leftRight) {
-            // output.graph.touch(rightNode, leftNode) { causes += LocalFlowCause.REF_BACK_FLOW; }
-        }
-    }
+    // for (leftNode in rightLeft.lvalues) {
+    // for (rightNode in leftRight) {
+    // output.graph.touch(rightNode, leftNode) { causes += LocalFlowCause.REF_BACK_FLOW; }
+    // }
+    // }
 }

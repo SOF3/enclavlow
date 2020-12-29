@@ -103,8 +103,6 @@ class LocalFlow(
     }
 
     infix fun copyTo(dest: LocalFlow) {
-        printDebug { "$control copyTo ${dest.control}" }
-
         graph copyTo dest.graph
         dest.locals = locals
         dest.calls = calls
