@@ -81,13 +81,13 @@ sealed class DiGraph<N : Any, E : Edge<E, N>>(
         for ((i, node) in nodes.withIndex()) {
             val attrs = nodeAttr(node)
             val attrString = attrs.map { (k, v) -> "$k = \"$v\"" }
-            ret.append("\t$i [${attrString.joinToString(",")}];\n")
+            ret.append("\t$i [${attrString.joinToString(",").replace("\n", "\\n")}];\n")
         }
 
         forEachEdgeIndex { i, j, edge ->
             val attrs = edgeAttr(nodes[i], nodes[j], edge)
             val attrString = attrs.map { (k, v) -> "$k = \"$v\"" }
-            ret.append("\t$i -> $j [${attrString.joinToString(",")}];\n")
+            ret.append("\t$i -> $j [${attrString.joinToString(",").replace("\n", "\\n")}];\n")
         }
         ret.append("}\n")
         return ret.toString()
@@ -248,11 +248,12 @@ class MutableDiGraph<N : Any, E : Edge<E, N>>(
 
         // L intersect R (overwrites the intersection part in the first clone)
         val intersect = nodes.filter { it in other.nodes }
+        printDebug { "Intersection: $intersect" }
         for (node1 in intersect) {
             for (node2 in intersect) {
                 if (node1 != node2) {
                     out.edges[out.nodes.find(node1)!!][out.nodes.find(node2)!!] = biMap(
-                        edges[other.nodes.find(node1)!!][nodes.find(node2)!!],
+                        this.edges[this.nodes.find(node1)!!][this.nodes.find(node2)!!],
                         other.edges[other.nodes.find(node1)!!][other.nodes.find(node2)!!],
                     )
                 }

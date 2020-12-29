@@ -3,7 +3,6 @@ package io.github.sof3.enclavlow.local
 import io.github.sof3.enclavlow.contract.CallTags
 import io.github.sof3.enclavlow.contract.Contract
 import io.github.sof3.enclavlow.contract.ContractNode
-import io.github.sof3.enclavlow.contract.ContractProjectionNode
 import io.github.sof3.enclavlow.contract.ControlNode
 import io.github.sof3.enclavlow.contract.ExplicitSinkLocalNode
 import io.github.sof3.enclavlow.contract.LocalControlNode
@@ -56,7 +55,6 @@ class SenFlow(
         printDebug { "out: ${out.control}" }
 
         in1.graph.merge(in2.graph) { a, b ->
-            // TODO handle ControlFlow
             // if flow is detected from either side
             if (a != null) {
                 if (b != null) {
@@ -223,8 +221,8 @@ class SenFlow(
             }
         })
 
-        for(projection in flow.projections) {
-            if(projection.base == dest && projection is ContractNode){
+        for (projection in flow.projections) {
+            if (projection.base == dest && projection is ContractNode) {
                 ancestorPostprocess(flow, setOf(projection), projection)
             }
         }
@@ -256,7 +254,7 @@ private fun handleAssign(output: LocalFlow, left: Value, right: Value) {
     // val leftNodesDelete = lvalueNodes(output, left, LvalueUsage.DELETION)
 
     // for (remove in leftNodesDelete.lvalues) {
-        // printDebug { "NOT Deleting all edges into $remove due to overwrite" }
+    // printDebug { "NOT Deleting all edges into $remove due to overwrite" }
     // }
 
     // precompute the nodes to avoid mutations on output from affecting node searches

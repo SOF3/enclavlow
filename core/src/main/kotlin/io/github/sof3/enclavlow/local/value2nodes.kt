@@ -43,8 +43,7 @@ private fun rvalueNodesSeq(flow: LocalFlow, value: Value): Sequence<LocalNode> =
             // constant leaks no information
         }
         is Local -> {
-            val node = flow.getLocal(value.name)
-                ?: throw IllegalArgumentException("rvalue variable ${value.name} should appear as an lvalue first")
+            val node = flow.getOrAddLocal(value.name) // ?: throw IllegalArgumentException("rvalue variable ${value.name} should appear as an lvalue first")
             yield(node)
         }
         is ThisRef -> {

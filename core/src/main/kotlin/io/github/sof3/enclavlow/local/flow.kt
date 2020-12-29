@@ -209,6 +209,8 @@ data class FnCall(
         yield(throwNode)
         yield(controlNode)
     }
+
+    override fun toString() = "FnCall(fn=$fn)"
 }
 
 fun createFnCall(method: SootMethod): FnCall {

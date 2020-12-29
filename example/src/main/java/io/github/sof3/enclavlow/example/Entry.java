@@ -15,6 +15,15 @@ import java.security.Key;
 import java.security.MessageDigest;
 
 public class Entry {
+    @IntelSGXOcall
+    static byte[] readFile(File file) throws IOException {
+        var baos = new ByteArrayOutputStream();
+        try(var fis = new FileInputStream(file)){
+            fis.transferTo(baos);
+        }
+        return baos.toByteArray();
+    }
+
     public static void main(String[] args) {
         Spark.get("/sha512/:file", (req, res) -> {
             String file = req.params("file");
@@ -25,15 +34,6 @@ public class Entry {
 
     static byte[] getSecret() {
         return Enclavlow.sourceMarker(new byte[]{1, 2, 3, 4, 5, 6, 7, 8});
-    }
-
-    @IntelSGXOcall
-    static byte[] readFile(File file) throws IOException {
-        var baos = new ByteArrayOutputStream();
-        try(var fis = new FileInputStream(file)){
-            fis.transferTo(baos);
-        }
-        return baos.toByteArray();
     }
 
     @IntelSGX
