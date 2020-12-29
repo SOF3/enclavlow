@@ -7,6 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - uses: ts-graphviz/setup-graphviz@v1
       - run: ./gradlew core:test --info
       - run: git clone https://sof3:${{secrets.GH_TOKEN}}@github.com/SOF3/enclavlow gh-pages -b gh-pages
       - run: "rm -rf gh-pages/tests/core/${{github.ref}} || true"
