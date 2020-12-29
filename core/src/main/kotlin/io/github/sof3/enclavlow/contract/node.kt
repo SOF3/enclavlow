@@ -91,7 +91,7 @@ object ExplicitSinkLocalNode : ContractNode() {
         get() = "<sink>"
 }
 
-data class ProxyLocalNode(override val name: String) : ContractNode()
+class ProxyLocalNode(override val name: String) : ContractNode()
 
 /**
  * A private node only considered within method local analysis

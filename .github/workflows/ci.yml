@@ -13,6 +13,8 @@ jobs:
       - run: "rm -rf gh-pages/tests/core/${{github.ref}} || true"
       - run: mkdir -p $(dirname core/build/reports/tests/test gh-pages/tests/core/${{github.ref}})
       - run: cp -r core/build/reports/tests/test gh-pages/tests/core/${{github.ref}}
+      - run: git add -A
+        working-directory: gh-pages
       - run: 'git -c "user.name=GitHub-CI" -c "user.email=41898282+github-actions[bot]@users.noreply.github.com" commit -m "Update tests for "${{github.sha}}'
         working-directory: gh-pages
       - run: git push

@@ -1,7 +1,5 @@
 package io.github.sof3.enclavlow.cases.lfg;
 
-import io.github.sof3.enclavlow.cases.Box;
-
 @SuppressWarnings("unused")
 public class AssignCase {
     public static int paramToReturn(int x) {
@@ -13,28 +11,15 @@ public class AssignCase {
     }
 
     static int a;
-    int b;
 
     public static void paramToStatic(int x) {
         a = x;
-    }
-
-    public void paramToThis(int x) {
-        b = x;
-    }
-
-    public void thisToStatic() {
-        a = b;
     }
 
     public static int zeroizeAssign(int x) {
         @SuppressWarnings({"SuspiciousNameCombination", "UnusedAssignment"}) int y = x;
         y = 0;
         return y;
-    }
-
-    public static void paramToParam(String x, Box<String> y) {
-        y.inner = x;
     }
 
     @SuppressWarnings({"UnusedAssignment", "ParameterCanBeLocal"})
