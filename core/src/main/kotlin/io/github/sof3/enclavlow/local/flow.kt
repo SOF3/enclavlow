@@ -19,7 +19,6 @@ import io.github.sof3.enclavlow.util.MutableDiGraph
 import io.github.sof3.enclavlow.util.getOrFill
 import io.github.sof3.enclavlow.util.indexedSetOf
 import io.github.sof3.enclavlow.util.newDiGraph
-import io.github.sof3.enclavlow.util.printDebug
 import soot.SootField
 import soot.SootMethod
 
@@ -62,8 +61,8 @@ class LocalFlow(
         flow.outputContract.calls.add(call)
     }
 
-    private fun getProjection(base: LocalNode, field: SootField): ProjectionNode<LocalNode> {
-        val fieldNode = ProjectionNode.create(base, field.declaration)
+    fun getProjection(base: LocalNode, fieldDecl: String): ProjectionNode<LocalNode> {
+        val fieldNode = ProjectionNode.create(base, fieldDecl)
         if (fieldNode !in projections) {
             projections.add(fieldNode)
             graph.addNodeIfMissing(fieldNode as LocalNode)
@@ -76,7 +75,7 @@ class LocalFlow(
                         LocalFlowCause.FIELD_ASSIGNMENT,
                         LocalFlowCause.FIELD_ASSIGNMENT_BACK_FLOW)
                         ).isNotEmpty()) {
-                    val originalField = getProjectionAsNode(original, field)
+                    val originalField = getProjection(original, fieldDecl) as LocalNode
                     graph.touch(originalField, fieldNode) {
                         causes += LocalFlowCause.FIELD_ASSIGNMENT
                     }
@@ -87,7 +86,8 @@ class LocalFlow(
         return fieldNode
     }
 
-    fun getProjectionAsNode(base: LocalNode, field: SootField) = getProjection(base, field) as LocalNode
+    fun getProjectionAsNode(base: LocalNode, field: SootField) = getProjection(base, field.declaration) as LocalNode
+    fun getUnknownOffsetProjectionAsNode(base: LocalNode) = getProjection(base, "<unknown offset>") as LocalNode
 
     fun finalizedCopy(methodControl: MethodControlNode): LocalFlow {
         val copy = newLocalFlow(params.size, control as ControlNode, flow)

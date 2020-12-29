@@ -5,7 +5,6 @@ import io.github.sof3.enclavlow.contract.ExplicitSourceLocalNode
 import io.github.sof3.enclavlow.contract.LocalNode
 import io.github.sof3.enclavlow.contract.StaticLocalNode
 import io.github.sof3.enclavlow.contract.ThisLocalNode
-import io.github.sof3.enclavlow.util.alwaysAssert
 import io.github.sof3.enclavlow.util.onlyItem
 import io.github.sof3.enclavlow.util.printDebug
 import soot.Local
@@ -58,15 +57,16 @@ private fun rvalueNodesSeq(flow: LocalFlow, value: Value): Sequence<LocalNode> =
             // TODO: does this leak memory reads?
         }
         is InstanceFieldRef -> {
-            val nodes = rvalueNodesSeq(flow, value.base).toList()
-            alwaysAssert(nodes.size == 1) { "InstanceFieldRef base has complex nodes" }
-            val node = nodes[0]
+            val node = onlyItem(rvalueNodesSeq(flow, value.base).toList()) { "InstanceFieldRef base has complex nodes" }
             val projection = flow.getProjectionAsNode(node, value.field)
             yield(projection)
         }
         is ArrayRef -> {
-            yieldAll(rvalueNodesSeq(flow, value.base))
+//            yieldAll(rvalueNodesSeq(flow, value.base))
             yieldAll(rvalueNodesSeq(flow, value.index))
+            val node = onlyItem(rvalueNodesSeq(flow, value.base).toList()) { "ArrayRef base has complex nodes" }
+            val projection = flow.getUnknownOffsetProjectionAsNode(node)
+            yield(projection)
         }
         is UnopExpr -> {
             yieldAll(rvalueNodesSeq(flow, value.op))
@@ -186,7 +186,8 @@ private fun lvalueNodesSeq(flow: LocalFlow, value: Value, usage: LvalueUsage, rv
             yield(StaticLocalNode)
         }
         is InstanceFieldRef -> {
-            val base = onlyItem(rvalueNodesSeq(flow, value.base).toList())
+            // Jimple is 3AC, so there is only one rvalue node for base
+            val base = onlyItem(rvalueNodesSeq(flow, value.base).toList()) { "InstanceFieldRef base has complex nodes" }
 
             // // not covered in deletion: even if we overwrite this value again, it will still be passed to outside at some point
             // if (usage == LvalueUsage.ASSIGN) yield(base)
@@ -196,7 +197,9 @@ private fun lvalueNodesSeq(flow: LocalFlow, value: Value, usage: LvalueUsage, rv
         is ArrayRef -> {
             when (usage) {
                 LvalueUsage.ASSIGN -> {
-                    yieldAll(lvalueNodesSeq(flow, value.base, usage, rvalues))
+                    val base = onlyItem(rvalueNodesSeq(flow, value.base).toList()) { "ArrayRef base has complex nodes" }
+                    yield(flow.getProjection(base, "<unknown offset>") as LocalNode)
+                    // yieldAll(lvalueNodesSeq(flow, value.base, usage, rvalues))
                 }
                 LvalueUsage.DELETION -> {
                     // assigning a[1] does not remove sources of a[0]

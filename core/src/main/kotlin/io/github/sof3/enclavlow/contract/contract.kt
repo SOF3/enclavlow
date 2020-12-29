@@ -149,9 +149,13 @@ class MakeContractContext<T : Any, E : Edge<E, T>>(private val graph: MutableDiG
     fun projection(base: T, name: String): T {
         @Suppress("UNCHECKED_CAST")
         val node = ProjectionNode.create(base as LocalNode, name) as T
-        node into base
+        node into base with {
+            (this as ContractEdge).projectionBackFlow = true
+        }
         return node
     }
+
+    fun arrayProjection(base: T) = projection(base, "<unknown offset>")
 }
 
 enum class CallTags {

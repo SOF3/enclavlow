@@ -1,11 +1,13 @@
 package io.github.sof3.enclavlow.tests
 
+import com.google.common.graph.MutableGraph
 import io.github.sof3.enclavlow.contract.Contract
 import io.github.sof3.enclavlow.contract.ContractFlowGraph
 import io.github.sof3.enclavlow.contract.MethodNameType
 import io.github.sof3.enclavlow.contract.analyzeMethod
 import io.github.sof3.enclavlow.local.PRINT_DOT
 import io.github.sof3.enclavlow.util.IS_DEBUG
+import io.github.sof3.enclavlow.util.MutableDiGraph
 import java.io.File
 import java.lang.management.ManagementFactory
 import kotlin.test.assertEquals
@@ -29,5 +31,7 @@ private fun <T> runImpl(clazz: Class<T>, method: String, expectedContract: Contr
         set_soot_classpath(classPath) // cp of current JVM runtime
     }
 
+    (expectedContract.graph as MutableDiGraph).sortNodes { it.toString() }
+    (actual.graph as MutableDiGraph).sortNodes { it.toString() }
     assertEquals(expectedContract, actual, "Method $method has unexpected contract")
 }

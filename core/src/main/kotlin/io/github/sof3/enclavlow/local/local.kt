@@ -180,8 +180,8 @@ class SenFlow(
             }
             else -> throw UnsupportedOperationException("Unsupported statement ${stmt.javaClass} $stmt")
         }
-        // printDebug { "Output: $fallOutList" }
-        // printDebug { "Branched Output: $branchOutList" }
+        printDebug { "Output: $fallOutList" }
+        printDebug { "Branched Output: $branchOutList" }
     }
 
     private fun ancestorPostprocessCommon(flow: LocalFlow) {
