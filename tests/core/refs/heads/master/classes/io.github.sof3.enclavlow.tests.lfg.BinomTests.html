@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - Class io.github.sof3.enclavlow.tests.lfg.BinomTests</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>Class io.github.sof3.enclavlow.tests.lfg.BinomTests</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/io.github.sof3.enclavlow.tests.lfg.html">io.github.sof3.enclavlow.tests.lfg</a> &gt; BinomTests</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">1</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.145s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard output</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">binomPlus</td>
+<td class="success">0.145s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>[9 +3388.773]     public static int binomPlus(int, int)
+                  {
+                      int i0, i1, $i2;
+              
+                      i0 := @parameter0: int;
+              
+                      i1 := @parameter1: int;
+              
+                      $i2 = i0 + i1;
+              
+                      return $i2;
+                  }
+              
+Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.BinomCase: int binomPlus(int,int)&gt;
+  Copy
+  Node i0 := @parameter0: int
+    [9 +3394.407] JIdentityStmt: i0 := @parameter0: int
+    [9 +3394.691] lvalueNodesImpl(JimpleLocal i0)
+    [9 +3394.958] Output: [LocalFlow(control=control89, locals={i0=i0}, params=[param0, param1], calls=[], graph=
+                  digraph DiGraph1730990894 {
+                  	0 [label = &quot;this&quot;,color = &quot;#def717&quot;];
+                  	1 [label = &quot;static&quot;,color = &quot;#abac43&quot;];
+                  	2 [label = &quot;return&quot;,color = &quot;#19071f&quot;];
+                  	3 [label = &quot;throw&quot;,color = &quot;#8210d0&quot;];
+                  	4 [label = &quot;&lt;source&gt;&quot;,color = &quot;#c520ad&quot;];
+                  	5 [label = &quot;&lt;sink&gt;&quot;,color = &quot;#f9766c&quot;];
+                  	6 [label = &quot;param0&quot;,color = &quot;#4800e4&quot;];
+                  	7 [label = &quot;param1&quot;,color = &quot;#4800e4&quot;];
+                  	8 [label = &quot;control89&quot;,color = &quot;#ac8603&quot;];
+                  	9 [label = &quot;i0&quot;,color = &quot;#0e882b&quot;];
+                  	6 -&gt; 9 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	8 -&gt; 9 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  }
+                  )]
+    [9 +3397.135] Branched Output: []
+  Copy
+  Copy
+  Copy
+  Node i1 := @parameter1: int
+    [9 +3397.935] JIdentityStmt: i1 := @parameter1: int
+    [9 +3398.177] lvalueNodesImpl(JimpleLocal i1)
+    [9 +3398.701] Output: [LocalFlow(control=control89, locals={i0=i0, i1=i1}, params=[param0, param1], calls=[], graph=
+                  digraph DiGraph1751675189 {
+                  	0 [label = &quot;this&quot;,color = &quot;#def717&quot;];
+                  	1 [label = &quot;static&quot;,color = &quot;#abac43&quot;];
+                  	2 [label = &quot;return&quot;,color = &quot;#19071f&quot;];
+                  	3 [label = &quot;throw&quot;,color = &quot;#8210d0&quot;];
+                  	4 [label = &quot;&lt;source&gt;&quot;,color = &quot;#c520ad&quot;];
+                  	5 [label = &quot;&lt;sink&gt;&quot;,color = &quot;#f9766c&quot;];
+                  	6 [label = &quot;param0&quot;,color = &quot;#4800e4&quot;];
+                  	7 [label = &quot;param1&quot;,color = &quot;#4800e4&quot;];
+                  	8 [label = &quot;control89&quot;,color = &quot;#ac8603&quot;];
+                  	9 [label = &quot;i0&quot;,color = &quot;#0e882b&quot;];
+                  	10 [label = &quot;i1&quot;,color = &quot;#0e882b&quot;];
+                  	6 -&gt; 9 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	7 -&gt; 10 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	8 -&gt; 9 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	8 -&gt; 10 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  }
+                  )]
+    [9 +3413.254] Branched Output: []
+  Copy
+  Copy
+  Copy
+  Node $i2 = i0 + i1
+    [9 +3415.156] JAssignStmt: $i2 = i0 + i1
+    [9 +3416.015] lvalueNodesImpl(JimpleLocal $i2)
+    [9 +3416.393] Output: [LocalFlow(control=control89, locals={i0=i0, i1=i1, $i2=$i2}, params=[param0, param1], calls=[], graph=
+                  digraph DiGraph1985121060 {
+                  	0 [label = &quot;this&quot;,color = &quot;#def717&quot;];
+                  	1 [label = &quot;static&quot;,color = &quot;#abac43&quot;];
+                  	2 [label = &quot;return&quot;,color = &quot;#19071f&quot;];
+                  	3 [label = &quot;throw&quot;,color = &quot;#8210d0&quot;];
+                  	4 [label = &quot;&lt;source&gt;&quot;,color = &quot;#c520ad&quot;];
+                  	5 [label = &quot;&lt;sink&gt;&quot;,color = &quot;#f9766c&quot;];
+                  	6 [label = &quot;param0&quot;,color = &quot;#4800e4&quot;];
+                  	7 [label = &quot;param1&quot;,color = &quot;#4800e4&quot;];
+                  	8 [label = &quot;control89&quot;,color = &quot;#ac8603&quot;];
+                  	9 [label = &quot;i0&quot;,color = &quot;#0e882b&quot;];
+                  	10 [label = &quot;i1&quot;,color = &quot;#0e882b&quot;];
+                  	11 [label = &quot;$i2&quot;,color = &quot;#0e882b&quot;];
+                  	6 -&gt; 9 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	7 -&gt; 10 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	8 -&gt; 9 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	8 -&gt; 10 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	8 -&gt; 11 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	9 -&gt; 11 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	10 -&gt; 11 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  }
+                  )]
+    [9 +3418.866] Branched Output: []
+  Copy
+  Copy
+  Node return $i2
+    [9 +3419.527] JReturnStmt: return $i2
+    Printing result LFG to dot
+      [9 +3420.464] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.BinomCase.int.binomPlus.int.int_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.BinomCase.int.binomPlus.int.int_0.dot
+    [9 +3434.597] Output: []
+    [9 +3434.750] Branched Output: []
+Contract of UNSPECIFIED int binomPlus(int,int)
+  [9 +3434.839] 
+                digraph DiGraph2069531576 {
+                	0 [label = &quot;this&quot;,color = &quot;#def717&quot;];
+                	1 [label = &quot;static&quot;,color = &quot;#abac43&quot;];
+                	2 [label = &quot;return&quot;,color = &quot;#19071f&quot;];
+                	3 [label = &quot;throw&quot;,color = &quot;#8210d0&quot;];
+                	4 [label = &quot;&lt;source&gt;&quot;,color = &quot;#c520ad&quot;];
+                	5 [label = &quot;&lt;sink&gt;&quot;,color = &quot;#f9766c&quot;];
+                	6 [label = &quot;param0&quot;,color = &quot;#4800e4&quot;];
+                	7 [label = &quot;param1&quot;,color = &quot;#4800e4&quot;];
+                	8 [label = &quot;methodCall&quot;,color = &quot;#bb15d3&quot;];
+                	6 -&gt; 2 [style = &quot;solid&quot;,color = &quot;black&quot;];
+                	7 -&gt; 2 [style = &quot;solid&quot;,color = &quot;black&quot;];
+                	8 -&gt; 2 [style = &quot;solid&quot;,color = &quot;black&quot;];
+                }
+                
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 6.3</a> at Dec 29, 2020 3:35:44 PM</p>
+</div>
+</div>
+</body>
+</html>

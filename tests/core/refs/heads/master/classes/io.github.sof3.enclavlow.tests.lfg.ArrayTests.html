@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - Class io.github.sof3.enclavlow.tests.lfg.ArrayTests</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>Class io.github.sof3.enclavlow.tests.lfg.ArrayTests</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/io.github.sof3.enclavlow.tests.lfg.html">io.github.sof3.enclavlow.tests.lfg</a> &gt; ArrayTests</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">2</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.603s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard output</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">assignElement</td>
+<td class="success">0.264s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">returnElement</td>
+<td class="success">0.339s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>[9 +2856.274]     int returnElement(int[], int)
+                  {
+                      int[] r0;
+                      int i0, $i1;
+                      io.github.sof3.enclavlow.cases.lfg.ArrayCase r1;
+              
+                      r1 := @this: io.github.sof3.enclavlow.cases.lfg.ArrayCase;
+              
+                      r0 := @parameter0: int[];
+              
+                      i0 := @parameter1: int;
+              
+                      $i1 = r0[i0];
+              
+                      return $i1;
+                  }
+              
+Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.ArrayCase: int returnElement(int[],int)&gt;
+  Copy
+  Node r1 := @this: io.github.sof3.enclavlow.cases.lfg.ArrayCase
+    [9 +2861.009] JIdentityStmt: r1 := @this: io.github.sof3.enclavlow.cases.lfg.ArrayCase
+    [9 +2861.619] lvalueNodesImpl(JimpleLocal r1)
+    [9 +2862.054] Output: [LocalFlow(control=control127, locals={r1=r1}, params=[param0, param1], calls=[], graph=
+                  digraph DiGraph308934825 {
+                  	0 [label = &quot;this&quot;,color = &quot;#def717&quot;];
+                  	1 [label = &quot;static&quot;,color = &quot;#abac43&quot;];
+                  	2 [label = &quot;return&quot;,color = &quot;#19071f&quot;];
+                  	3 [label = &quot;throw&quot;,color = &quot;#8210d0&quot;];
+                  	4 [label = &quot;&lt;source&gt;&quot;,color = &quot;#c520ad&quot;];
+                  	5 [label = &quot;&lt;sink&gt;&quot;,color = &quot;#f9766c&quot;];
+                  	6 [label = &quot;param0&quot;,color = &quot;#4800e4&quot;];
+                  	7 [label = &quot;param1&quot;,color = &quot;#4800e4&quot;];
+                  	8 [label = &quot;control127&quot;,color = &quot;#ac8603&quot;];
+                  	9 [label = &quot;r1&quot;,color = &quot;#0e882b&quot;];
+                  	0 -&gt; 9 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	8 -&gt; 9 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  }
+                  )]
+    [9 +2875.104] Branched Output: []
+  Copy
+  Copy
+  Copy
+  Node r0 := @parameter0: int[]
+    [9 +2876.089] JIdentityStmt: r0 := @parameter0: int[]
+    [9 +2876.353] lvalueNodesImpl(JimpleLocal r0)
+    [9 +2876.617] Output: [LocalFlow(control=control127, locals={r1=r1, r0=r0}, params=[param0, param1], calls=[], graph=
+                  digraph DiGraph1203946084 {
+                  	0 [label = &quot;this&quot;,color = &quot;#def717&quot;];
+                  	1 [label = &quot;static&quot;,color = &quot;#abac43&quot;];
+                  	2 [label = &quot;return&quot;,color = &quot;#19071f&quot;];
+                  	3 [label = &quot;throw&quot;,color = &quot;#8210d0&quot;];
+                  	4 [label = &quot;&lt;source&gt;&quot;,color = &quot;#c520ad&quot;];
+                  	5 [label = &quot;&lt;sink&gt;&quot;,color = &quot;#f9766c&quot;];
+                  	6 [label = &quot;param0&quot;,color = &quot;#4800e4&quot;];
+                  	7 [label = &quot;param1&quot;,color = &quot;#4800e4&quot;];
+                  	8 [label = &quot;control127&quot;,color = &quot;#ac8603&quot;];
+                  	9 [label = &quot;r1&quot;,color = &quot;#0e882b&quot;];
+                  	10 [label = &quot;r0&quot;,color = &quot;#0e882b&quot;];
+                  	0 -&gt; 9 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	6 -&gt; 10 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	8 -&gt; 9 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	8 -&gt; 10 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  }
+                  )]
+    [9 +2878.748] Branched Output: []
+  Copy
+  Copy
+  Copy
+  Node i0 := @parameter1: int
+    [9 +2879.520] JIdentityStmt: i0 := @parameter1: int
+    [9 +2879.752] lvalueNodesImpl(JimpleLocal i0)
+    [9 +2880.000] Output: [LocalFlow(control=control127, locals={r1=r1, r0=r0, i0=i0}, params=[param0, param1], calls=[], graph=
+                  digraph DiGraph1070947910 {
+                  	0 [label = &quot;this&quot;,color = &quot;#def717&quot;];
+                  	1 [label = &quot;static&quot;,color = &quot;#abac43&quot;];
+                  	2 [label = &quot;return&quot;,color = &quot;#19071f&quot;];
+                  	3 [label = &quot;throw&quot;,color = &quot;#8210d0&quot;];
+                  	4 [label = &quot;&lt;source&gt;&quot;,color = &quot;#c520ad&quot;];
+                  	5 [label = &quot;&lt;sink&gt;&quot;,color = &quot;#f9766c&quot;];
+                  	6 [label = &quot;param0&quot;,color = &quot;#4800e4&quot;];
+                  	7 [label = &quot;param1&quot;,color = &quot;#4800e4&quot;];
+                  	8 [label = &quot;control127&quot;,color = &quot;#ac8603&quot;];
+                  	9 [label = &quot;r1&quot;,color = &quot;#0e882b&quot;];
+                  	10 [label = &quot;r0&quot;,color = &quot;#0e882b&quot;];
+                  	11 [label = &quot;i0&quot;,color = &quot;#0e882b&quot;];
+                  	0 -&gt; 9 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	6 -&gt; 10 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	7 -&gt; 11 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	8 -&gt; 9 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	8 -&gt; 10 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	8 -&gt; 11 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  }
+                  )]
+    [9 +2883.026] Branched Output: []
+  Copy
+  Copy
+  Copy
+  Node $i1 = r0[i0]
+    [9 +2889.257] JAssignStmt: $i1 = r0[i0]
+    [9 +2889.552] lvalueNodesImpl(JimpleLocal $i1)
+    [9 +2901.951] Output: [LocalFlow(control=control127, locals={r1=r1, r0=r0, i0=i0, $i1=$i1}, params=[param0, param1], calls=[], graph=
+                  digraph DiGraph804568743 {
+                  	0 [label = &quot;this&quot;,color = &quot;#def717&quot;];
+                  	1 [label = &quot;static&quot;,color = &quot;#abac43&quot;];
+                  	2 [label = &quot;return&quot;,color = &quot;#19071f&quot;];
+                  	3 [label = &quot;throw&quot;,color = &quot;#8210d0&quot;];
+                  	4 [label = &quot;&lt;source&gt;&quot;,color = &quot;#c520ad&quot;];
+                  	5 [label = &quot;&lt;sink&gt;&quot;,color = &quot;#f9766c&quot;];
+                  	6 [label = &quot;param0&quot;,color = &quot;#4800e4&quot;];
+                  	7 [label = &quot;param1&quot;,color = &quot;#4800e4&quot;];
+                  	8 [label = &quot;control127&quot;,color = &quot;#ac8603&quot;];
+                  	9 [label = &quot;r1&quot;,color = &quot;#0e882b&quot;];
+                  	10 [label = &quot;r0&quot;,color = &quot;#0e882b&quot;];
+                  	11 [label = &quot;i0&quot;,color = &quot;#0e882b&quot;];
+                  	12 [label = &quot;$i1&quot;,color = &quot;#0e882b&quot;];
+                  	13 [label = &quot;&lt;r0&gt;.&lt;unknown offset&gt;&quot;,color = &quot;#481dc6&quot;];
+                  	14 [label = &quot;&lt;param0&gt;.&lt;unknown offset&gt;&quot;,color = &quot;#36b16e&quot;];
+                  	0 -&gt; 9 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	6 -&gt; 10 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	7 -&gt; 11 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	8 -&gt; 9 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	8 -&gt; 10 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	8 -&gt; 11 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	8 -&gt; 12 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	11 -&gt; 12 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	13 -&gt; 10 [label = &quot;field projection backflow&quot;,style = &quot;solid&quot;,color = &quot;blue&quot;];
+                  	13 -&gt; 12 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	13 -&gt; 14 [label = &quot;field assignment backflow&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	14 -&gt; 6 [label = &quot;field projection backflow&quot;,style = &quot;solid&quot;,color = &quot;blue&quot;];
+                  	14 -&gt; 13 [label = &quot;field assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  }
+                  )]
+    [9 +2907.247] Branched Output: []
+  Copy
+  Copy
+  Node return $i1
+    [9 +2911.659] JReturnStmt: return $i1
+    Printing result LFG to dot
+      [9 +2917.010] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ArrayCase.int.returnElement.int.int_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ArrayCase.int.returnElement.int.int_0.dot
+    [9 +2953.967] Output: []
+    [9 +2954.127] Branched Output: []
+Contract of UNSPECIFIED int returnElement(int[],int)
+  [9 +2954.230] 
+                digraph DiGraph1318244451 {
+                	0 [label = &quot;this&quot;,color = &quot;#def717&quot;];
+                	1 [label = &quot;static&quot;,color = &quot;#abac43&quot;];
+                	2 [label = &quot;return&quot;,color = &quot;#19071f&quot;];
+                	3 [label = &quot;throw&quot;,color = &quot;#8210d0&quot;];
+                	4 [label = &quot;&lt;source&gt;&quot;,color = &quot;#c520ad&quot;];
+                	5 [label = &quot;&lt;sink&gt;&quot;,color = &quot;#f9766c&quot;];
+                	6 [label = &quot;param0&quot;,color = &quot;#4800e4&quot;];
+                	7 [label = &quot;param1&quot;,color = &quot;#4800e4&quot;];
+                	8 [label = &quot;methodCall&quot;,color = &quot;#bb15d3&quot;];
+                	9 [label = &quot;&lt;param0&gt;.&lt;unknown offset&gt;&quot;,color = &quot;#36b16e&quot;];
+                	7 -&gt; 2 [style = &quot;solid&quot;,color = &quot;black&quot;];
+                	8 -&gt; 2 [style = &quot;solid&quot;,color = &quot;black&quot;];
+                	9 -&gt; 2 [style = &quot;solid&quot;,color = &quot;black&quot;];
+                	9 -&gt; 6 [style = &quot;solid&quot;,color = &quot;blue&quot;];
+                }
+                
+[9 +3082.172]     void assignElement(int[], int, int)
+                  {
+                      int[] r0;
+                      int i0, i1;
+                      io.github.sof3.enclavlow.cases.lfg.ArrayCase r1;
+              
+                      r1 := @this: io.github.sof3.enclavlow.cases.lfg.ArrayCase;
+              
+                      r0 := @parameter0: int[];
+              
+                      i0 := @parameter1: int;
+              
+                      i1 := @parameter2: int;
+              
+                      r0[i0] = i1;
+              
+                      return;
+                  }
+              
+Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.ArrayCase: void assignElement(int[],int,int)&gt;
+  Copy
+  Node r1 := @this: io.github.sof3.enclavlow.cases.lfg.ArrayCase
+    [9 +3092.282] JIdentityStmt: r1 := @this: io.github.sof3.enclavlow.cases.lfg.ArrayCase
+    [9 +3093.979] lvalueNodesImpl(JimpleLocal r1)
+    [9 +3094.249] Output: [LocalFlow(control=control141, locals={r1=r1}, params=[param0, param1, param2], calls=[], graph=
+                  digraph DiGraph2133027597 {
+                  	0 [label = &quot;this&quot;,color = &quot;#def717&quot;];
+                  	1 [label = &quot;static&quot;,color = &quot;#abac43&quot;];
+                  	2 [label = &quot;return&quot;,color = &quot;#19071f&quot;];
+                  	3 [label = &quot;throw&quot;,color = &quot;#8210d0&quot;];
+                  	4 [label = &quot;&lt;source&gt;&quot;,color = &quot;#c520ad&quot;];
+                  	5 [label = &quot;&lt;sink&gt;&quot;,color = &quot;#f9766c&quot;];
+                  	6 [label = &quot;param0&quot;,color = &quot;#4800e4&quot;];
+                  	7 [label = &quot;param1&quot;,color = &quot;#4800e4&quot;];
+                  	8 [label = &quot;param2&quot;,color = &quot;#4800e4&quot;];
+                  	9 [label = &quot;control141&quot;,color = &quot;#ac8603&quot;];
+                  	10 [label = &quot;r1&quot;,color = &quot;#0e882b&quot;];
+                  	0 -&gt; 10 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	9 -&gt; 10 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  }
+                  )]
+    [9 +3098.909] Branched Output: []
+  Copy
+  Copy
+  Copy
+  Node r0 := @parameter0: int[]
+    [9 +3099.901] JIdentityStmt: r0 := @parameter0: int[]
+    [9 +3101.134] lvalueNodesImpl(JimpleLocal r0)
+    [9 +3102.956] Output: [LocalFlow(control=control141, locals={r1=r1, r0=r0}, params=[param0, param1, param2], calls=[], graph=
+                  digraph DiGraph1201307642 {
+                  	0 [label = &quot;this&quot;,color = &quot;#def717&quot;];
+                  	1 [label = &quot;static&quot;,color = &quot;#abac43&quot;];
+                  	2 [label = &quot;return&quot;,color = &quot;#19071f&quot;];
+                  	3 [label = &quot;throw&quot;,color = &quot;#8210d0&quot;];
+                  	4 [label = &quot;&lt;source&gt;&quot;,color = &quot;#c520ad&quot;];
+                  	5 [label = &quot;&lt;sink&gt;&quot;,color = &quot;#f9766c&quot;];
+                  	6 [label = &quot;param0&quot;,color = &quot;#4800e4&quot;];
+                  	7 [label = &quot;param1&quot;,color = &quot;#4800e4&quot;];
+                  	8 [label = &quot;param2&quot;,color = &quot;#4800e4&quot;];
+                  	9 [label = &quot;control141&quot;,color = &quot;#ac8603&quot;];
+                  	10 [label = &quot;r1&quot;,color = &quot;#0e882b&quot;];
+                  	11 [label = &quot;r0&quot;,color = &quot;#0e882b&quot;];
+                  	0 -&gt; 10 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	6 -&gt; 11 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	9 -&gt; 10 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	9 -&gt; 11 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  }
+                  )]
+    [9 +3110.379] Branched Output: []
+  Copy
+  Copy
+  Copy
+  Node i0 := @parameter1: int
+    [9 +3115.276] JIdentityStmt: i0 := @parameter1: int
+    [9 +3115.566] lvalueNodesImpl(JimpleLocal i0)
+    [9 +3116.008] Output: [LocalFlow(control=control141, locals={r1=r1, r0=r0, i0=i0}, params=[param0, param1, param2], calls=[], graph=
+                  digraph DiGraph855280137 {
+                  	0 [label = &quot;this&quot;,color = &quot;#def717&quot;];
+                  	1 [label = &quot;static&quot;,color = &quot;#abac43&quot;];
+                  	2 [label = &quot;return&quot;,color = &quot;#19071f&quot;];
+                  	3 [label = &quot;throw&quot;,color = &quot;#8210d0&quot;];
+                  	4 [label = &quot;&lt;source&gt;&quot;,color = &quot;#c520ad&quot;];
+                  	5 [label = &quot;&lt;sink&gt;&quot;,color = &quot;#f9766c&quot;];
+                  	6 [label = &quot;param0&quot;,color = &quot;#4800e4&quot;];
+                  	7 [label = &quot;param1&quot;,color = &quot;#4800e4&quot;];
+                  	8 [label = &quot;param2&quot;,color = &quot;#4800e4&quot;];
+                  	9 [label = &quot;control141&quot;,color = &quot;#ac8603&quot;];
+                  	10 [label = &quot;r1&quot;,color = &quot;#0e882b&quot;];
+                  	11 [label = &quot;r0&quot;,color = &quot;#0e882b&quot;];
+                  	12 [label = &quot;i0&quot;,color = &quot;#0e882b&quot;];
+                  	0 -&gt; 10 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	6 -&gt; 11 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	7 -&gt; 12 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	9 -&gt; 10 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	9 -&gt; 11 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	9 -&gt; 12 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  }
+                  )]
+    [9 +3130.248] Branched Output: []
+  Copy
+  Copy
+  Copy
+  Node i1 := @parameter2: int
+    [9 +3131.910] JIdentityStmt: i1 := @parameter2: int
+    [9 +3132.150] lvalueNodesImpl(JimpleLocal i1)
+    [9 +3132.392] Output: [LocalFlow(control=control141, locals={r1=r1, r0=r0, i0=i0, i1=i1}, params=[param0, param1, param2], calls=[], graph=
+                  digraph DiGraph1446011057 {
+                  	0 [label = &quot;this&quot;,color = &quot;#def717&quot;];
+                  	1 [label = &quot;static&quot;,color = &quot;#abac43&quot;];
+                  	2 [label = &quot;return&quot;,color = &quot;#19071f&quot;];
+                  	3 [label = &quot;throw&quot;,color = &quot;#8210d0&quot;];
+                  	4 [label = &quot;&lt;source&gt;&quot;,color = &quot;#c520ad&quot;];
+                  	5 [label = &quot;&lt;sink&gt;&quot;,color = &quot;#f9766c&quot;];
+                  	6 [label = &quot;param0&quot;,color = &quot;#4800e4&quot;];
+                  	7 [label = &quot;param1&quot;,color = &quot;#4800e4&quot;];
+                  	8 [label = &quot;param2&quot;,color = &quot;#4800e4&quot;];
+                  	9 [label = &quot;control141&quot;,color = &quot;#ac8603&quot;];
+                  	10 [label = &quot;r1&quot;,color = &quot;#0e882b&quot;];
+                  	11 [label = &quot;r0&quot;,color = &quot;#0e882b&quot;];
+                  	12 [label = &quot;i0&quot;,color = &quot;#0e882b&quot;];
+                  	13 [label = &quot;i1&quot;,color = &quot;#0e882b&quot;];
+                  	0 -&gt; 10 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	6 -&gt; 11 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	7 -&gt; 12 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	8 -&gt; 13 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	9 -&gt; 10 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	9 -&gt; 11 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	9 -&gt; 12 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	9 -&gt; 13 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  }
+                  )]
+    [9 +3135.510] Branched Output: []
+  Copy
+  Copy
+  Copy
+  Node r0[i0] = i1
+    [9 +3136.310] JAssignStmt: r0[i0] = i1
+    [9 +3136.531] lvalueNodesImpl(JArrayRef r0[i0])
+    [9 +3141.729] Output: [LocalFlow(control=control141, locals={r1=r1, r0=r0, i0=i0, i1=i1}, params=[param0, param1, param2], calls=[], graph=
+                  digraph DiGraph643751529 {
+                  	0 [label = &quot;this&quot;,color = &quot;#def717&quot;];
+                  	1 [label = &quot;static&quot;,color = &quot;#abac43&quot;];
+                  	2 [label = &quot;return&quot;,color = &quot;#19071f&quot;];
+                  	3 [label = &quot;throw&quot;,color = &quot;#8210d0&quot;];
+                  	4 [label = &quot;&lt;source&gt;&quot;,color = &quot;#c520ad&quot;];
+                  	5 [label = &quot;&lt;sink&gt;&quot;,color = &quot;#f9766c&quot;];
+                  	6 [label = &quot;param0&quot;,color = &quot;#4800e4&quot;];
+                  	7 [label = &quot;param1&quot;,color = &quot;#4800e4&quot;];
+                  	8 [label = &quot;param2&quot;,color = &quot;#4800e4&quot;];
+                  	9 [label = &quot;control141&quot;,color = &quot;#ac8603&quot;];
+                  	10 [label = &quot;r1&quot;,color = &quot;#0e882b&quot;];
+                  	11 [label = &quot;r0&quot;,color = &quot;#0e882b&quot;];
+                  	12 [label = &quot;i0&quot;,color = &quot;#0e882b&quot;];
+                  	13 [label = &quot;i1&quot;,color = &quot;#0e882b&quot;];
+                  	14 [label = &quot;&lt;r0&gt;.&lt;unknown offset&gt;&quot;,color = &quot;#481dc6&quot;];
+                  	15 [label = &quot;&lt;param0&gt;.&lt;unknown offset&gt;&quot;,color = &quot;#36b16e&quot;];
+                  	0 -&gt; 10 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	6 -&gt; 11 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	7 -&gt; 12 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	8 -&gt; 13 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	9 -&gt; 10 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	9 -&gt; 11 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	9 -&gt; 12 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	9 -&gt; 13 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	9 -&gt; 14 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	12 -&gt; 14 [label = &quot;assignment\nside effect&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	13 -&gt; 14 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	14 -&gt; 11 [label = &quot;field projection backflow&quot;,style = &quot;solid&quot;,color = &quot;blue&quot;];
+                  	14 -&gt; 15 [label = &quot;field assignment backflow&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  	15 -&gt; 6 [label = &quot;field projection backflow&quot;,style = &quot;solid&quot;,color = &quot;blue&quot;];
+                  	15 -&gt; 14 [label = &quot;field assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
+                  }
+                  )]
+    [9 +3150.195] Branched Output: []
+  Copy
+  Copy
+  Node return
+    [9 +3152.591] JReturnVoidStmt: return
+    Printing result LFG to dot
+      [9 +3157.587] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ArrayCase.void.assignElement.int.int.int_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ArrayCase.void.assignElement.int.int.int_0.dot
+    [9 +3218.012] Output: []
+    [9 +3218.155] Branched Output: []
+Contract of UNSPECIFIED void assignElement(int[],int,int)
+  [9 +3218.260] 
+                digraph DiGraph1083355753 {
+                	0 [label = &quot;this&quot;,color = &quot;#def717&quot;];
+                	1 [label = &quot;static&quot;,color = &quot;#abac43&quot;];
+                	2 [label = &quot;return&quot;,color = &quot;#19071f&quot;];
+                	3 [label = &quot;throw&quot;,color = &quot;#8210d0&quot;];
+                	4 [label = &quot;&lt;source&gt;&quot;,color = &quot;#c520ad&quot;];
+                	5 [label = &quot;&lt;sink&gt;&quot;,color = &quot;#f9766c&quot;];
+                	6 [label = &quot;param0&quot;,color = &quot;#4800e4&quot;];
+                	7 [label = &quot;param1&quot;,color = &quot;#4800e4&quot;];
+                	8 [label = &quot;param2&quot;,color = &quot;#4800e4&quot;];
+                	9 [label = &quot;methodCall&quot;,color = &quot;#bb15d3&quot;];
+                	10 [label = &quot;&lt;param0&gt;.&lt;unknown offset&gt;&quot;,color = &quot;#36b16e&quot;];
+                	7 -&gt; 10 [style = &quot;solid&quot;,color = &quot;black&quot;];
+                	8 -&gt; 10 [style = &quot;solid&quot;,color = &quot;black&quot;];
+                	9 -&gt; 2 [style = &quot;solid&quot;,color = &quot;black&quot;];
+                	9 -&gt; 10 [style = &quot;solid&quot;,color = &quot;black&quot;];
+                	10 -&gt; 6 [style = &quot;solid&quot;,color = &quot;blue&quot;];
+                }
+                
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 6.3</a> at Dec 29, 2020 3:35:44 PM</p>
+</div>
+</div>
+</body>
+</html>
