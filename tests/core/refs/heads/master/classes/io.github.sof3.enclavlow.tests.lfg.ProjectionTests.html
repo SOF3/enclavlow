@@ -41,7 +41,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">2.613s</div>
+<div class="counter">2.280s</div>
 <p>duration</p>
 </div>
 </td>
@@ -79,17 +79,17 @@
 </thead>
 <tr>
 <td class="success">paramToParam</td>
-<td class="success">1.688s</td>
+<td class="success">1.481s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">paramToThis</td>
-<td class="success">0.542s</td>
+<td class="success">0.457s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">thisToStatic</td>
-<td class="success">0.383s</td>
+<td class="success">0.342s</td>
 <td class="success">passed</td>
 </tr>
 </table>
@@ -97,7 +97,7 @@
 <div id="tab1" class="tab">
 <h2>Standard output</h2>
 <span class="code">
-<pre>[9 +0.051]     public static void paramToParam(java.lang.String, io.github.sof3.enclavlow.cases.Box)
+<pre>[9 +0.045]     public static void paramToParam(java.lang.String, io.github.sof3.enclavlow.cases.Box)
                {
                    io.github.sof3.enclavlow.cases.Box r0;
                    java.lang.String r1;
@@ -114,96 +114,29 @@
 Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.ProjectionCase: void paramToParam(java.lang.String,io.github.sof3.enclavlow.cases.Box)&gt;
   Copy
   Node r1 := @parameter0: java.lang.String
-    [9 +71.613] JIdentityStmt: r1 := @parameter0: java.lang.String
-    [9 +84.305] lvalueNodesImpl(JimpleLocal r1)
-    [9 +88.423] Output: [LocalFlow(control=control7, locals={r1=r1}, params=[param0, param1], calls=[], graph=
-                digraph DiGraph1296130916 {
-                	0 [label = &quot;this&quot;,color = &quot;#def717&quot;];
-                	1 [label = &quot;static&quot;,color = &quot;#abac43&quot;];
-                	2 [label = &quot;return&quot;,color = &quot;#19071f&quot;];
-                	3 [label = &quot;throw&quot;,color = &quot;#8210d0&quot;];
-                	4 [label = &quot;&lt;source&gt;&quot;,color = &quot;#c520ad&quot;];
-                	5 [label = &quot;&lt;sink&gt;&quot;,color = &quot;#f9766c&quot;];
-                	6 [label = &quot;param0&quot;,color = &quot;#4800e4&quot;];
-                	7 [label = &quot;param1&quot;,color = &quot;#4800e4&quot;];
-                	8 [label = &quot;control7&quot;,color = &quot;#ac8603&quot;];
-                	9 [label = &quot;r1&quot;,color = &quot;#0e882b&quot;];
-                	6 -&gt; 9 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
-                	8 -&gt; 9 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
-                }
-                )]
-    [9 +143.052] Branched Output: []
+    [9 +55.122] JIdentityStmt: r1 := @parameter0: java.lang.String
+    [9 +72.048] lvalueNodesImpl(JimpleLocal r1)
   Copy
   Copy
   Copy
   Node r0 := @parameter1: io.github.sof3.enclavlow.cases.Box
-    [9 +146.663] JIdentityStmt: r0 := @parameter1: io.github.sof3.enclavlow.cases.Box
-    [9 +147.143] lvalueNodesImpl(JimpleLocal r0)
-    [9 +147.680] Output: [LocalFlow(control=control7, locals={r1=r1, r0=r0}, params=[param0, param1], calls=[], graph=
-                 digraph DiGraph1018395159 {
-                 	0 [label = &quot;this&quot;,color = &quot;#def717&quot;];
-                 	1 [label = &quot;static&quot;,color = &quot;#abac43&quot;];
-                 	2 [label = &quot;return&quot;,color = &quot;#19071f&quot;];
-                 	3 [label = &quot;throw&quot;,color = &quot;#8210d0&quot;];
-                 	4 [label = &quot;&lt;source&gt;&quot;,color = &quot;#c520ad&quot;];
-                 	5 [label = &quot;&lt;sink&gt;&quot;,color = &quot;#f9766c&quot;];
-                 	6 [label = &quot;param0&quot;,color = &quot;#4800e4&quot;];
-                 	7 [label = &quot;param1&quot;,color = &quot;#4800e4&quot;];
-                 	8 [label = &quot;control7&quot;,color = &quot;#ac8603&quot;];
-                 	9 [label = &quot;r1&quot;,color = &quot;#0e882b&quot;];
-                 	10 [label = &quot;r0&quot;,color = &quot;#0e882b&quot;];
-                 	6 -&gt; 9 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
-                 	7 -&gt; 10 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
-                 	8 -&gt; 9 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
-                 	8 -&gt; 10 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
-                 }
-                 )]
-    [9 +166.275] Branched Output: []
+    [9 +137.523] JIdentityStmt: r0 := @parameter1: io.github.sof3.enclavlow.cases.Box
+    [9 +137.775] lvalueNodesImpl(JimpleLocal r0)
   Copy
   Copy
   Copy
   Node r0.&lt;io.github.sof3.enclavlow.cases.Box: java.lang.Object inner&gt; = r1
-    [9 +169.313] JAssignStmt: r0.&lt;io.github.sof3.enclavlow.cases.Box: java.lang.Object inner&gt; = r1
-    [9 +170.121] lvalueNodesImpl(JInstanceFieldRef r0.&lt;io.github.sof3.enclavlow.cases.Box: java.lang.Object inner&gt;)
-    [9 +172.970] Output: [LocalFlow(control=control7, locals={r1=r1, r0=r0}, params=[param0, param1], calls=[], graph=
-                 digraph DiGraph843620545 {
-                 	0 [label = &quot;this&quot;,color = &quot;#def717&quot;];
-                 	1 [label = &quot;static&quot;,color = &quot;#abac43&quot;];
-                 	2 [label = &quot;return&quot;,color = &quot;#19071f&quot;];
-                 	3 [label = &quot;throw&quot;,color = &quot;#8210d0&quot;];
-                 	4 [label = &quot;&lt;source&gt;&quot;,color = &quot;#c520ad&quot;];
-                 	5 [label = &quot;&lt;sink&gt;&quot;,color = &quot;#f9766c&quot;];
-                 	6 [label = &quot;param0&quot;,color = &quot;#4800e4&quot;];
-                 	7 [label = &quot;param1&quot;,color = &quot;#4800e4&quot;];
-                 	8 [label = &quot;control7&quot;,color = &quot;#ac8603&quot;];
-                 	9 [label = &quot;r1&quot;,color = &quot;#0e882b&quot;];
-                 	10 [label = &quot;r0&quot;,color = &quot;#0e882b&quot;];
-                 	11 [label = &quot;&lt;r0&gt;.public java.lang.Object inner&quot;,color = &quot;#481dc6&quot;];
-                 	12 [label = &quot;&lt;param1&gt;.public java.lang.Object inner&quot;,color = &quot;#36b16e&quot;];
-                 	6 -&gt; 9 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
-                 	7 -&gt; 10 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
-                 	8 -&gt; 9 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
-                 	8 -&gt; 10 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
-                 	8 -&gt; 11 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
-                 	9 -&gt; 11 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
-                 	11 -&gt; 10 [label = &quot;field projection backflow&quot;,style = &quot;solid&quot;,color = &quot;blue&quot;];
-                 	11 -&gt; 12 [label = &quot;field assignment backflow&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
-                 	12 -&gt; 7 [label = &quot;field projection backflow&quot;,style = &quot;solid&quot;,color = &quot;blue&quot;];
-                 	12 -&gt; 11 [label = &quot;field assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
-                 }
-                 )]
-    [9 +183.936] Branched Output: []
+    [9 +139.513] JAssignStmt: r0.&lt;io.github.sof3.enclavlow.cases.Box: java.lang.Object inner&gt; = r1
+    [9 +139.738] lvalueNodesImpl(JInstanceFieldRef r0.&lt;io.github.sof3.enclavlow.cases.Box: java.lang.Object inner&gt;)
   Copy
   Copy
   Node return
-    [9 +185.497] JReturnVoidStmt: return
+    [9 +154.762] JReturnVoidStmt: return
     Printing result LFG to dot
-      [9 +224.355] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ProjectionCase.void.paramToParam.java.lang.String.io.github.sof3.enclavlow.cases.Box_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ProjectionCase.void.paramToParam.java.lang.String.io.github.sof3.enclavlow.cases.Box_0.dot
-    [9 +294.988] Output: []
-    [9 +295.217] Branched Output: []
+      [9 +180.488] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ProjectionCase.void.paramToParam.java.lang.String.io.github.sof3.enclavlow.cases.Box_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ProjectionCase.void.paramToParam.java.lang.String.io.github.sof3.enclavlow.cases.Box_0.dot
 Contract of UNSPECIFIED void paramToParam(java.lang.String,io.github.sof3.enclavlow.cases.Box)
-  [9 +295.414] 
-               digraph DiGraph1887835265 {
+  [9 +290.125] 
+               digraph DiGraph1602033704 {
                	0 [label = &quot;this&quot;,color = &quot;#def717&quot;];
                	1 [label = &quot;static&quot;,color = &quot;#abac43&quot;];
                	2 [label = &quot;return&quot;,color = &quot;#19071f&quot;];
@@ -220,7 +153,7 @@ Contract of UNSPECIFIED void paramToParam(java.lang.String,io.github.sof3.enclav
                	9 -&gt; 7 [style = &quot;solid&quot;,color = &quot;blue&quot;];
                }
                
-[9 +686.710]     public void paramToThis(int)
+[9 +631.664]     public void paramToThis(int)
                  {
                      io.github.sof3.enclavlow.cases.lfg.ProjectionCase r0;
                      int i0;
@@ -237,93 +170,29 @@ Contract of UNSPECIFIED void paramToParam(java.lang.String,io.github.sof3.enclav
 Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.ProjectionCase: void paramToThis(int)&gt;
   Copy
   Node r0 := @this: io.github.sof3.enclavlow.cases.lfg.ProjectionCase
-    [9 +705.112] JIdentityStmt: r0 := @this: io.github.sof3.enclavlow.cases.lfg.ProjectionCase
-    [9 +705.779] lvalueNodesImpl(JimpleLocal r0)
-    [9 +707.312] Output: [LocalFlow(control=control17, locals={r0=r0}, params=[param0], calls=[], graph=
-                 digraph DiGraph328392006 {
-                 	0 [label = &quot;this&quot;,color = &quot;#def717&quot;];
-                 	1 [label = &quot;static&quot;,color = &quot;#abac43&quot;];
-                 	2 [label = &quot;return&quot;,color = &quot;#19071f&quot;];
-                 	3 [label = &quot;throw&quot;,color = &quot;#8210d0&quot;];
-                 	4 [label = &quot;&lt;source&gt;&quot;,color = &quot;#c520ad&quot;];
-                 	5 [label = &quot;&lt;sink&gt;&quot;,color = &quot;#f9766c&quot;];
-                 	6 [label = &quot;param0&quot;,color = &quot;#4800e4&quot;];
-                 	7 [label = &quot;control17&quot;,color = &quot;#ac8603&quot;];
-                 	8 [label = &quot;r0&quot;,color = &quot;#0e882b&quot;];
-                 	0 -&gt; 8 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
-                 	7 -&gt; 8 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
-                 }
-                 )]
-    [9 +722.226] Branched Output: []
+    [9 +662.838] JIdentityStmt: r0 := @this: io.github.sof3.enclavlow.cases.lfg.ProjectionCase
+    [9 +664.645] lvalueNodesImpl(JimpleLocal r0)
   Copy
   Copy
   Copy
   Node i0 := @parameter0: int
-    [9 +724.333] JIdentityStmt: i0 := @parameter0: int
-    [9 +725.258] lvalueNodesImpl(JimpleLocal i0)
-    [9 +725.669] Output: [LocalFlow(control=control17, locals={r0=r0, i0=i0}, params=[param0], calls=[], graph=
-                 digraph DiGraph180343665 {
-                 	0 [label = &quot;this&quot;,color = &quot;#def717&quot;];
-                 	1 [label = &quot;static&quot;,color = &quot;#abac43&quot;];
-                 	2 [label = &quot;return&quot;,color = &quot;#19071f&quot;];
-                 	3 [label = &quot;throw&quot;,color = &quot;#8210d0&quot;];
-                 	4 [label = &quot;&lt;source&gt;&quot;,color = &quot;#c520ad&quot;];
-                 	5 [label = &quot;&lt;sink&gt;&quot;,color = &quot;#f9766c&quot;];
-                 	6 [label = &quot;param0&quot;,color = &quot;#4800e4&quot;];
-                 	7 [label = &quot;control17&quot;,color = &quot;#ac8603&quot;];
-                 	8 [label = &quot;r0&quot;,color = &quot;#0e882b&quot;];
-                 	9 [label = &quot;i0&quot;,color = &quot;#0e882b&quot;];
-                 	0 -&gt; 8 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
-                 	6 -&gt; 9 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
-                 	7 -&gt; 8 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
-                 	7 -&gt; 9 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
-                 }
-                 )]
-    [9 +738.017] Branched Output: []
+    [9 +674.387] JIdentityStmt: i0 := @parameter0: int
+    [9 +676.503] lvalueNodesImpl(JimpleLocal i0)
   Copy
   Copy
   Copy
   Node r0.&lt;io.github.sof3.enclavlow.cases.lfg.ProjectionCase: int b&gt; = i0
-    [9 +739.372] JAssignStmt: r0.&lt;io.github.sof3.enclavlow.cases.lfg.ProjectionCase: int b&gt; = i0
-    [9 +740.422] lvalueNodesImpl(JInstanceFieldRef r0.&lt;io.github.sof3.enclavlow.cases.lfg.ProjectionCase: int b&gt;)
-    [9 +741.753] Output: [LocalFlow(control=control17, locals={r0=r0, i0=i0}, params=[param0], calls=[], graph=
-                 digraph DiGraph1364277682 {
-                 	0 [label = &quot;this&quot;,color = &quot;#def717&quot;];
-                 	1 [label = &quot;static&quot;,color = &quot;#abac43&quot;];
-                 	2 [label = &quot;return&quot;,color = &quot;#19071f&quot;];
-                 	3 [label = &quot;throw&quot;,color = &quot;#8210d0&quot;];
-                 	4 [label = &quot;&lt;source&gt;&quot;,color = &quot;#c520ad&quot;];
-                 	5 [label = &quot;&lt;sink&gt;&quot;,color = &quot;#f9766c&quot;];
-                 	6 [label = &quot;param0&quot;,color = &quot;#4800e4&quot;];
-                 	7 [label = &quot;control17&quot;,color = &quot;#ac8603&quot;];
-                 	8 [label = &quot;r0&quot;,color = &quot;#0e882b&quot;];
-                 	9 [label = &quot;i0&quot;,color = &quot;#0e882b&quot;];
-                 	10 [label = &quot;&lt;r0&gt;.int b&quot;,color = &quot;#481dc6&quot;];
-                 	11 [label = &quot;&lt;this&gt;.int b&quot;,color = &quot;#36b16e&quot;];
-                 	0 -&gt; 8 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
-                 	6 -&gt; 9 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
-                 	7 -&gt; 8 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
-                 	7 -&gt; 9 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
-                 	7 -&gt; 10 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
-                 	9 -&gt; 10 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
-                 	10 -&gt; 8 [label = &quot;field projection backflow&quot;,style = &quot;solid&quot;,color = &quot;blue&quot;];
-                 	10 -&gt; 11 [label = &quot;field assignment backflow&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
-                 	11 -&gt; 0 [label = &quot;field projection backflow&quot;,style = &quot;solid&quot;,color = &quot;blue&quot;];
-                 	11 -&gt; 10 [label = &quot;field assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
-                 }
-                 )]
-    [9 +769.844] Branched Output: []
+    [9 +688.471] JAssignStmt: r0.&lt;io.github.sof3.enclavlow.cases.lfg.ProjectionCase: int b&gt; = i0
+    [9 +693.457] lvalueNodesImpl(JInstanceFieldRef r0.&lt;io.github.sof3.enclavlow.cases.lfg.ProjectionCase: int b&gt;)
   Copy
   Copy
   Node return
-    [9 +770.997] JReturnVoidStmt: return
+    [9 +695.422] JReturnVoidStmt: return
     Printing result LFG to dot
-      [9 +772.502] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ProjectionCase.void.paramToThis.int_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ProjectionCase.void.paramToThis.int_0.dot
-    [9 +842.802] Output: []
-    [9 +843.025] Branched Output: []
+      [9 +702.042] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ProjectionCase.void.paramToThis.int_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ProjectionCase.void.paramToThis.int_0.dot
 Contract of UNSPECIFIED void paramToThis(int)
-  [9 +843.174] 
-               digraph DiGraph1235742252 {
+  [9 +753.942] 
+               digraph DiGraph1484612219 {
                	0 [label = &quot;this&quot;,color = &quot;#def717&quot;];
                	1 [label = &quot;static&quot;,color = &quot;#abac43&quot;];
                	2 [label = &quot;return&quot;,color = &quot;#19071f&quot;];
@@ -339,7 +208,7 @@ Contract of UNSPECIFIED void paramToThis(int)
                	8 -&gt; 0 [style = &quot;solid&quot;,color = &quot;blue&quot;];
                }
                
-[9 +1142.352]     public void thisToStatic()
+[9 +1022.322]     public void thisToStatic()
                   {
                       io.github.sof3.enclavlow.cases.lfg.ProjectionCase r0;
                       int $i0;
@@ -356,96 +225,29 @@ Contract of UNSPECIFIED void paramToThis(int)
 Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.ProjectionCase: void thisToStatic()&gt;
   Copy
   Node r0 := @this: io.github.sof3.enclavlow.cases.lfg.ProjectionCase
-    [9 +1153.638] JIdentityStmt: r0 := @this: io.github.sof3.enclavlow.cases.lfg.ProjectionCase
-    [9 +1155.358] lvalueNodesImpl(JimpleLocal r0)
-    [9 +1155.787] Output: [LocalFlow(control=control27, locals={r0=r0}, params=[], calls=[], graph=
-                  digraph DiGraph1565002658 {
-                  	0 [label = &quot;this&quot;,color = &quot;#def717&quot;];
-                  	1 [label = &quot;static&quot;,color = &quot;#abac43&quot;];
-                  	2 [label = &quot;return&quot;,color = &quot;#19071f&quot;];
-                  	3 [label = &quot;throw&quot;,color = &quot;#8210d0&quot;];
-                  	4 [label = &quot;&lt;source&gt;&quot;,color = &quot;#c520ad&quot;];
-                  	5 [label = &quot;&lt;sink&gt;&quot;,color = &quot;#f9766c&quot;];
-                  	6 [label = &quot;control27&quot;,color = &quot;#ac8603&quot;];
-                  	7 [label = &quot;r0&quot;,color = &quot;#0e882b&quot;];
-                  	0 -&gt; 7 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
-                  	6 -&gt; 7 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
-                  }
-                  )]
-    [9 +1163.016] Branched Output: []
+    [9 +1031.685] JIdentityStmt: r0 := @this: io.github.sof3.enclavlow.cases.lfg.ProjectionCase
+    [9 +1032.099] lvalueNodesImpl(JimpleLocal r0)
   Copy
   Copy
   Copy
   Node $i0 = r0.&lt;io.github.sof3.enclavlow.cases.lfg.ProjectionCase: int b&gt;
-    [9 +1164.227] JAssignStmt: $i0 = r0.&lt;io.github.sof3.enclavlow.cases.lfg.ProjectionCase: int b&gt;
-    [9 +1164.622] lvalueNodesImpl(JimpleLocal $i0)
-    [9 +1165.130] Output: [LocalFlow(control=control27, locals={r0=r0, $i0=$i0}, params=[], calls=[], graph=
-                  digraph DiGraph1072209183 {
-                  	0 [label = &quot;this&quot;,color = &quot;#def717&quot;];
-                  	1 [label = &quot;static&quot;,color = &quot;#abac43&quot;];
-                  	2 [label = &quot;return&quot;,color = &quot;#19071f&quot;];
-                  	3 [label = &quot;throw&quot;,color = &quot;#8210d0&quot;];
-                  	4 [label = &quot;&lt;source&gt;&quot;,color = &quot;#c520ad&quot;];
-                  	5 [label = &quot;&lt;sink&gt;&quot;,color = &quot;#f9766c&quot;];
-                  	6 [label = &quot;control27&quot;,color = &quot;#ac8603&quot;];
-                  	7 [label = &quot;r0&quot;,color = &quot;#0e882b&quot;];
-                  	8 [label = &quot;$i0&quot;,color = &quot;#0e882b&quot;];
-                  	9 [label = &quot;&lt;r0&gt;.int b&quot;,color = &quot;#481dc6&quot;];
-                  	10 [label = &quot;&lt;this&gt;.int b&quot;,color = &quot;#36b16e&quot;];
-                  	0 -&gt; 7 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
-                  	6 -&gt; 7 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
-                  	6 -&gt; 8 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
-                  	9 -&gt; 7 [label = &quot;field projection backflow&quot;,style = &quot;solid&quot;,color = &quot;blue&quot;];
-                  	9 -&gt; 8 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
-                  	9 -&gt; 10 [label = &quot;field assignment backflow&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
-                  	10 -&gt; 0 [label = &quot;field projection backflow&quot;,style = &quot;solid&quot;,color = &quot;blue&quot;];
-                  	10 -&gt; 9 [label = &quot;field assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
-                  }
-                  )]
-    [9 +1172.937] Branched Output: []
+    [9 +1033.752] JAssignStmt: $i0 = r0.&lt;io.github.sof3.enclavlow.cases.lfg.ProjectionCase: int b&gt;
+    [9 +1034.166] lvalueNodesImpl(JimpleLocal $i0)
   Copy
   Copy
   Copy
   Node &lt;io.github.sof3.enclavlow.cases.lfg.ProjectionCase: int a&gt; = $i0
-    [9 +1174.174] JAssignStmt: &lt;io.github.sof3.enclavlow.cases.lfg.ProjectionCase: int a&gt; = $i0
-    [9 +1174.518] lvalueNodesImpl(StaticFieldRef &lt;io.github.sof3.enclavlow.cases.lfg.ProjectionCase: int a&gt;)
-    [9 +1174.867] Output: [LocalFlow(control=control27, locals={r0=r0, $i0=$i0}, params=[], calls=[], graph=
-                  digraph DiGraph431921836 {
-                  	0 [label = &quot;this&quot;,color = &quot;#def717&quot;];
-                  	1 [label = &quot;static&quot;,color = &quot;#abac43&quot;];
-                  	2 [label = &quot;return&quot;,color = &quot;#19071f&quot;];
-                  	3 [label = &quot;throw&quot;,color = &quot;#8210d0&quot;];
-                  	4 [label = &quot;&lt;source&gt;&quot;,color = &quot;#c520ad&quot;];
-                  	5 [label = &quot;&lt;sink&gt;&quot;,color = &quot;#f9766c&quot;];
-                  	6 [label = &quot;control27&quot;,color = &quot;#ac8603&quot;];
-                  	7 [label = &quot;r0&quot;,color = &quot;#0e882b&quot;];
-                  	8 [label = &quot;$i0&quot;,color = &quot;#0e882b&quot;];
-                  	9 [label = &quot;&lt;r0&gt;.int b&quot;,color = &quot;#481dc6&quot;];
-                  	10 [label = &quot;&lt;this&gt;.int b&quot;,color = &quot;#36b16e&quot;];
-                  	0 -&gt; 7 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
-                  	6 -&gt; 1 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
-                  	6 -&gt; 7 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
-                  	6 -&gt; 8 [label = &quot;assignment\ncondition&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
-                  	8 -&gt; 1 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
-                  	9 -&gt; 7 [label = &quot;field projection backflow&quot;,style = &quot;solid&quot;,color = &quot;blue&quot;];
-                  	9 -&gt; 8 [label = &quot;assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
-                  	9 -&gt; 10 [label = &quot;field assignment backflow&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
-                  	10 -&gt; 0 [label = &quot;field projection backflow&quot;,style = &quot;solid&quot;,color = &quot;blue&quot;];
-                  	10 -&gt; 9 [label = &quot;field assignment&quot;,style = &quot;solid&quot;,color = &quot;black&quot;];
-                  }
-                  )]
-    [9 +1184.991] Branched Output: []
+    [9 +1045.278] JAssignStmt: &lt;io.github.sof3.enclavlow.cases.lfg.ProjectionCase: int a&gt; = $i0
+    [9 +1045.715] lvalueNodesImpl(StaticFieldRef &lt;io.github.sof3.enclavlow.cases.lfg.ProjectionCase: int a&gt;)
   Copy
   Copy
   Node return
-    [9 +1185.947] JReturnVoidStmt: return
+    [9 +1047.180] JReturnVoidStmt: return
     Printing result LFG to dot
-      [9 +1187.189] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ProjectionCase.void.thisToStatic_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ProjectionCase.void.thisToStatic_0.dot
-    [9 +1226.691] Output: []
-    [9 +1226.898] Branched Output: []
+      [9 +1048.975] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ProjectionCase.void.thisToStatic_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ProjectionCase.void.thisToStatic_0.dot
 Contract of UNSPECIFIED void thisToStatic()
-  [9 +1227.024] 
-                digraph DiGraph406226229 {
+  [9 +1095.875] 
+                digraph DiGraph167614601 {
                 	0 [label = &quot;this&quot;,color = &quot;#def717&quot;];
                 	1 [label = &quot;static&quot;,color = &quot;#abac43&quot;];
                 	2 [label = &quot;return&quot;,color = &quot;#19071f&quot;];
@@ -471,7 +273,7 @@ Contract of UNSPECIFIED void thisToStatic()
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="http://www.gradle.org">Gradle 6.3</a> at Dec 29, 2020 3:35:44 PM</p>
+<a href="http://www.gradle.org">Gradle 6.3</a> at Dec 30, 2020 4:13:01 AM</p>
 </div>
 </div>
 </body>
