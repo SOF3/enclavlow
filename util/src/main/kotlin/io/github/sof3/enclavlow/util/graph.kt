@@ -116,7 +116,8 @@ sealed class DiGraph<N : Any, E : Edge<E, N>>(
             "${node.toString().replace("\n", "[LF]")} in " +
             nodes.joinToString(",\n") { "\t" + it.toString().replace("\n", "\\n") })
 
-    fun flowsFrom(src: N): List<N> = flowsFromIndex(indexOf(src)).map { nodes[it] }
+    fun flowsFrom(src: N): List<N> = flowsFromIndices(src).map { nodes[it] }
+    fun flowsFromIndices(src: N): List<Int> = flowsFromIndex(indexOf(src))
     fun flowsFromEdges(src: N): List<Pair<N, E>> {
         val i = indexOf(src)
         return flowsFromIndex(i).map { nodes[it] to edges[i][it]!! }
@@ -125,6 +126,8 @@ sealed class DiGraph<N : Any, E : Edge<E, N>>(
     private fun flowsFromIndex(i: Int) = edges[i].mapIndexed { j, t -> if (t != null) j else null }.filterNotNull()
 
     fun flowsTo(dest: N): List<N> = flowsToIndex(indexOf(dest)).map { nodes[it] }
+    fun flowsTO(dest: N): List<N> = flowsToIndices(dest).map { nodes[it] }
+    fun flowsToIndices(dest: N): List<Int> = flowsFromIndex(indexOf(dest))
     fun flowsToEdges(dest: N): List<Pair<N, E>> {
         val j = indexOf(dest)
         return flowsToIndex(j).map { nodes[it] to edges[it][j]!! }
@@ -216,7 +219,7 @@ class MutableDiGraph<N : Any, E : Edge<E, N>>(
             super.edges = value
         }
 
-    fun <R: Comparable<R>> sortNodes(selector: (N) -> R?) {
+    fun <R : Comparable<R>> sortNodes(selector: (N) -> R?) {
         val indexMap = nodes.sortIndexedBy(selector)
         val newEdges = MutableList(nodes.size) { i ->
             MutableList(nodes.size) { j ->
@@ -233,6 +236,29 @@ class MutableDiGraph<N : Any, E : Edge<E, N>>(
             }
             edges.add(MutableList(nodes.size) { null })
         }
+    }
+
+    fun removeNodes(removeNodes: List<N>) {
+        val removeIndices = removeNodes.map { indexOf(it) }.toSet()
+
+        val indexMap = run {
+            var next = 0
+            List(nodes.size - removeIndices.size) {
+                var ret = next++
+                while (ret in removeIndices) ret = next++
+                ret
+            }
+        }
+
+        val newEdges = MutableList(nodes.size - removeIndices.size) { i ->
+            MutableList(nodes.size - removeIndices.size) { j ->
+                edges[indexMap[i]][indexMap[j]]
+            }
+        }
+        edges = newEdges
+
+        nodes.removeIndices(removeIndices)
+        alwaysAssert(nodes.size == edges.size) { "removeNodes implementation incorrect" }
     }
 
     fun touch(from: N, to: N, config: E.() -> Unit): E? {

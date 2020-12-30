@@ -11,7 +11,7 @@ fun <T : Any> indexedSetOf(vararg values: T): IndexedSet<T> {
 }
 
 class IndexedSet<T : Any> internal constructor(
-    private val values: MutableList<T> = mutableListOf(),
+    private var values: MutableList<T> = mutableListOf(),
     private val index: MutableMap<T, Int> = mutableMapOf(),
 ) : Iterable<T>, Cloneable {
     fun addIfMissing(value: T): Boolean {
@@ -28,6 +28,12 @@ class IndexedSet<T : Any> internal constructor(
             i += 1
         }
         values.addAll(newValues)
+    }
+
+    fun removeIndices(indices: Set<Int>){
+        for(i in indices) index.remove(values[i])
+        values = values.filterIndexed{i, _ -> i !in indices}.toMutableList()
+        for((i, value) in values.withIndex()) index[value] = i
     }
 
     operator fun contains(value: T) = index.containsKey(value)
@@ -55,14 +61,14 @@ class IndexedSet<T : Any> internal constructor(
 
     override fun toString() = "{$values}"
 
-    fun <R: Comparable<R>> sortIndexedBy(selector: (T) -> R?): MutableList<Int> {
+    fun <R : Comparable<R>> sortIndexedBy(selector: (T) -> R?): MutableList<Int> {
         val indexMap = (0 until size).toMutableList()
         indexMap.sortBy { selector(values[it]) }
-        val newList = MutableList(size){values[indexMap[it]]}
-        for(i in 0 until size) {
+        val newList = MutableList(size) { values[indexMap[it]] }
+        for (i in 0 until size) {
             values[i] = newList[i]
         }
-        for((key, value) in index.entries) {
+        for ((key, value) in index.entries) {
             index[key] = indexMap[value]
         }
         return indexMap
@@ -94,4 +100,13 @@ fun <T> randomColor(t: T): String {
     sb.append('#')
     for (i in 0 until 6) sb.append(random.nextInt(16).toString(16))
     return sb.toString()
+}
+
+/**
+ * A wrapper class that delegates equals() and hashCode() behaviour to the original Object implementations
+ */
+class Pointer<T : Any>(var value: T) {
+    override fun equals(other: Any?) = other is Pointer<*> && value === other.value
+
+    override fun hashCode() = System.identityHashCode(value)
 }

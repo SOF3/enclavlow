@@ -3,61 +3,63 @@ package io.github.sof3.enclavlow.example;
 import edu.hku.cs.uranus.IntelSGX;
 import edu.hku.cs.uranus.IntelSGXOcall;
 import io.github.sof3.enclavlow.api.Enclavlow;
-import spark.Spark;
 
-import javax.crypto.Cipher;
-import javax.crypto.CipherInputStream;
-import javax.crypto.spec.SecretKeySpec;
-import java.io.*;
-import java.security.DigestOutputStream;
-import java.security.Key;
-import java.security.MessageDigest;
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
 
 public class Entry {
-    @IntelSGX
-    static byte[] hashFile(File file) {
-        try {
-            return hashFileImpl(file);
-        } catch (Throwable e) {
-            return null;
+    public static void main(String[] args) throws IOException {
+        DatagramSocket sock = new DatagramSocket();
+        sock.bind(new InetSocketAddress("0.0.0.0", 12345));
+
+        while (!sock.isClosed()) {
+            heartbeat(sock);
         }
     }
 
-    static byte[] hashFileImpl(File file) throws Exception {
-        Cipher cipher = Cipher.getInstance("AES/CBC");
-        Key key = new SecretKeySpec(getSecret(), "AES");
-        cipher.init(Cipher.DECRYPT_MODE, key);
-        byte[] contents = readFile(file);
+    static void heartbeat(DatagramSocket sock) throws IOException {
+        DatagramPacket pack = new DatagramPacket(new byte[1500], 1500);
+        sock.receive(pack);
+        byte[] resp = process(pack.getData());
+        pack.setData(resp);
+        sock.send(pack);
+    }
 
-        var cis = new CipherInputStream(new ByteArrayInputStream(contents), cipher);
+    @IntelSGX
+    static byte[] process(byte[] enc) {
+        byte[] secret = getSecret();
+        byte[] dec = new byte[secret.length];
 
-        var baos = new ByteArrayOutputStream();
-        MessageDigest digest = MessageDigest.getInstance("SHA-512");
-        var dos = new DigestOutputStream(baos, digest);
+        long time = time1();
 
-        int read;
-        // for(byte[] buffer = new byte[8192]; (read = cis.read(buffer, 0, 8192)) >= 0; ) {
-        // dos.write(buffer, 0, read);
-        // }
+        for (int i = 0; i < secret.length; i++) {
+            dec[i] = (byte) (enc[i] ^ secret[i] ^ time ^ time2());
+        }
 
-        return baos.toByteArray();
+        int sum = 0;
+        for (byte b : dec) {
+            sum += b;
+        }
+
+        int result = Enclavlow.intSinkMarker(sum % 1000000);
+        byte[] resp = new byte[6];
+        for (int i = 5; i >= 0; i--) {
+            resp[i] = (byte) (result % 10 + (int) '0');
+            result /= 10;
+        }
+        return resp;
     }
 
     @IntelSGXOcall
-    static byte[] readFile(File file) throws IOException {
-        var baos = new ByteArrayOutputStream();
-        try (var fis = new FileInputStream(file)) {
-            fis.transferTo(baos);
-        }
-        return baos.toByteArray();
+    static long time1() {
+        return System.currentTimeMillis() / 60000;
     }
 
-    public static void main(String[] args) {
-        Spark.get("/sha512/:file", (req, res) -> {
-            String file = req.params("file");
-            File path = new File(".", file);
-            return hashFile(path);
-        });
+    @IntelSGXOcall
+    static long time2() {
+        return System.currentTimeMillis() / 60000;
     }
 
     static byte[] getSecret() {

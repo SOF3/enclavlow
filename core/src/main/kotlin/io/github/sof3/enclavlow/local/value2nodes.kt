@@ -98,6 +98,7 @@ private fun rvalueNodesSeq(flow: LocalFlow, value: Value): Sequence<LocalNode> =
                     throw IllegalArgumentException("Unknown method in io.github.sof3.enclavlow.api.Enclavlow called")
                 }
             } else if (value.method.isNative) {
+                // assume all params -> return, no side effects, no exceptions
                 for (arg in value.args) {
                     yieldAll(rvalueNodesSeq(flow, arg))
                 }

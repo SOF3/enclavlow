@@ -25,14 +25,14 @@ import soot.SootMethod
 fun newLocalFlow(paramCount: Int, control: ControlNode, flow: SenFlow): LocalFlow {
     val params = List(paramCount) { ParamLocalNode(it) }
     val graph = makeLocalFlowGraph(params + (control as LocalNode))
-    return LocalFlow(graph, control, mutableMapOf(), mutableListOf(), mutableSetOf(), params, flow)
+    return LocalFlow(graph, control, mutableMapOf(), mutableSetOf(), mutableSetOf(), params, flow)
 }
 
 class LocalFlow(
     val graph: LocalFlowGraph,
     _control: LocalNode,
     var locals: MutableMap<String, LocalVarNode>,
-    var calls: MutableList<FnCall>,
+    var calls: MutableSet<FnCall>,
     var projections: MutableSet<ProjectionNode<*>>,
     var params: List<ParamLocalNode>,
     private val flow: SenFlow,
@@ -213,7 +213,7 @@ data class FnCall(
 
 fun createFnCall(method: SootMethod): FnCall {
     val fnIden = FnIden(method)
-    val fn = fnIden.toString().replace(" ", "\n")
+    val fn = fnIden.toString()
     val params = List(method.parameterCount) { ProxyLocalNode("<$fn>\nparam $it") }
     val thisNode = if (method.isStatic) null else ProxyLocalNode("<$fn>\nthis")
     val returnNode = ProxyLocalNode("<$fn>\nreturn")

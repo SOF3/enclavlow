@@ -156,6 +156,11 @@ class MakeContractContext<T : Any, E : Edge<E, T>>(private val graph: MutableDiG
     }
 
     fun arrayProjection(base: T) = projection(base, "<unknown offset>")
+
+    inline fun <reified T> proxy(methodSignature: String, variant: String): ProxyLocalNode {
+        val fn = "<${T::class.java.name}.$methodSignature>"
+        return ProxyLocalNode("$fn\n$variant")
+    }
 }
 
 enum class CallTags {

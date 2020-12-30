@@ -1,6 +1,5 @@
 package io.github.sof3.enclavlow.tests
 
-import com.google.common.graph.MutableGraph
 import io.github.sof3.enclavlow.contract.Contract
 import io.github.sof3.enclavlow.contract.ContractFlowGraph
 import io.github.sof3.enclavlow.contract.MethodNameType
@@ -33,5 +32,6 @@ private fun <T> runImpl(clazz: Class<T>, method: String, expectedContract: Contr
 
     (expectedContract.graph as MutableDiGraph).sortNodes { it.toString() }
     (actual.graph as MutableDiGraph).sortNodes { it.toString() }
-    assertEquals(expectedContract, actual, "Method $method has unexpected contract")
+    assertEquals(expectedContract.graph, actual.graph, "Method $method has unexpected contract")
+    assertEquals(expectedContract.callTags, actual.callTags, "Method $method has unexpected contract")
 }

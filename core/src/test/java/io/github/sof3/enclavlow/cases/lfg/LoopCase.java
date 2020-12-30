@@ -1,5 +1,8 @@
 package io.github.sof3.enclavlow.cases.lfg;
 
+import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
+
 @SuppressWarnings("unused")
 public class LoopCase {
     public static int loopInc(int i) {
@@ -18,4 +21,11 @@ public class LoopCase {
         return a;
     }
 
+    public static int whileCall(BooleanSupplier supplier) {
+        int i = 0;
+        while(supplier.getAsBoolean()){
+            i++;
+        }
+        return i;
+    }
 }

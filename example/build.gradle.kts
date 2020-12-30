@@ -17,5 +17,4 @@ plugins {
 
 dependencies {
     implementation("io.github.sof3.enclavlow", "api", "1.0-SNAPSHOT")
-    implementation("com.sparkjava", "spark-kotlin", "1.0.0-alpha")
 }

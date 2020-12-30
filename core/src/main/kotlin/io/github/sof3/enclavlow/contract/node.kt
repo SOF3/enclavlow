@@ -91,7 +91,7 @@ object ExplicitSinkLocalNode : ContractNode() {
         get() = "<sink>"
 }
 
-class ProxyLocalNode(override val name: String) : ContractNode()
+data class ProxyLocalNode(override val name: String) : ContractNode()
 
 /**
  * A private node only considered within method local analysis
@@ -111,7 +111,7 @@ interface ControlNode
  * Flows to ControlFlow indicates the current control flow contains data
  */
 class LocalControlNode : LocalOnlyNode(), ControlNode {
-    private val id = count.getAndAdd(1)
+    internal val id = count.getAndAdd(1)
 
     override fun toString(): String {
         return "control$id"

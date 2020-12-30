@@ -48,6 +48,8 @@ class SenFlow(
     val outputContract: Contract<MutableContractFlowGraph> = makeContract(callTags, paramCount)
     private var dotWrites: Int = 0
 
+    private val controlMap = mutableMapOf<Pair<Int, Int>, LocalControlNode>()
+
     override fun newInitialFlow() = newLocalFlow(paramCount, LocalControlNode(), this)
     override fun merge(in1: LocalFlow, in2: LocalFlow, out: LocalFlow) = block("Merge") {
         in1.graph.merge(in2.graph) { a, b ->
@@ -68,7 +70,7 @@ class SenFlow(
             putAll(in1.locals)
             putAll(in2.locals)
         }
-        out.calls = mutableListOf<FnCall>().apply {
+        out.calls = mutableSetOf<FnCall>().apply {
             addAll(in1.calls)
             addAll(in2.calls)
         }
@@ -155,12 +157,15 @@ class SenFlow(
                 }
                 alwaysAssert(cond !is InvokeExpr) { "if/switch on InvokeExpr condition" }
                 val nodes = rvalueNodes(input, cond)
-                for (flow in listOf(fallOutList, branchOutList).flatten()) {
+                for ((flowCount, flow) in listOf(fallOutList.mapIndexed { i, flow -> -1 - i to flow }, branchOutList.mapIndexed { i, flow -> i to flow }).flatten()) {
                     input copyTo flow
+                    flow.control = controlMap.getOrPut(System.identityHashCode(stmt) to flowCount) { LocalControlNode() }
+                    flow.graph.addNodeIfMissing(flow.control)
                     for (node in nodes) {
                         flow.graph.touch(node, flow.control) { causes += LocalFlowCause.BRANCH }
                     }
                 }
+                System.nanoTime();
             }
             is NopStmt, is BreakpointStmt, is MonitorStmt -> {
                 // nothing to do
@@ -180,8 +185,40 @@ class SenFlow(
             }
             else -> throw UnsupportedOperationException("Unsupported statement ${stmt.javaClass} $stmt")
         }
-        printDebug { "Output: $fallOutList" }
-        printDebug { "Branched Output: $branchOutList" }
+        // printDebug { "Output: $fallOutList" }
+        // printDebug { "Branched Output: $branchOutList" }
+
+        for (flow in listOf(fallOutList, branchOutList).flatten()) {
+            flow.control = contractFlow(flow.graph, flow.control as LocalControlNode)
+        }
+    }
+
+    private fun contractFlow(graph: LocalFlowGraph, control: LocalControlNode) : LocalControlNode{
+        val controls = graph.nodes.filterIsInstance<LocalControlNode>().toMutableSet()
+        val numControls = controls.size
+        val equivClasses = mutableMapOf<Pair<Set<Int>, Set<Int>>, MutableSet<LocalControlNode>>()
+        while (controls.isNotEmpty()) {
+            val node = controls.iterator().next()
+            controls.remove(node)
+            val key = graph.flowsFromIndices(node).toSet() to graph.flowsToIndices(node).toSet()
+            val nodes = equivClasses.getOrPut(key) { mutableSetOf() }
+            nodes.add(node)
+        }
+        if (equivClasses.size == numControls) return control
+
+        val removals = mutableListOf<LocalControlNode>()
+        var ret: LocalControlNode? = null;
+        for (equivClass in equivClasses.values) {
+            val keep = equivClass.minByOrNull { it.id }!!
+            for (node in equivClass) {
+                if (node != keep) {
+                    removals.add(node)
+                }
+                if(node == control) ret = keep;
+            }
+        }
+        graph.removeNodes(removals)
+        return ret!!
     }
 
     private fun ancestorPostprocessCommon(flow: LocalFlow) {
