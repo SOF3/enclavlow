@@ -2,6 +2,7 @@ package io.github.sof3.enclavlow.util
 
 var IS_DEBUG = false
 var ENCLAVLOW_DEBUG_LOGGER: (String) -> Unit = { println(it) }
+var ENCLAVLOW_WARN_LOGGER: (String) -> Unit = { println("[WARN] $it") }
 
 object DebugOutput {
     val EPOCH = System.nanoTime()
@@ -25,8 +26,6 @@ object DebugOutput {
 
     inline fun put(message: () -> String) = synchronized(this) {
         if (!IS_DEBUG) return
-
-        if (counter > 10000) throw Error("Too many debug messages; possible infinite loop?")
 
         val time = "[${Thread.currentThread().id} %+.3f] ".format((System.nanoTime() - EPOCH) / 1e6f)
         for ((i, line) in message().split("\n").withIndex()) {

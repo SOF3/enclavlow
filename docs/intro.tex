@@ -1,5 +1,4 @@
 \section{Introduction}\label{sec:introduction}
-
 \subsection{Background}\label{subsec:background}
 With the rise of third-party public cloud services
 such as \ac{AWS}~\cite{aws} and Microsoft Azure~\cite{azure},
@@ -13,41 +12,47 @@ are processed in secure \q{enclaves},
 protected at hardware level to prevent access
 from other hardware or software layers.
 
-One significant application of \ac{TEE} is in big data processing,
-where confidential user data are processed,
+One significant application of \ac{TEE} is the big data industry,
+in which confidential user data are processed on cloud servers,
 and protection from cloud providers may be necessary
 for compliance with privacy regulations such as GDPR~\cite{gdpr}.
-However, a significant subset of such applications are written
+However, a significant amount of big data libraries and frameworks are written
 using languages that use \ac{JVM} as the runtime,
 such as Hadoop~\cite{apachehadoop} and Spark~\cite{apachespark}.
-Recently, Uranus, a system for
-writing \ac{SGX} applications in Java languages, was released~\cite{uranus}.
-It provides simple interface for \ac{SGX},
+Recently, Uranus~\cite{uranus}, a system for
+writing \ac{SGX} applications in Java languages, was released.
+It provides a simple interface for interacting with \ac{SGX} in Java,
 where users annotate methods with \code{@JECall} and \code{@JOCall}
 to move control flow into or out of enclaves.
 It is the responsibility of the user to determine the correct positions
 for the \code{@JECall} and \code{@JOCall} annotations,
 namely the enclave boundary partitioning.
-Since \ac{JVM} involves a different approach compared to native applications
-with software development and distribution,
-the tools applicable for native applications are mostly incompatible with \ac{JVM}.
+Since \ac{JVM} involves a very different approach compared to native applications
+in terms of software development, distribution and execution,
+tools designed for native applications are mostly incompatible in \ac{JVM}.
 
-This project focuses on the dilemma of enclave boundary selection:
-running the whole application within an \ac{SGX} enclave is undesirable for two reasons.
+One important question in enclave programming is the choice of an appropriate enclave boundary.
+Running the whole application within an \ac{SGX} enclave is undesirable for two reasons.
 First, this violates the Principle of Least Privilege,
 where the whole application becomes possible attack surface
 for adversaries to compromise protected data~\cite{glamdring}.
 Second, this implies all memory used by the application
 is placed in the enclave memory (the \ac{EPC}),
-which is restricted to 100 MB before significant performance degrading
-(\q{1,000X slowdown compared to regular OS paging})~\cite{uranus}.
+which is restricted to 100 MB,
+the overflow of which results in swap memory mechanism,
+leading to significant performance degrade
+(\q{1,000X slowdown compared to regular OS paging}~\cite{uranus}).
 On the other hand, if the enclave is smaller than necessary,
 adversaries can either obtain sensitive data directly or
 infer sensitive characteristics of them indirectly.
-An enclave boundary is to be selected with high precision to avoid either downside.
+An enclave boundary is to be selected with high precision to avoid impacts from either side.
+Ideally, the enclave boundary shall cover the minimum subset of code
+in which sensitive data are processed
+such that use of \ac{EPC} is minimized
+without resulting in any sensitive data leak.
 
 This project presents \pname{}
-\footnote{\q{enclavlow} is a new term coined from the words \q{enclave} and \q{flow}.},
+\footnote{\q{enclavlow} is a term coined from the words \q{enclave} and \q{flow}.},
 an information flow analysis tool
 for identifying data leak from enclaves.
 The user first wraps sensitive data sources in \code{sourceMarker} and sinks in \code{sinkMarker}.
@@ -55,16 +60,9 @@ The tool performs information flow analysis from \code{sourceMarker} variables,
 identifying the ways that data from such variables are leaked
 to the system outside the executing enclave
 without first passing through a \code{sinkMarker} variable.
-The tool compiles a report in HTML format that summarizes the following:
-\begin{itemize}
-	\item \textbf{Data leak}:
-		The report displays the lines of code on which sensitive data are moved
-		into areas accessible by privileged adversaries.
-		It demonstrates the path from the \code{sourceMarker} expression to the point of leak.
-	\item \textbf{Redundant protection}:
-		The report lists the functions that could not hold any sensitive data in its local variables,
-		hence should be moved out of the enclave partition.
-\end{itemize}
+The tool compiles a report in HTML format
+that lists the flow of sensitive data leak
+from the source marker to areas accessible by privileged adversaries.
 
 \pname{} is shipped as a Gradle plugin,
 providing a Gradle task that
@@ -102,3 +100,4 @@ Challenges found in this project, such as polymorphism complexity, were also obs
 
 This report will focus on the algorithm used to detect data leaks,
 as well as performance concerns and limitations from the \ac{JVM} design.
+An example application is evaluated to demonstrate the functionality of \pname{}.

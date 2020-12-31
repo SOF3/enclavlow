@@ -1,5 +1,5 @@
 class KnownFalsePositives {
-	int foo(int x) {
+	static int foo(int x) {
 		boolean secret = sourceMarker(1);
 		if (secret) {
 			return x;

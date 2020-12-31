@@ -18,13 +18,12 @@ import io.github.sof3.enclavlow.contract.ThisLocalNode
 import io.github.sof3.enclavlow.contract.ThrowLocalNode
 import io.github.sof3.enclavlow.contract.analyzeMethod
 import io.github.sof3.enclavlow.local.FnIden
-import io.github.sof3.enclavlow.util.MutableDiGraph
+import io.github.sof3.enclavlow.util.SparseGraph
 import io.github.sof3.enclavlow.util.block
-import io.github.sof3.enclavlow.util.newDiGraph
 
-typealias AggGraph = MutableDiGraph<AggNode, AggEdge>
+typealias AggGraph = SparseGraph<AggNode, AggEdge>
 
-fun computeAggregate(classpath: List<String>, entryClasses: List<String>): Pair<AggGraph, Set<Pair<AggNode, AggNode>>> {
+fun computeAggregate(classpath: List<String>, entryClasses: List<String>): AggResult {
     soot.G.reset()
 
     val optionsConfig: soot.options.Options.() -> Unit = {
@@ -54,23 +53,33 @@ fun computeAggregate(classpath: List<String>, entryClasses: List<String>): Pair<
             val swap = mutableSetOf<FnIden>()
             for (request in requestsCopy) {
                 val contract = analyzeMethod(request.clazz, request.method, MethodNameType.SUB_SIGNATURE, optionsConfig)
-                contracts[request] = contract
-                for (call in contract.calls) {
-                    val fn = FnIden(call.fn.clazz, call.fn.method)
-                    if (fn !in contracts && fn !in requestsCopy) {
-                        swap.add(fn)
+                synchronized(contracts) {
+                    contracts[request] = contract
+                    for (call in contract.calls) {
+                        val fn = FnIden(call.fn.clazz, call.fn.method)
+                        if (fn !in contracts && fn !in requestsCopy) {
+                            swap.add(fn)
+                        }
                     }
                 }
             }
+
             requests = swap.takeIf { it.isNotEmpty() }
         }
     }
 
-    val aggregate = newDiGraph<AggNode, AggEdge> { AggEdge() }
+    val aggregate = SparseGraph { AggEdge() }
     val crossEdges = mutableSetOf<Pair<AggNode, AggNode>>()
+
+    System.gc() // we can throw away all local stuff
 
     block("Merging AFG") {
         for ((fn, contract) in contracts) {
+            var edgeCount = 0
+            contract.graph.forEachEdge { _, _, _ ->
+                edgeCount++
+            }
+
             val proxyMap = mutableMapOf<ProxyLocalNode, FnAggNode>()
             for (call in contract.calls) {
                 // just construct a new object; FnAggNode will delegate equality and hashCode
@@ -114,14 +123,20 @@ fun computeAggregate(classpath: List<String>, entryClasses: List<String>): Pair<
         }
     }
 
-    return Pair(aggregate, crossEdges)
+    return AggResult(aggregate, crossEdges, contracts)
 }
+
+data class AggResult(
+    val graph: AggGraph,
+    val crossEdges: Set<Pair<AggNode, AggNode>>,
+    val contracts: MutableMap<FnIden, Contract<out ContractFlowGraph>>,
+)
 
 private fun contractNodeToAgg(fn: FnIden, node: ContractNode, proxyMap: Map<ProxyLocalNode, FnAggNode>): AggNode = when (node) {
     is ScopedContractNode -> FnAggNode(fn, node)
     is ExplicitSourceLocalNode -> ExplicitSourceAggNode
     is ExplicitSinkLocalNode -> ExplicitSinkAggNode
     is StaticLocalNode -> StaticAggNode
-    is ContractProjectionNode -> TODO()
+    is ContractProjectionNode -> ProjectionAggNode(contractNodeToAgg(fn, node.base, proxyMap), node.name)
     is ProxyLocalNode -> proxyMap[node] ?: throw IllegalArgumentException("Unknown ProxyLocalNode $node")
 }

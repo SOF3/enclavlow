@@ -6,7 +6,6 @@ import io.github.sof3.enclavlow.contract.LocalNode
 import io.github.sof3.enclavlow.contract.StaticLocalNode
 import io.github.sof3.enclavlow.contract.ThisLocalNode
 import io.github.sof3.enclavlow.util.onlyItem
-import io.github.sof3.enclavlow.util.printDebug
 import soot.Local
 import soot.Value
 import soot.jimple.AnyNewExpr
@@ -156,7 +155,6 @@ internal fun lvalueNodes(flow: LocalFlow, value: Value, usage: LvalueUsage): Lva
 }
 
 private fun lvalueNodesSeq(flow: LocalFlow, value: Value, usage: LvalueUsage, rvalues: MutableSet<LocalNode>): Sequence<LocalNode> = sequence {
-    printDebug { "lvalueNodesImpl(${value.javaClass.simpleName} $value)" }
     when (value) {
         is Constant, is InstanceOfExpr, is UnopExpr, is BinopExpr, is AnyNewExpr, is InvokeExpr -> {
             // these expressions create new/constant values and can never be mutated in another expression
@@ -199,7 +197,7 @@ private fun lvalueNodesSeq(flow: LocalFlow, value: Value, usage: LvalueUsage, rv
             when (usage) {
                 LvalueUsage.ASSIGN -> {
                     val base = onlyItem(rvalueNodesSeq(flow, value.base).toList()) { "ArrayRef base has complex nodes" }
-                    yield(flow.getProjection(base, "<unknown offset>") as LocalNode)
+                    yield(flow.getUnknownOffsetProjectionAsNode(base))
                     // yieldAll(lvalueNodesSeq(flow, value.base, usage, rvalues))
                 }
                 LvalueUsage.DELETION -> {

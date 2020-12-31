@@ -17,57 +17,60 @@ where each node represents an element that may be leaked.
 	even if all other nodes are removed.
 
 	If the \q{even if} condition is removed, this is a transitive relation.
+  The edges $\left\{(x, y), (x, z)\right\} \subset E$ imply that
+  leaking \emph{either} $y$ \emph{or} $z$ already allows the adversary to distinguish $x$.
+  However, there is no way to represent that $x$ is distinguishable if
+  \emph{both} $y$ \emph{and} $z$ are distinguished.
+  This limitation is resolved by creating additional nodes that delegate $x$.
 \end{defin}
 
 Note that this definition (\q{our definition}) differs slightly from
 the usual definition of flow graphs (especially in \ac{DTA}),
 where an edge $(x, y)$ represents the flow of information from $x$ to $y$~\cite{YinHeng2007Pcsi}.
-In the usual definition, only adversary read access to $y$ is concerned,
+In the usual definition, only read access for the adversary to $y$ is concerned,
 while in our definition, the adversary possesses write access to $x$.
+
 \pname{} constructs flow graphs in three stages
 to reduce local opcodes to a cross-method flow graph.
+Each method is first analyzed independently into a \ac{LFG}.
+The \ac{LFG} is then contracted into a subgraph of only non-local nodes,
+namely the \ac{CFG}.
+The \ac{CFG} of each method is merged together to form the \ac{AFG},
+on which enclave boundary intersections are identified to be leaks.
 
-\subsubsection{\acf{CFG}}
+\subsubsection{\acf{CFG}}\label{subsubsec:cfg}
+\pname{} constructs a \ac{CFG} for each method analyzed.
+The \ac{CFG} contains the nodes listed in Table \ref{tab:cfg-nodes}.
+In this article, the names for flow graph nodes are \fnname{underlined}.
+
 \begin{table}
 	\caption{Nodes in \ac{CFG}}
 	\centering
-	\begin{tabular}{|c|c|}
+	\begin{tabular}{|c|l|}
 		\hline
-		\underline{Static} & Represents data located in static class fields \\ \hline
-		\underline{This} & Represents the object on which a method was invoked \\ \hline
-		\underline{Param} $x$ & Each parameter is represented by a node \\ \hline
-		\underline{Return} & Represents data flow through the return path \\ \hline
-		\underline{Throw} & Represents data flow through the return path \\ \hline
-		\underline{Source} & Represents variables in the method explicitly wrapped in \code{sourceMarker} \\ \hline
-		\underline{Sink} & Represents locals in the method explicitly declared as \code{sinkMarker} \\ \hline
-		\underline{Control} & This is a special node representing how many times the function is called. \\ \hline
-		\underline{This} & \underline{Param $y$}, \underline{Return}, \underline{Throw} and \underline{Control}
-		from each function called from the current node \\ \hline
+		\fnname{Static} & Data located in static class fields \\ \hline
+    \fnname{Param $x$} & Each parameter corresponds to a \fnname{Param} node \\ \hline
+		\fnname{This} & The object on which a method was invoked \\ \hline
+		\fnname{Return} & Information flow through the throw path \\ \hline
+		\fnname{Throw} & Information flow through the return path \\ \hline
+    \fnname{Source} & \code{sourceMarker} values \\ \hline
+    \fnname{Sink} & \code{sinkMarker} values \\ \hline
+    \fnname{Control} & See section \ref{subsubsec:control} \\ \hline
+    Proxy nodes & \fnname{Param $y$}, \fnname{Return}, \fnname{Throw}
+    and \fnname{Control} for each function call \\ \hline
 	\end{tabular}
 	\label{tab:cfg-nodes}
 \end{table}
 
-\pname{} constructs a \ac{CFG} for each method analyzed.
-The \ac{CFG} contains the nodes listed in Table \ref{tab:cfg-nodes}.
-In this article, all flow graph nodes are \underline{underlined}.
-
-The CFG is computed by contracting the \ac{LFG},
-as described in the next subsection.
+The \ac{CFG} is computed by contracting the \ac{LFG},
+as described in the section \ref{subsubsec:lfg}.
 After all methods in a class are evaluated,
-the CFGs of child methods called from the analyzed methods
+the \ac{CFG}s of child methods called from the analyzed methods
 are lazily evaluated as well.
-All CFGs are merged into an \ac{AFG},
+All \ac{CFG}s are merged into an \ac{AFG},
 joined using the function call nodes.
 
-For the case of polymorphism in \ac{OOP},
-the CFGs of all overrides in scope are merged by taking the union of all flow edges.
-While it is possible to improve precision by performing call graph analysis
-to identify the exact subclasses passed to the method,
-it is not implemented in this project due to time constraints.
-
-\begin{wrapfigure}{r}{0.45\textwidth}
-	% \vspace{-2em}
-	\begin{minipage}{0.45\textwidth}
+\begin{figure}
 		\caption{Example \ac{CFG} for Listing~\ref{lst:SourceSinkExample}}
 		\begin{center}
 			\digraph[scale=0.5]{contract}{
@@ -91,151 +94,143 @@ it is not implemented in this project due to time constraints.
 				getSumControl -> computeSumControl;
 			}
 		\end{center}
-		\label{fig:SourceSinkContract}
-	\end{minipage}
-\end{wrapfigure}
+    \label{fig:source-sink-contract}
+\end{figure}
 
-Figure~\ref{fig:SourceSinkContract} shows an example of \ac{AFG}.
+Figure~\ref{fig:source-sink-contract} shows an example of \ac{AFG}.
 Unconnected nodes are omitted for brevity.
 
-\subsubsection{\acf{LFG}}
+\subsubsection{\acf{LFG}\label{subsubsec:lfg}}
 To construct the \ac{CFG}, a local flow graph is constructed
 to identify the information flow between temporary variables.
-The analysis follows along the control flow of the program,
-performing the \emph{consume}, \emph{branch} and \emph{merge} operations.
+Using \code{ForwardBranchedFlowAnalysis} from the Soot \cite{sootsurvivor} framework,
+the analysis follows along the control flow of the program.
+Java bytecode of the program to analyze is converted into Jimple code,
+a \acf{3AC} language.
+Each \ac{3AC} statement maps a \ac{LFG} to another \ac{LFG},
+with the exception of \textit{branch} operations (\code{if}/\code{switch})
+that map one flow graph to multiple branches
+and \textit{merge} operations that map multiple branches to one.
+For the case of loops,
+the analysis repeats until the \ac{LFG} converges.
 
 The \ac{LFG} extends the \ac{CFG} with the following additions:
 \begin{itemize}
 	\item Each local variable (some may only exist as intermediate values in source code)
 		is allocated a node.
-	\item Each branch has its own \underline{Control} node.
+	\item Each branch has its own \fnname{Control} node.
 \end{itemize}
 
-The \emph{consume} operation consumes statements in form of \acf{3AC}~\cite{sootsurvivor}.
-Every step adds or removes some flow edges,
-as described exhaustively in Table~\ref{tab:tac}.
-The relationship between the graph and the \q{lvalue}s and \q{rvalue}s
-mentioned in Table~\ref{tab:tac} are explained in Table~\ref{tab:lrvalue}.
+For assignment statements,
+rvalue nodes for the source, side effect nodes from the destination
+and the current control flow contribute edges towards the lvalue nodes for the destination.
+The rvalue and lvalue nodes depend on the expression type:
 
-\begin{table}
-	\caption{\ac{3AC} instructions affecting \ac{LFG}}
-	\centering
-	\begin{tabular}{|c|l|}
-		\hline
-		\textbf{Instruction type} & \textbf{Effects on \ac{LFG}}
-		\\ \hline
-		\multirow4*{Assignment} & \underline{Control} flows to lvalue nodes of destination. \\
-		& Erases current connections to lvalue nodes of destination. \\
-		& rvalue nodes of source flow to lvalue nodes of destination. \\
-		& lvalue nodes of source flow to rvalue nodes of destination.
-		\\ \hline
-		\multirow2*{Return} & \underline{Control} flows to \underline{Return} node. \\
-		& rvalue nodes of returned value flow to \underline{Return} node.
-		\\ \hline
-		\multirow2*{Throw} & \underline{Control} flows to \underline{Throw} node. \\
-		& rvalue nodes of thrown value leaks to \underline{Throw} node.
-		\\ \hline
-		\multirow3*{Conditional (If/Switch)}
-		& A new \underline{Control} node is pushed to the control stack. \\
-		& Previous \underline{Control} flows to the new \underline{Control}. \\
-		& rvalue nodes of predicate leaks to the new \underline{Control}.
-		\\ \hline
-		Method call & Same effect as assigning call result to a sink variable.
-		\\ \hline
-	\end{tabular}
-	\label{tab:tac}
-\end{table}
+\paragraph{Literals}
+As rvalues, these values do not leak any information.
+They cannot appear as lvalues.
 
-\begin{table}
-	\caption{lvalue and rvalue nodes for expressions}
-	\centering
-	\begin{tabular}{|c|c|c|}
-		\hline
-		\textbf{Expression type} & \textbf{lvalue nodes} & \textbf{rvalue nodes}
-		\\ \hline
-		Binary operations & unreachable & union of rvalues from operands
-		\\ \hline
-		Array literal \code{new int[a]} & unreachable & union of rvalues from count
-		\\ \hline
-		Array access \code{a[b]} & lvalues of \code a & rvalues of \code a and \code b
-		\\ \hline
-		Instance field access \code{a.b} & lvalues of \code a & rvalues of \code a
-		\\ \hline
-		Static field access \code{Class.field} & \underline{Static} & none
-		\\ \hline
-		Parameter & the parameter node \footnotemark{} & the parameter node
-		\\ \hline
-		Local variable & its own dedicated node & its own dedicated node
-		\\ \hline
-		\code{this} & \underline{This} & \underline{This}
-		\\ \hline
-		Class cast and instanceof & lvalues of the underlying value & rvalues of the underlying value
-		\\ \hline
-		Method/constructor call & \underline{Return} of the called method & \underline{Return} of the called method
-		\\ \hline
-	\end{tabular}
-	\label{tab:lrvalue}
-\end{table}
+\paragraph{Local variables}
+Local variables may be declared or temporary expressions.
+As mentioned above, each local variable has its own node.
 
-\footnotetext{Jimple always first assigns parameters to a local variable,
-so direct assignments to the parameter variable will not overwrite it.}
+\paragraph{Parameters and \text{this}}
+Jimple always assigns parameters to a local variable first,
+so they can only appear as rvalues.
+The only usage for parameters and \text{this} in Jimple code
+is some statement like \code{r0 := @this: IagoAttack;},
 
-The \emph{branch} operation performs a deep clone of the \ac{LFG}
-and continues following each branch with its clone.
+\paragraph{Object field references}
+A new \emph{projection} node is created for the field if it does not already exist.
+An edge from the field to the object (\code{FIELD\_PROJECTION\_BACK\_FLOW}) is added.
+For each assignment with the object value,
+assignment edges are created from the equivalent fields to the new field.
 
-The \emph{merge} operation pops the uppermost control flow node from the graph,
-and takes the union of all flows from each branched graph.
+For the case of static fields,
+reads are always considered to have no leaks,
+while writes are always considered to be leaks
+as mentioned in the threat model section above.
 
-\IncludeCode{lst:iago-attack}{./IagoAttack.java}
-{Iago attack}{.3}{3}
+\paragraph{Array references}
+\code{a[b]} is treated as a special field of \code{a}.
+If used as an lvalue or an rvalue, \code{b} also contributes as rvalue.
 
-The control flow stack is always pushed from a conditional instruction
-before splitting into branches,
-which is the source of information leak for attacks
-that count the number of times a method was called.
+\paragraph{Array literal}
+The array size contributes as an rvalue as it can be directly recovered from the array.
+Since mutations have no effect on the size value provided in the array literal,
+this is effectively the same as \code{array.size = inputSize;}.
 
-Each node representing an object may contain subnodes that represent its fields. 
-Edges to field nodes do not directly affect the parent object
-despite the intuitive belief that \code{a.b = c;} leaks \code c to \code a.
+\paragraph{Type casts, instanceof expressions and other operators}
+As this only affects at the type level,
+type casts and instanceof have the same semantics as their value operands.
+Unary and binary operations have the same behaviour as
+the union of rvalue nodes from their operands.
 
-In traditional information flow analysis,
-this naive approach described in the table appears to result in high false positive rate
-as it does not separate the internal structure used by instance fields and arrays.
-For example, consider Listing~\ref{lst:iago-attack}
-(Jimple code in Listing~\ref{lst:iago-attack-jimple}).
-At return point, the \ac{LFG} becomes as shown in Figure~\ref{fig:tfp-graph}.
-Intuitively, this appears incorrect;
-param \#0 does not flow to \code{return}
-since it is just used for \code{this.bar} but not \code{this.qux}.
-Nevertheless, in the threat model where
-the adversary has access to modify any memory allocated outside the enclave,
-such a program is vulnerable to Iago attacks~\cite{iago},
-where assignment to object fields may not always work as intended;
-if the \code{IagoAttack} context was allocated outside the enclave,
-\code{this.bar} might be modified by the adversary to \code{this.qux}
-(even if they belong to different classes),
-hence leaking into the return value.
-Recall the definition of an edge in the \ac{LFG} used in this project,
-where $(a, b) \in E$ implies $b$ must to be protected if $a$ is protected.
+\paragraph{Method calls}
+Calling methods creates blackbox proxy nodes to the nodes in their \ac{CFG},
+with the exception of \code{sourceMarker} and \code{sinkMarker},
+which are resolved as \fnname{Source} and \fnname{Sink} directly.
+The \fnname{Sink} node is actually not necessary for analysis,
+but is cosmetically helpful for interpreting sensitive data flow in the output.
 
-\begin{wrapfigure}{r}{.6\textwidth}
-	\vspace{-2em}
-	\caption{\ac{LFG} of \code{IagoAttack.foo(int)} in Listing~\ref{lst:iago-attack}}
-	\begin{center}
-		\digraph[scale=0.5]{local}{
-			rankdir = "LR";
-			param0 [label = "Param \#0"];
-			This -> r0 [dir = "both"];
-			param0 -> i0;
-			r0 -> r1 [dir = "both"];
-			i0 -> r1;
-			r0 -> r2 [dir = "both"];
-			r2 -> Return;
-		}
-	\end{center}
-	\vspace{-2em}
-	\label{fig:tfp-graph}
-\end{wrapfigure}
+For most expression types above, corresponding test cases can be found on the
+GitHub repository under the directory \code{core/src/test}.
 
-\IncludeCode{lst:iago-attack-jimple}{./sootOutput/IagoAttack.jimple}
-{Iago attack (Jimple output)}{.5}{2}
+Since the mapping of flow graphs is deterministic,
+overwriting a variable does not remove its body.
+
+At exit points, the \ac{CFG} is constructed by considering the contract nodes
+that flow into \fnname{This}, \fnname{Static}, \fnname{Sink},
+all \fnname{Param}s and all blackbox proxy nodes.
+For return and throw statements,
+the flow into the returned/thrown value is also considered.
+
+\subsubsection{Handling control flow}\label{subsubsec:control}
+Sensitive data can be leaked through control flow,
+such as in Listing \ref{lst:control-flow-leak}.
+The code effectively copies the value of \code{secret} to \code{result}.
+To handle this case,
+a special node called \fnname{Control} is introduced
+to denote the information that can be revealed through the control flow.
+
+\IncludeCode{lst:control-flow-leak}{./ControlFlowLeak.java}
+{Leak by control flow}{.3}3
+
+The control node $\mathrm{CTRL}$ is defined with these semantics:
+
+\begin{defin}
+  For a local flow graph $(V, E)$, \begin{itemize}
+    \item $(x, \mathrm{CTRL}) \in E$ implies that
+      there exists a deterministic predicate $p$
+      such that some code represented by $\mathrm{CTRL}$
+      is executed if $p(x)$ is true.
+    \item $(\mathrm{CTRL}_1, \mathrm{CTRL}_2) \in E$ implies that
+      $\mathrm{CTRL}_2$ is a branch that executes only if $\mathrm{CTRL}_1$.
+    \item $(\mathrm{CTRL}, y) \in E$ implies that
+      leaking $y$ allows the adversary to distinguish whether $\mathrm{CTRL}$ was executed.
+  \end{itemize}
+\end{defin}
+
+When branch statements are encountered,
+a new \fnname{Control} node is created for each branch,
+with an edge from the old node.
+When the control flow converges,
+the \ac{LCA} of the \fnname{Control} of each input \ac{LFG}
+is selected as the new \fnname{Control}.
+
+Each method call also involves its base control node;
+for example, a \code{@JOCall} method always leaks everything including its control flow.
+An empty \code{@JOCall} method leaks exactly just its own control,
+so it is necessary to expose method control nodes as part of the contract graph.
+
+\subsubsection{Aggregation}
+The \ac{AFG} simply merges all \ac{CFG}s by linking proxy nodes together.
+The presence of sensitive information leak is detected
+by searching one of the following types of edges
+in a \ac{DFS} from \fnname{Source}:
+\begin{itemize}
+  \item Return/throw paths of \code{@JECall}s
+  \item Parameters/call context of \code{@JOCall}s
+  \item Control flow of \code{@JOCall}s
+  \item Assignment to \fnname{Static}
+\end{itemize}

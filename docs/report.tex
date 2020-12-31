@@ -1,5 +1,5 @@
 \documentclass[a4paper, 12pt]{article}
-\usepackage[top=1.0in, bottom=1.0in, left=0.6in, right=0.6in]{geometry}
+\usepackage[top=1.2in, bottom=1.2in, left=1.0in, right=1.0in]{geometry}
 \usepackage[utf8]{inputenc}
 \usepackage[english]{babel}
 \usepackage[document]{ragged2e}
@@ -38,8 +38,6 @@
 \usepackage{xcolor}
 \usepackage{soul}
 
-\usepackage{fontspec}
-\setmainfont{TeX Gyre Termes}
 \usepackage{sourcecodepro}
 
 \usepackage{csquotes}
@@ -48,24 +46,39 @@
 
 \title{Data flow analysis for Uranus applications}
 \author{Chan Kwan Yin (3035466978)}
-\date{28 October 2020}
+\date{\today}
 
 
 \newcommand{\IncludeCode}[5]{
-	\begin{wrapfigure}{r}{#4\textwidth}
-		\begin{minipage}{#4\textwidth}
-			\vspace{-#5 em}
-			\begin{center}
-				\lstinputlisting[style=j, language=java, label={#1}, caption={#3}]{#2}
-			\end{center}
-			\vspace{-#5 em}
-		\end{minipage}
-	\end{wrapfigure}
+  % \begin{wrapfigure}{r}{#4\textwidth}
+  % \begin{minipage}{#4\textwidth}
+  % \vspace{-#5 em}
+  \begin{center}
+    \lstinputlisting[style=j, language=java, label={#1}, caption={#3}]{#2}
+  \end{center}
+  % \vspace{-#5 em}
+  % \end{minipage}
+  % \end{wrapfigure}
+}
+
+\newcommand{\IncludeCodePart}[5]{
+  \begin{center}
+    \lstinputlisting[
+    style=j,
+    language=java,
+    label={#1},
+    caption={#3},
+    firstline={#4},
+    lastline={#5},
+    ]{#2}
+  \end{center}
 }
 
 \newcommand{\q}[1]{\enquote{#1}}
 
-\newcommand{\pname}{\emph{enclavlow}}
+\newcommand{\pname}{\textit{enclavlow}}
+
+\newcommand{\fnname}[1]{\underline{#1}}
 
 \definecolor{code}{rgb}{0.95, 0.95, 0.95}
 \sethlcolor{code}
@@ -73,17 +86,19 @@
 
 \begin{document}
 % title page
-\include{title}
+\input{title}
 
 % abstract page
 \thispagestyle{empty}
-\include{abstract}
+\input{abstract}
 \newpage
 
 % table of contents
 \thispagestyle{empty}
 \setlength\columnsep{3em}
 \begin{multicols}2
+  \footnotesize
+
 	\tableofcontents
 	\listoffigures
 	\listoftables
@@ -105,6 +120,8 @@
 
 \input{methodology}
 
+\input{evaluation}
+
 \input{discussion}
 
 \input{conclusion}
@@ -112,7 +129,8 @@
 \newpage
 \addcontentsline{toc}{section}{References}
 \begin{multicols}2
-	\bibliographystyle{acm}
+  \footnotesize
+	\bibliographystyle{plain}
 	\bibliography{cite}
 \end{multicols}
 

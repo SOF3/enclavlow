@@ -4,7 +4,6 @@ import io.github.sof3.enclavlow.cases.lfg.LoopCase
 import io.github.sof3.enclavlow.contract.CallTags
 import io.github.sof3.enclavlow.contract.MethodControlNode
 import io.github.sof3.enclavlow.contract.ParamLocalNode
-import io.github.sof3.enclavlow.contract.ProxyLocalNode
 import io.github.sof3.enclavlow.contract.ReturnLocalNode
 import io.github.sof3.enclavlow.contract.makeContract
 import io.github.sof3.enclavlow.tests.testMethod
@@ -30,5 +29,6 @@ class LoopTests {
         MethodControlNode into proxy<BooleanSupplier>("boolean getAsBoolean()", "control")
         MethodControlNode into proxy<BooleanSupplier>("boolean getAsBoolean()", "this")
         ParamLocalNode(0) into proxy<BooleanSupplier>("boolean getAsBoolean()", "this")
+        proxy<BooleanSupplier>("boolean getAsBoolean()", "return") into ReturnLocalNode
     })
 }

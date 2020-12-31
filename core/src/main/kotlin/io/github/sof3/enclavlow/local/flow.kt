@@ -15,10 +15,10 @@ import io.github.sof3.enclavlow.contract.StaticLocalNode
 import io.github.sof3.enclavlow.contract.ThisLocalNode
 import io.github.sof3.enclavlow.contract.ThrowLocalNode
 import io.github.sof3.enclavlow.util.Edge
-import io.github.sof3.enclavlow.util.MutableDiGraph
+import io.github.sof3.enclavlow.util.MutableDenseGraph
 import io.github.sof3.enclavlow.util.getOrFill
 import io.github.sof3.enclavlow.util.indexedSetOf
-import io.github.sof3.enclavlow.util.newDiGraph
+import io.github.sof3.enclavlow.util.newDenseGraph
 import soot.SootField
 import soot.SootMethod
 
@@ -63,9 +63,10 @@ class LocalFlow(
 
     fun getProjection(base: LocalNode, fieldDecl: String): ProjectionNode<LocalNode> {
         val fieldNode = ProjectionNode.create(base, fieldDecl)
+        fieldNode as LocalNode
+        graph.addNodeIfMissing(fieldNode)
         if (fieldNode !in projections) {
             projections.add(fieldNode)
-            graph.addNodeIfMissing(fieldNode as LocalNode)
             // graph.touch(base, fieldNode) { causes += LocalFlowCause.FIELD_PROJECTION }
             graph.touch(fieldNode, base) { causes += LocalFlowCause.FIELD_PROJECTION_BACK_FLOW }
 
@@ -131,7 +132,7 @@ class LocalFlow(
     override fun toString() = "LocalFlow(control=$control, locals=$locals, params=$params, calls=$calls, graph=$graph)"
 }
 
-typealias LocalFlowGraph = MutableDiGraph<LocalNode, LocalEdge>
+typealias LocalFlowGraph = MutableDenseGraph<LocalNode, LocalEdge>
 
 fun makeLocalFlowGraph(vararg extraNodes: Iterable<LocalNode>): LocalFlowGraph {
     val nodes = indexedSetOf<LocalNode>(ThisLocalNode, StaticLocalNode, ReturnLocalNode, ThrowLocalNode, ExplicitSourceLocalNode, ExplicitSinkLocalNode)
@@ -139,7 +140,7 @@ fun makeLocalFlowGraph(vararg extraNodes: Iterable<LocalNode>): LocalFlowGraph {
         nodes.addAll(extra)
     }
 
-    return newDiGraph(nodes) { LocalEdge(mutableSetOf()) }
+    return newDenseGraph(nodes) { LocalEdge(mutableSetOf()) }
 }
 
 data class LocalEdge(val causes: MutableSet<LocalFlowCause>) : Edge<LocalEdge, LocalNode> {

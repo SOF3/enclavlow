@@ -6,7 +6,7 @@ import io.github.sof3.enclavlow.contract.MethodNameType
 import io.github.sof3.enclavlow.contract.analyzeMethod
 import io.github.sof3.enclavlow.local.PRINT_DOT
 import io.github.sof3.enclavlow.util.IS_DEBUG
-import io.github.sof3.enclavlow.util.MutableDiGraph
+import io.github.sof3.enclavlow.util.MutableDenseGraph
 import java.io.File
 import java.lang.management.ManagementFactory
 import kotlin.test.assertEquals
@@ -30,8 +30,8 @@ private fun <T> runImpl(clazz: Class<T>, method: String, expectedContract: Contr
         set_soot_classpath(classPath) // cp of current JVM runtime
     }
 
-    (expectedContract.graph as MutableDiGraph).sortNodes { it.toString() }
-    (actual.graph as MutableDiGraph).sortNodes { it.toString() }
+    (expectedContract.graph as MutableDenseGraph).sortNodes { it.toString() }
+    (actual.graph as MutableDenseGraph).sortNodes { it.toString() }
     assertEquals(expectedContract.graph, actual.graph, "Method $method has unexpected contract")
     assertEquals(expectedContract.callTags, actual.callTags, "Method $method has unexpected contract")
 }

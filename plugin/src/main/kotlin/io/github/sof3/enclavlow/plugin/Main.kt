@@ -2,6 +2,7 @@ package io.github.sof3.enclavlow.plugin
 
 import io.github.sof3.enclavlow.aggregate.AggGraph
 import io.github.sof3.enclavlow.aggregate.AggNode
+import io.github.sof3.enclavlow.aggregate.ExplicitSinkAggNode
 import io.github.sof3.enclavlow.aggregate.ExplicitSourceAggNode
 import io.github.sof3.enclavlow.aggregate.computeAggregate
 import io.github.sof3.enclavlow.local.PRINT_DOT
@@ -16,16 +17,17 @@ import java.io.File
 import java.io.FileWriter
 import java.util.*
 
-private val logger = LoggerFactory.getLogger(Main::class.java)
-
+@Suppress("unused")
 class Main : Plugin<Project> {
+    private val logger = LoggerFactory.getLogger(Main::class.java)
+
     override fun apply(project: Project) {
         project.tasks.create("enclavlow") { task ->
             task.dependsOn("classes")
             task.doLast {
                 IS_DEBUG = project.gradle.startParameter.logLevel == LogLevel.DEBUG
-                if(IS_DEBUG){
-                    PRINT_DOT = IS_DEBUG
+                if (IS_DEBUG) {
+                    PRINT_DOT = true
                     val index = File(project.buildDir, "lfgOutput/index.html")
                     index.writeText("<ul>\n")
                 }
@@ -53,9 +55,16 @@ class Main : Plugin<Project> {
 
                 logger.info("Computing AFG from $entryClasses")
 
-                val (afg, crossEdges) = computeAggregate(classpath.filter { it.exists() }.map { it.absolutePath }, entryClasses)
+                val classpathList = classpath.filter { it.exists() }.map { it.absolutePath }
+                logger.info("Computing AFG for $classpathList with classes $entryClasses")
+
+                val (afg, crossEdges, contracts) = computeAggregate(classpathList, entryClasses)
 
                 afg.addNodeIfMissing(ExplicitSourceAggNode)
+
+                val reports = File(project.buildDir, "reports")
+                reports.mkdirs()
+                File(reports, "afg.dot").writeText(afg.toGraphviz("AggregateFlowGraph"))
 
                 class Link(val node: AggNode, val prev: Link? = null) {
                     private val depth: Int = (prev?.depth ?: 0) + 1
@@ -74,10 +83,12 @@ class Main : Plugin<Project> {
 
                 val leakPaths = mutableListOf<List<AggNode>>()
                 val visited = mutableSetOf<AggNode>()
+                val visitedEdges = mutableSetOf<Pair<AggNode, AggNode>>()
                 fun dfs(graph: AggGraph, src: AggNode, path: Link) {
-                    if (src in visited) return
+                    if (src in visited || src == ExplicitSinkAggNode) return
                     visited.add(src)
                     for ((dest, edge) in graph.flowsFromEdges(src)) {
+                        visitedEdges.add(src to dest)
                         val link = Link(dest, path)
                         if ((src to dest) in crossEdges) {
                             leakPaths.add(link.asList())
@@ -88,6 +99,8 @@ class Main : Plugin<Project> {
                 }
 
                 dfs(afg, ExplicitSourceAggNode, Link(ExplicitSourceAggNode, null))
+
+                printReport(File(reports, "enclavlow.html"), afg, leakPaths, contracts, entryClasses, visitedEdges)
             }
         }
     }

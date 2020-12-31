@@ -5,41 +5,72 @@ import edu.hku.cs.uranus.IntelSGXOcall
 import io.github.sof3.enclavlow.local.FnCall
 import io.github.sof3.enclavlow.local.FnIden
 import io.github.sof3.enclavlow.local.SenFlow
-import io.github.sof3.enclavlow.util.DiGraph
+import io.github.sof3.enclavlow.util.DenseGraph
 import io.github.sof3.enclavlow.util.Edge
-import io.github.sof3.enclavlow.util.MutableDiGraph
+import io.github.sof3.enclavlow.util.MutableDenseGraph
 import io.github.sof3.enclavlow.util.block
 import io.github.sof3.enclavlow.util.indexedSetOf
-import io.github.sof3.enclavlow.util.newDiGraph
+import io.github.sof3.enclavlow.util.newDenseGraph
 import io.github.sof3.enclavlow.util.printDebug
 import soot.Body
 import soot.BodyTransformer
 import soot.Scene
+import soot.SootMethod
+import soot.SootResolver
 import soot.options.Options
 import soot.tagkit.VisibilityAnnotationTag
 import soot.toolkits.graph.ExceptionalUnitGraph
 
-inline fun analyzeMethod(
+fun analyzeMethod(
     className: String,
     methodName: String,
     methodNameType: MethodNameType,
     configure: Options.() -> Unit,
 ): Contract<out ContractFlowGraph> {
-    soot.G.reset()
-    val options = Options.v()
-    options.set_output_format(Options.output_format_jimple)
-    configure(options)
-    SenTransformer.contracts.get().clear()
-    val clazz = Scene.v().loadClassAndSupport(className)
-    Scene.v().loadNecessaryClasses()
-    clazz.setApplicationClass()
-    val method = when (methodNameType) {
-        MethodNameType.UNIQUE_NAME -> clazz.getMethodByName(methodName)
-        MethodNameType.SUB_SIGNATURE -> clazz.getMethod(methodName)
+    val body: Body
+    val method: SootMethod
+    synchronized(soot.Main.v()) {
+        soot.G.reset()
+        val options = Options.v()
+        options.set_output_format(Options.output_format_jimple)
+        configure(options)
+        SenTransformer.contracts.get().clear()
+        val clazz = try {
+            Scene.v().loadClassAndSupport(className)
+        } catch (e: SootResolver.SootClassNotFoundException) {
+            return makeContract(CallTags.UNSPECIFIED, 0) // empty contract
+        }
+        Scene.v().loadNecessaryClasses()
+        clazz.setApplicationClass()
+        method = when (methodNameType) {
+            MethodNameType.UNIQUE_NAME -> clazz.getMethodByName(methodName)
+            MethodNameType.SUB_SIGNATURE -> clazz.getMethod(methodName)
+        }
+        if (method.isAbstract || method.isNative) {
+            // TODO improve: try merging all subclasses
+            return degenerateContractFor(method)
+        }
+        body = method.retrieveActiveBody()
     }
-    val body = method.retrieveActiveBody()
     SenTransformer.transform(body)
     return SenTransformer.contracts.get()[FnIden(method)]!!
+}
+
+/**
+ * This is a dummy implementation of analyzeMethod for methods that cannot yet be analyzed.
+ */
+fun degenerateContractFor(method: SootMethod): Contract<out ContractFlowGraph> {
+    return makeContract(CallTags.UNSPECIFIED, method.parameterCount) {
+        MethodControlNode into ReturnLocalNode
+
+        if (!method.isStatic) {
+            ThisLocalNode into ReturnLocalNode
+        }
+
+        for (param in 0 until method.parameterCount) {
+            ParamLocalNode(param) into ReturnLocalNode
+        }
+    }
 }
 
 enum class MethodNameType {
@@ -79,9 +110,6 @@ object SenTransformer : BodyTransformer() {
             flow.doAnalysis()
         }
         contracts.get()[FnIden(body.method)] = flow.outputContract
-        block("Contract of ${flow.outputContract.callTags} ${body.method.subSignature}") {
-            printDebug { flow.outputContract.graph }
-        }
     }
 }
 
@@ -104,7 +132,7 @@ fun makeContract(
     nodes.addIfMissing(methodControl)
     nodes.addAll(extraNodes)
 
-    val graph = newDiGraph<ContractNode, ContractEdge>(nodes) {
+    val graph = newDenseGraph<ContractNode, ContractEdge>(nodes) {
         ContractEdge(
             refOnly = false,
             projectionBackFlow = false,
@@ -114,8 +142,8 @@ fun makeContract(
     return Contract(graph, callTags, mutableListOf(), methodControl)
 }
 
-typealias ContractFlowGraph = DiGraph<ContractNode, ContractEdge>
-typealias MutableContractFlowGraph = MutableDiGraph<ContractNode, ContractEdge>
+typealias ContractFlowGraph = DenseGraph<ContractNode, ContractEdge>
+typealias MutableContractFlowGraph = MutableDenseGraph<ContractNode, ContractEdge>
 
 data class ContractEdge(
     var refOnly: Boolean,
@@ -134,7 +162,7 @@ data class ContractEdge(
     }
 }
 
-class MakeContractContext<T : Any, E : Edge<E, T>>(private val graph: MutableDiGraph<T, E>) {
+class MakeContractContext<T : Any, E : Edge<E, T>>(private val graph: MutableDenseGraph<T, E>) {
     infix fun T.into(other: T): E? {
         graph.addNodeIfMissing(this)
         graph.addNodeIfMissing(other)

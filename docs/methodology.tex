@@ -8,6 +8,17 @@ are not focus areas of this project, and hence will not be discussed further.
 
 \input{methodology-design}
 
+\subsection{Implementation details}\label{subsec:details}
+Local and contract flow graphs are considered "dense" graphs,
+and are represented using edge matrix.
+Meanwhile, the aggregate flow graph has a much lower density of edges,
+and an edge list is much more memory-efficient.
+
+Since Soot uses \ac{LFG} equality as the predicate
+to decide whether loops have to be analyzed again,
+to avoid infinite loops, \fnname{Control} nodes and function calls
+are excluded from consideration when comparing the graph.
+
 \subsection{System Requirements}\label{subsec:system-requirements}
 The logical code of this project is mostly implemented in Kotlin,
 a \ac{JVM} language with more concise syntax than Java.
@@ -17,8 +28,8 @@ all test cases are written in Java.
 
 As Uranus was only tested against Linux systems,
 this project does not intend to support other operating systems.
-Furthermore, due to classpath detection difficulties,
-only OpenJDK Version 8 and 11 are supported currently.
+Furthermore, due to challenges with classpath detection,
+only OpenJDK Versions 8 and 11 are supported currently.
 Nevertheless, since \pname{} is just a developer tool,
 its runtime is actually independent of that targeted by Uranus,
 so it is possible to test support for other platforms in the future.
@@ -27,21 +38,24 @@ so it is possible to test support for other platforms in the future.
 allowing developers to use it in projects with a Gradle toolchain.
 However, the \code{enclavlow-core} subproject can be reused in other contexts,
 such as Maven plugins, IDE plugins, etc.
+With Kotlin toolchain integrated,
+it is possible to include enclavlow code into Uranus for compile-time analysis.
 
 \subsection{Flow analysis framework}\label{subsec:flow-analysis-framework}
 Soot~\cite{sootsurvivor} was selected as the framework for conducting flow analysis.
 Although multiple flow analysis systems using Soot already exist,
-they are not designed against \ac{SGX} enclave protection,
-but \pname{} adopts more strict security policies
+they are not designed against \ac{SGX} enclave protection.
+\pname{} adopts more strict security policies
 to prevent attacks from more privileged attackers,
 unlike traditional information flow analysis
 that mostly detects user input as the source of insecurity.
 
 Soot accepts Java bytecode files (\code{*.class}) as input
-and compiles them into a \ac{3AC} language called Jimple,
-which simplifies analysis work.
-The consume-branch-merge approach mentioned in the last subsection
-was inspired by the forward flow analysis interface in Jimple.
+and compiles them into Jimple \ac{3AC},
+so inputs compiled from different \ac{JVM} languages are still compatible.
+Nevertheless, some languages generate a lot of boilerplate code,
+such as null assertion code from Kotlin,
+which reduces readability of the report.
 
 Other flow analysis frameworks were also considered,
 such as Joana~\cite{joana} and JFlow~\cite{jflow}.
@@ -50,6 +64,7 @@ and builtin support for call graph analysis.
 
 \subsection{Testing}\label{subsec:testing}
 This project uses JUnit 5 and \code{kotlin.test} framework
-to conduct both unit and integration tests.
+to conduct unit tests.
 Test case classes are compiled together in the \code{:core:testClasses} task,
-which declares dependency on the APIs \code{sourceMarker} and \code{sinkMarker}.
+which declares dependency on the APIs \code{sourceMarker} and \code{sinkMarker},
+but this is not necessary for actual usage.

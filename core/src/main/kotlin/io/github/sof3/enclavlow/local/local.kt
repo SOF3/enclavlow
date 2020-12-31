@@ -95,7 +95,7 @@ class SenFlow(
         }
     }
 
-    override fun copy(source: LocalFlow, dest: LocalFlow) = block("Copy") { source copyTo dest }
+    override fun copy(source: LocalFlow, dest: LocalFlow) = source copyTo dest
 
     public override fun doAnalysis() = super.doAnalysis()
 
@@ -105,8 +105,6 @@ class SenFlow(
         fallOutList: List<LocalFlow>,
         branchOutList: List<LocalFlow>,
     ) = block("Node $stmt") {
-        printDebug { "${stmt.javaClass.simpleName}: $stmt" }
-        // printDebug { "Input: $input" }
         val output = fallOutList.getOrNull(0)
         if (fallOutList.size > 1) throw AssertionError("Unsupported fallOutList non-singleton")
 
@@ -185,15 +183,13 @@ class SenFlow(
             }
             else -> throw UnsupportedOperationException("Unsupported statement ${stmt.javaClass} $stmt")
         }
-        // printDebug { "Output: $fallOutList" }
-        // printDebug { "Branched Output: $branchOutList" }
 
         for (flow in listOf(fallOutList, branchOutList).flatten()) {
             flow.control = contractFlow(flow.graph, flow.control as LocalControlNode)
         }
     }
 
-    private fun contractFlow(graph: LocalFlowGraph, control: LocalControlNode) : LocalControlNode{
+    private fun contractFlow(graph: LocalFlowGraph, control: LocalControlNode): LocalControlNode {
         val controls = graph.nodes.filterIsInstance<LocalControlNode>().toMutableSet()
         val numControls = controls.size
         val equivClasses = mutableMapOf<Pair<Set<Int>, Set<Int>>, MutableSet<LocalControlNode>>()
@@ -214,7 +210,7 @@ class SenFlow(
                 if (node != keep) {
                     removals.add(node)
                 }
-                if(node == control) ret = keep;
+                if (node == control) ret = keep;
             }
         }
         graph.removeNodes(removals)
@@ -255,7 +251,7 @@ class SenFlow(
         })
 
         for (projection in flow.projections) {
-            if (projection.base == dest && projection is ContractNode) {
+            if (projection.base == dest && projection is ContractNode && projection in flow.graph.nodes) {
                 ancestorPostprocess(flow, setOf(projection), projection)
             }
         }

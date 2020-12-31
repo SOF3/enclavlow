@@ -1,18 +1,25 @@
-\section{Results and Discussion}\label{sec:results-and-discussion}
-There have been multiple unsolved difficulties and unimplemented features in this project,
+\section{Discussion}\label{sec:discussion}
+There are various unimplemented features in this project,
 which can be tackled in future research.
 
-\subsection{Difficulties and Limitations}\label{subsec:difficulties-and-limitations}
-\IncludeCode{lst:oop-subst-attack}{./OopSubstAttack.java}
-{Example attack through OOP substitution}{.6}{2.5}
+\subsection{Limitations}\label{subsec:difficulties-and-limitations}
+As is every code analysis system,
+perfect detection is almost impossible.
+This subsection will show that
+the requirements of \pname{} is a \emph{superset} of the common analysis tools
+in terms of problems to identify.
 
+\subsubsection{Polymorphism}\label{subsubsec:polymorphism}
 The principles of \ac{OOP} imply that the receiver of a method call
 may be swapped with a compatible implementation in another subclass
 that performs different actions than the current one.
 Although Uranus prevents the adversary
 from passing arbitrary malicious code into the enclave memory,
-it is still possible to pass objects of unexpected trusted subclass
+it is still possible to pass objects of unexpected but trusted subclass
 through the \code{@JECall} boundary.
+Alternatively, an alternative form of Iago attack
+passes originally impossible combination of subtypes to the function,
+which could also introduce attack vectors.
 Consider Listing~\ref{lst:oop-subst-attack} for example.
 If \code{cs} is passed with a \code{substr} implementation
 that writes its parameters to a static variable,
@@ -22,35 +29,91 @@ To correctly solve the vulnerability of \ac{OOP} substitution,
 it is necessary to perform call graph analysis on the actual classes passed to the method,
 which involves more complex framework level work.
 
-\IncludeCode{lst:known-false-positives}{./KnownFalsePositives.java}
-{Known false positives}{.6}{3}
+\IncludeCode{lst:oop-subst-attack}{./OopSubstAttack.java}
+{Iago attack through substitution}{.6}{2.5}
 
+Due to time constraints,
+polymorphism handling is not implemented in this project.
+Instead, a \emph{degenerate} contract graph
+with the edge set $\left\{(\text{\fnname{Param}}~x, \text{\fnname{Return}}) : x\right\}$
+is used as placeholder for abstract methods,
+and possible subclass overrides are not yet considered.
+
+\subsubsection{Native methods}\label{subsubsec:jni}
+Similar to abstract methods,
+\ac{JNI} methods are also not easy to analyze.
+The implementation of \ac{JNI} methods is only available in the form of native dynamic libraries,
+and reverse engineering such libraries is unnecessary, tedious and sometimes illegal.
+A much simpler but accurate approach
+is to analyze the native methods in the original languages they were written in,
+integrating with tools such as Glamdring \cite{glamdring};
+for the native methods within Java standard library,
+it is possible to precompute the contract of each of them manually
+and ship these with the software.
+Similar to above, this task is omitted due to time constraints;
+degenerate contracts are used as placeholder instead.
+This assumption is inaccurate;
+a common counterexample is the \code{System.arraycopy} method,
+which leaks the values of the integer parameters into the destination array parameter
+since the amount of elements changed leaks the integers involved.
+
+\subsubsection{Duplicate code}\label{subsubsec:duplicate-code}
 Despite optimizations and simplifications,
-it is still not possible to perform 100\% accurate information flow analysis
+it is still not possible to perform perfectly accurate information flow analysis
 within efficient time complexity~\cite{SmithGeoffrey2007PoSI}.
 For example, this project merges conditional branches together
 by taking the union of flow graphs,
-resulting in easy false positive rates.
-Listing~\ref{lst:known-false-positives} is an example of this  due to multiple return arms.
-The CFG contains an edge (\code{secret} $\to$ \underline{Return}),
-but the returned value is in fact always 1.
-This is not to be fixed since it is a minor use case;
-duplicated code in multiple return arms
-is typically regarded as an antipattern anyway.
+resulting in easy false positive cases.
+Listing~\ref{lst:known-false-positives} is an example of this:
+the return statement appears in both arms,
+so according to the mechanism explained above, the control flow shall leak
+the branching condition \code{secret} to the return path.
+Nevertheless, but the returned value is in fact always \code{x}.
+Since this is a minor use case, this bug is considered not worth fixing.
+In fact, duplicated code in multiple branch arms
+is often regarded as an antipattern as well. % citation needed
 
-It is also impossible to analyze further than the \ac{JNI} level,
-since analyzing across \ac{JNI} boundary implies
-the need to interact with a native analysis tool.
-Since this involves multiple layers of interaction
-such as native code reverse engineering (hence legal issues)
-and platform-specific support (defeating the purpose of using \ac{JVM}),
-Since Uranus effectively denies system calls,
-the contract is always assumed to be
-$\left\{ (p, \text{return}) : p \in \text{params} \right\}$.
-This assumption might miss some special cases,
-such as the \code{System.arraycopy} method in the Java \ac{SDK},
-which leaks information about its bounds parameters to an array.
+\IncludeCode{lst:known-false-positives}{./KnownFalsePositives.java}
+{False positive by duplicate code}{.6}{3}
 
+Similarly, self-anonymized sensitive data are not identified correctly,
+such as in Listing~\ref{lst:self-anonymized}.
+It is believed that such errors are easy for a human to discover
+and could be marked \code{sinkMarker} directly,
+or simply copying \code{a} to another variable,
+so these false positives do not have major effect on usability.
+Note also that mutably sensitive data may be an antipattern
+as the user may accidentally leak it in the future
+by moving a line of code incorrectly.
+
+\IncludeCode{lst:self-anonymized}{./SelfAnonymized.java}
+{False positive by self-anonymization}{.6}{3}
+
+\subsubsection{Implicit exceptions}
+Apart from explicit \code{throw} statements,
+runtime exceptions can also be raised when invalid operations are performed,
+leaking information through control flow.
+Consider Listing \ref{implicit-exceiption}.
+While the mechanism of \pname{} does not discover any bugs,
+the method throws an ArrayIndexOutOfBoundsException
+if and only if \code{a >= index},
+so an adversary could pass varying values for \code{a}
+to binary-search the value of \code{index}.
+
+\IncludeCode{implicit-exceiption}{./ImplicitException.java}
+{Implicit exception}{.4}{3}
+
+This is difficult to notice even for an alert developer.
+Solutions are unfortunately usually achieved at the source code level,
+such as using annotations like \code{@NotNull} and \code{@Size}.
+As this project does not intend to reinvent the wheel,
+prevention of such vulnerabilities is left as the task for other source-level tools.
+In fact, such exceptions tend to cause other security issues in addition to enclave security,
+well known as the "billion dollar problem" \cite{nullbillion}.
+It is likely more efficient to try to avoid such unexpected behaviour
+by fusing the source code before it gets compiled.
+
+\subsubsection{Readability}
 For the sake of consistency with Uranus,
 it was originally intended to expose \code{sourceMarker} and \code{sinkMarker}
 as annotations on local variables instead of method calls.
@@ -58,8 +121,20 @@ However, \ac{JLS} 9.6.1.2 explicitly stated that
 \q{an annotation on a local variable declaration
 is never retained in the binary representation}~\cite{jls},
 so a method call based approach is used instead.
-It is expected that JIT optimization removes the cost
-involved from an extra method call at JIT compile time.
+It is expected that \ac{JIT} optimization removes the cost
+involved from an extra method call at \ac{JIT} compile time.
+
+This also leads to readability issues.
+The current HTML output is unable to reveal more information than the \ac{CFG}
+because of the lack of information about the source code,
+like local variable names and line numbers.
+In the \ac{LFG}, generated variable names like \code{r0}
+and control marker names like \code{control13} are used instead,
+but they are not intuitive for the reader
+and become hard to interpret when the method grows large.
+The only solution for this problem is to provide additions at the source code level,
+but since \pname{} takes inputs in the form of Java class binaries,
+this is considered out of scope of the project.
 
 \subsection{Recommended future research}\label{subsec:recommended-future-research}
 There are multiple areas in which this project can be extended.
@@ -80,3 +155,6 @@ which checks the memory address against enclave bounds at runtime.
 The static analysis in \pname{} allows Uranus to validate these bounds at compile time,
 hence avoiding the runtime bounds-checking cost and improve performance.
 Note that JIT optimization is not able to detect unnecessary bounds checking.
+Since \code{enclavlow-core} exposes the \ac{AFG} result fully,
+it shall be possible for the compiler in Uranus
+to directly invoke this library to analyze the program being compiled.
