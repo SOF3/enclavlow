@@ -41,7 +41,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">1.237s</div>
+<div class="counter">1.240s</div>
 <p>duration</p>
 </div>
 </td>
@@ -79,27 +79,27 @@
 </thead>
 <tr>
 <td class="success">assignParam</td>
-<td class="success">0.195s</td>
+<td class="success">0.224s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">paramToReturn</td>
-<td class="success">0.232s</td>
+<td class="success">0.236s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">paramToStatic</td>
-<td class="success">0.245s</td>
+<td class="success">0.249s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">paramToThrow</td>
-<td class="success">0.247s</td>
+<td class="success">0.218s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">zeroizeAssign</td>
-<td class="success">0.318s</td>
+<td class="success">0.313s</td>
 <td class="success">passed</td>
 </tr>
 </table>
@@ -107,7 +107,7 @@
 <div id="tab1" class="tab">
 <h2>Standard output</h2>
 <span class="code">
-<pre>[9 +1084.464]     public static int zeroizeAssign(int)
+<pre>[9 +1483.620]     public static int zeroizeAssign(int)
                   {
                       int i0, i1;
                       byte b2;
@@ -127,8 +127,8 @@ Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.AssignCase: int zeroizeAssign(i
   Node b2 = 0
   Node return b2
     Printing result LFG to dot
-      [9 +1114.892] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.AssignCase.int.zeroizeAssign.int_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.AssignCase.int.zeroizeAssign.int_0.dot
-[9 +1332.367]     public static int paramToReturn(int)
+      [9 +1500.993] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.AssignCase.int.zeroizeAssign.int_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.AssignCase.int.zeroizeAssign.int_0.dot
+[9 +1714.420]     public static int paramToReturn(int)
                   {
                       int i0;
               
@@ -141,8 +141,8 @@ Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.AssignCase: int paramToReturn(i
   Node i0 := @parameter0: int
   Node return i0
     Printing result LFG to dot
-      [9 +1344.257] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.AssignCase.int.paramToReturn.int_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.AssignCase.int.paramToReturn.int_0.dot
-[9 +1567.237]     public static void paramToStatic(int)
+      [9 +1717.432] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.AssignCase.int.paramToReturn.int_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.AssignCase.int.paramToReturn.int_0.dot
+[9 +1950.843]     public static void paramToStatic(int)
                   {
                       int i0;
               
@@ -158,8 +158,8 @@ Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.AssignCase: void paramToStatic(
   Node &lt;io.github.sof3.enclavlow.cases.lfg.AssignCase: int a&gt; = i0
   Node return
     Printing result LFG to dot
-      [9 +1580.225] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.AssignCase.void.paramToStatic.int_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.AssignCase.void.paramToStatic.int_0.dot
-[9 +1812.460]     public static int paramToThrow(java.lang.RuntimeException)
+      [9 +1963.948] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.AssignCase.void.paramToStatic.int_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.AssignCase.void.paramToStatic.int_0.dot
+[9 +2174.805]     public static int paramToThrow(java.lang.RuntimeException)
                   {
                       java.lang.RuntimeException r0;
               
@@ -172,8 +172,8 @@ Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.AssignCase: int paramToThrow(ja
   Node r0 := @parameter0: java.lang.RuntimeException
   Node throw r0
     Printing result LFG to dot
-      [9 +1833.777] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.AssignCase.int.paramToThrow.java.lang.RuntimeException_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.AssignCase.int.paramToThrow.java.lang.RuntimeException_0.dot
-[9 +2021.654]     public static void assignParam(int)
+      [9 +2192.813] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.AssignCase.int.paramToThrow.java.lang.RuntimeException_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.AssignCase.int.paramToThrow.java.lang.RuntimeException_0.dot
+[9 +2407.746]     public static void assignParam(int)
                   {
                       int i0;
                       boolean z0;
@@ -190,7 +190,7 @@ Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.AssignCase: void assignParam(in
   Node z0 = 1
   Node return
     Printing result LFG to dot
-      [9 +2023.479] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.AssignCase.void.assignParam.int_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.AssignCase.void.assignParam.int_0.dot
+      [9 +2414.436] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.AssignCase.void.assignParam.int_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.AssignCase.void.assignParam.int_0.dot
 </pre>
 </span>
 </div>
@@ -202,7 +202,7 @@ Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.AssignCase: void assignParam(in
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="http://www.gradle.org">Gradle 6.3</a> at Dec 31, 2020 3:26:51 PM</p>
+<a href="http://www.gradle.org">Gradle 6.3</a> at Dec 31, 2020 3:45:09 PM</p>
 </div>
 </div>
 </body>

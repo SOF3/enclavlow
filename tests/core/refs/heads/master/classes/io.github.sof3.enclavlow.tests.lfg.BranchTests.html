@@ -41,7 +41,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">2.514s</div>
+<div class="counter">2.727s</div>
 <p>duration</p>
 </div>
 </td>
@@ -79,22 +79,22 @@
 </thead>
 <tr>
 <td class="success">conditionalAssign</td>
-<td class="success">0.259s</td>
+<td class="success">0.302s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">conditionalThrow</td>
-<td class="success">0.362s</td>
+<td class="success">0.317s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">controlReset</td>
-<td class="success">1.430s</td>
+<td class="success">1.611s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">switchMux</td>
-<td class="success">0.463s</td>
+<td class="success">0.497s</td>
 <td class="success">passed</td>
 </tr>
 </table>
@@ -102,7 +102,7 @@
 <div id="tab1" class="tab">
 <h2>Standard output</h2>
 <span class="code">
-<pre>[9 +0.034]     public static int controlReset(boolean)
+<pre>[9 +0.043]     public static int controlReset(boolean)
                {
                    boolean z0;
            
@@ -120,8 +120,8 @@ Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.BranchCase: int controlReset(bo
   Merge
   Node return 1
     Printing result LFG to dot
-      [9 +168.093] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.BranchCase.int.controlReset.boolean_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.BranchCase.int.controlReset.boolean_0.dot
-[9 +665.769]     public static void conditionalThrow(boolean, java.lang.Exception) throws java.lang.Exception
+      [9 +252.620] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.BranchCase.int.controlReset.boolean_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.BranchCase.int.controlReset.boolean_0.dot
+[9 +591.447]     public static void conditionalThrow(boolean, java.lang.Exception) throws java.lang.Exception
                  {
                      boolean z0;
                      java.lang.Exception r0;
@@ -144,11 +144,11 @@ Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.BranchCase: void conditionalThr
   Node if z0 == 0 goto return
   Node return
     Printing result LFG to dot
-      [9 +680.335] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.BranchCase.void.conditionalThrow.boolean.java.lang.Exception_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.BranchCase.void.conditionalThrow.boolean.java.lang.Exception_0.dot
+      [9 +605.953] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.BranchCase.void.conditionalThrow.boolean.java.lang.Exception_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.BranchCase.void.conditionalThrow.boolean.java.lang.Exception_0.dot
   Node throw r0
     Printing result LFG to dot
-      [9 +708.752] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.BranchCase.void.conditionalThrow.boolean.java.lang.Exception_1.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.BranchCase.void.conditionalThrow.boolean.java.lang.Exception_1.dot
-[9 +927.619]     public static int conditionalAssign(boolean)
+      [9 +658.419] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.BranchCase.void.conditionalThrow.boolean.java.lang.Exception_1.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.BranchCase.void.conditionalThrow.boolean.java.lang.Exception_1.dot
+[9 +927.206]     public static int conditionalAssign(boolean)
                  {
                      boolean z0;
                      int i0;
@@ -173,8 +173,8 @@ Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.BranchCase: int conditionalAssi
   Merge
   Node return i0
     Printing result LFG to dot
-      [9 +969.863] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.BranchCase.int.conditionalAssign.boolean_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.BranchCase.int.conditionalAssign.boolean_0.dot
-[9 +1251.034]     public static int switchMux(int, int, int, int, int)
+      [9 +952.645] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.BranchCase.int.conditionalAssign.boolean_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.BranchCase.int.conditionalAssign.boolean_0.dot
+[9 +1275.008]     public static int switchMux(int, int, int, int, int)
                   {
                       int i0, i1, i2, i3, i4;
               
@@ -218,16 +218,16 @@ Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.BranchCase: int switchMux(int,i
   Node tableswitch(i0) {     case 16: goto return i3;     case 17: goto return i2;     case 18: goto return i1;     default: goto return i4; }
   Node return i4
     Printing result LFG to dot
-      [9 +1289.409] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.BranchCase.int.switchMux.int.int.int.int.int_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.BranchCase.int.switchMux.int.int.int.int.int_0.dot
+      [9 +1302.183] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.BranchCase.int.switchMux.int.int.int.int.int_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.BranchCase.int.switchMux.int.int.int.int.int_0.dot
   Node return i1
     Printing result LFG to dot
-      [9 +1350.979] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.BranchCase.int.switchMux.int.int.int.int.int_1.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.BranchCase.int.switchMux.int.int.int.int.int_1.dot
+      [9 +1340.680] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.BranchCase.int.switchMux.int.int.int.int.int_1.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.BranchCase.int.switchMux.int.int.int.int.int_1.dot
   Node return i2
     Printing result LFG to dot
-      [9 +1387.460] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.BranchCase.int.switchMux.int.int.int.int.int_2.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.BranchCase.int.switchMux.int.int.int.int.int_2.dot
+      [9 +1400.172] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.BranchCase.int.switchMux.int.int.int.int.int_2.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.BranchCase.int.switchMux.int.int.int.int.int_2.dot
   Node return i3
     Printing result LFG to dot
-      [9 +1417.792] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.BranchCase.int.switchMux.int.int.int.int.int_3.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.BranchCase.int.switchMux.int.int.int.int.int_3.dot
+      [9 +1432.276] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.BranchCase.int.switchMux.int.int.int.int.int_3.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.BranchCase.int.switchMux.int.int.int.int.int_3.dot
 </pre>
 </span>
 </div>
@@ -239,7 +239,7 @@ Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.BranchCase: int switchMux(int,i
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="http://www.gradle.org">Gradle 6.3</a> at Dec 31, 2020 3:26:51 PM</p>
+<a href="http://www.gradle.org">Gradle 6.3</a> at Dec 31, 2020 3:45:09 PM</p>
 </div>
 </div>
 </body>

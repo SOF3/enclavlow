@@ -41,7 +41,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">0.768s</div>
+<div class="counter">0.980s</div>
 <p>duration</p>
 </div>
 </td>
@@ -79,17 +79,17 @@
 </thead>
 <tr>
 <td class="success">loopDec</td>
-<td class="success">0.281s</td>
+<td class="success">0.337s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">loopInc</td>
-<td class="success">0.281s</td>
+<td class="success">0.289s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">whileCall</td>
-<td class="success">0.206s</td>
+<td class="success">0.354s</td>
 <td class="success">passed</td>
 </tr>
 </table>
@@ -97,7 +97,7 @@
 <div id="tab1" class="tab">
 <h2>Standard output</h2>
 <span class="code">
-<pre>[9 +1644.861]     public static int whileCall(java.util.function.BooleanSupplier)
+<pre>[9 +1733.332]     public static int whileCall(java.util.function.BooleanSupplier)
                   {
                       java.util.function.BooleanSupplier r0;
                       boolean $z0;
@@ -128,12 +128,12 @@ Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.LoopCase: int whileCall(java.ut
   Node if $z0 == 0 goto return i0
   Node return i0
     Printing result LFG to dot
-      [9 +1659.315] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.whileCall.java.util.function.BooleanSupplier_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.whileCall.java.util.function.BooleanSupplier_0.dot
+      [9 +1794.209] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.whileCall.java.util.function.BooleanSupplier_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.whileCall.java.util.function.BooleanSupplier_0.dot
   Node i0 = i0 + 1
   Node goto [?= $z0 = interfaceinvoke r0.&lt;java.util.function.BooleanSupplier: boolean getAsBoolean()&gt;()]
   Merge
   Node $z0 = interfaceinvoke r0.&lt;java.util.function.BooleanSupplier: boolean getAsBoolean()&gt;()
-[9 +1852.784]     public static int loopDec(int)
+[9 +2080.525]     public static int loopDec(int)
                   {
                       int $i0, i1, i2;
               
@@ -165,7 +165,7 @@ Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.LoopCase: int loopDec(int)&gt;
   Node if $i0 &lt;= 0 goto return i2
   Node return i2
     Printing result LFG to dot
-      [9 +1867.947] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopDec.int_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopDec.int_0.dot
+      [9 +2103.054] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopDec.int_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopDec.int_0.dot
   Node i2 = i2 + i1
   Node goto [?= $i0 = i1]
   Merge
@@ -174,9 +174,9 @@ Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.LoopCase: int loopDec(int)&gt;
   Node if $i0 &lt;= 0 goto return i2
   Node return i2
     Printing result LFG to dot
-      [9 +1914.040] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopDec.int_1.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopDec.int_1.dot
+      [9 +2146.357] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopDec.int_1.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopDec.int_1.dot
   Node i2 = i2 + i1
-[9 +2106.518]     public static int loopInc(int)
+[9 +2346.317]     public static int loopInc(int)
                   {
                       int i0, i1, i2;
               
@@ -207,7 +207,7 @@ Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.LoopCase: int loopInc(int)&gt;
   Node if i2 &gt;= i0 goto return i1
   Node return i1
     Printing result LFG to dot
-      [9 +2134.322] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopInc.int_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopInc.int_0.dot
+      [9 +2374.219] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopInc.int_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopInc.int_0.dot
   Node i1 = i1 + i2
   Node i2 = i2 + 1
   Node goto [?= (branch)]
@@ -215,7 +215,7 @@ Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.LoopCase: int loopInc(int)&gt;
   Node if i2 &gt;= i0 goto return i1
   Node return i1
     Printing result LFG to dot
-      [9 +2200.098] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopInc.int_1.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopInc.int_1.dot
+      [9 +2424.976] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopInc.int_1.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopInc.int_1.dot
   Node i1 = i1 + i2
 </pre>
 </span>
@@ -228,7 +228,7 @@ Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.LoopCase: int loopInc(int)&gt;
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="http://www.gradle.org">Gradle 6.3</a> at Dec 31, 2020 3:26:51 PM</p>
+<a href="http://www.gradle.org">Gradle 6.3</a> at Dec 31, 2020 3:45:09 PM</p>
 </div>
 </div>
 </body>
