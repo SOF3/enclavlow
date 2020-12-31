@@ -41,7 +41,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">1.016s</div>
+<div class="counter">0.768s</div>
 <p>duration</p>
 </div>
 </td>
@@ -79,17 +79,17 @@
 </thead>
 <tr>
 <td class="success">loopDec</td>
-<td class="success">0.396s</td>
+<td class="success">0.281s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">loopInc</td>
-<td class="success">0.303s</td>
+<td class="success">0.281s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">whileCall</td>
-<td class="success">0.317s</td>
+<td class="success">0.206s</td>
 <td class="success">passed</td>
 </tr>
 </table>
@@ -97,7 +97,7 @@
 <div id="tab1" class="tab">
 <h2>Standard output</h2>
 <span class="code">
-<pre>[9 +1822.855]     public static int whileCall(java.util.function.BooleanSupplier)
+<pre>[9 +1644.861]     public static int whileCall(java.util.function.BooleanSupplier)
                   {
                       java.util.function.BooleanSupplier r0;
                       boolean $z0;
@@ -121,76 +121,19 @@
                   }
               
 Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.LoopCase: int whileCall(java.util.function.BooleanSupplier)&gt;
-  Copy
   Node r0 := @parameter0: java.util.function.BooleanSupplier
-    [9 +1836.835] JIdentityStmt: r0 := @parameter0: java.util.function.BooleanSupplier
-    [9 +1838.162] lvalueNodesImpl(JimpleLocal r0)
-  Copy
-  Copy
-  Copy
   Node i0 = 0
-    [9 +1848.669] JAssignStmt: i0 = 0
-    [9 +1849.001] lvalueNodesImpl(JimpleLocal i0)
-  Copy
-  Copy
-  Copy
   Merge
-  Copy
   Node $z0 = interfaceinvoke r0.&lt;java.util.function.BooleanSupplier: boolean getAsBoolean()&gt;()
-    [9 +1852.519] JAssignStmt: $z0 = interfaceinvoke r0.&lt;java.util.function.BooleanSupplier: boolean getAsBoolean()&gt;()
-    [9 +1852.961] lvalueNodesImpl(JimpleLocal $z0)
-  Copy
-  Copy
-  Copy
-  Copy
   Node if $z0 == 0 goto return i0
-    [9 +1857.801] JIfStmt: if $z0 == 0 goto return i0
-  Copy
-  Copy
-  Copy
   Node return i0
-    [9 +1861.721] JReturnStmt: return i0
     Printing result LFG to dot
-      [9 +1863.554] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.whileCall.java.util.function.BooleanSupplier_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.whileCall.java.util.function.BooleanSupplier_0.dot
-  Copy
-  Copy
+      [9 +1659.315] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.whileCall.java.util.function.BooleanSupplier_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.whileCall.java.util.function.BooleanSupplier_0.dot
   Node i0 = i0 + 1
-    [9 +1912.542] JAssignStmt: i0 = i0 + 1
-    [9 +1912.711] lvalueNodesImpl(JimpleLocal i0)
-  Copy
-  Copy
-  Copy
   Node goto [?= $z0 = interfaceinvoke r0.&lt;java.util.function.BooleanSupplier: boolean getAsBoolean()&gt;()]
-    [9 +1913.223] JGotoStmt: goto [?= $z0 = interfaceinvoke r0.&lt;java.util.function.BooleanSupplier: boolean getAsBoolean()&gt;()]
-  Copy
-  Copy
-  Copy
   Merge
-  Copy
   Node $z0 = interfaceinvoke r0.&lt;java.util.function.BooleanSupplier: boolean getAsBoolean()&gt;()
-    [9 +1914.382] JAssignStmt: $z0 = interfaceinvoke r0.&lt;java.util.function.BooleanSupplier: boolean getAsBoolean()&gt;()
-    [9 +1914.518] lvalueNodesImpl(JimpleLocal $z0)
-  Copy
-Contract of UNSPECIFIED int whileCall(java.util.function.BooleanSupplier)
-  [9 +1915.251] 
-                digraph DiGraph78891515 {
-                	0 [label = &quot;this&quot;,color = &quot;#def717&quot;];
-                	1 [label = &quot;static&quot;,color = &quot;#abac43&quot;];
-                	2 [label = &quot;return&quot;,color = &quot;#19071f&quot;];
-                	3 [label = &quot;throw&quot;,color = &quot;#8210d0&quot;];
-                	4 [label = &quot;&lt;source&gt;&quot;,color = &quot;#c520ad&quot;];
-                	5 [label = &quot;&lt;sink&gt;&quot;,color = &quot;#f9766c&quot;];
-                	6 [label = &quot;param0&quot;,color = &quot;#4800e4&quot;];
-                	7 [label = &quot;methodCall&quot;,color = &quot;#bb15d3&quot;];
-                	8 [label = &quot;ProxyLocalNode(name=&lt;java.util.function.BooleanSupplier.boolean getAsBoolean()&gt;\nthis)&quot;,color = &quot;#a6aa12&quot;];
-                	9 [label = &quot;ProxyLocalNode(name=&lt;java.util.function.BooleanSupplier.boolean getAsBoolean()&gt;\ncontrol)&quot;,color = &quot;#a6aa12&quot;];
-                	6 -&gt; 8 [style = &quot;solid&quot;,color = &quot;black&quot;];
-                	7 -&gt; 2 [style = &quot;solid&quot;,color = &quot;black&quot;];
-                	7 -&gt; 8 [style = &quot;solid&quot;,color = &quot;black&quot;];
-                	7 -&gt; 9 [style = &quot;solid&quot;,color = &quot;black&quot;];
-                }
-                
-[9 +2207.681]     public static int loopDec(int)
+[9 +1852.784]     public static int loopDec(int)
                   {
                       int $i0, i1, i2;
               
@@ -214,102 +157,26 @@ Contract of UNSPECIFIED int whileCall(java.util.function.BooleanSupplier)
                   }
               
 Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.LoopCase: int loopDec(int)&gt;
-  Copy
   Node i1 := @parameter0: int
-    [9 +2209.516] JIdentityStmt: i1 := @parameter0: int
-    [9 +2210.075] lvalueNodesImpl(JimpleLocal i1)
-  Copy
-  Copy
-  Copy
   Node i2 = 0
-    [9 +2210.710] JAssignStmt: i2 = 0
-    [9 +2210.956] lvalueNodesImpl(JimpleLocal i2)
-  Copy
-  Copy
-  Copy
   Merge
-  Copy
   Node $i0 = i1
-    [9 +2211.874] JAssignStmt: $i0 = i1
-    [9 +2212.077] lvalueNodesImpl(JimpleLocal $i0)
-  Copy
-  Copy
-  Copy
   Node i1 = i1 + -1
-    [9 +2213.246] JAssignStmt: i1 = i1 + -1
-    [9 +2213.476] lvalueNodesImpl(JimpleLocal i1)
-  Copy
-  Copy
-  Copy
-  Copy
   Node if $i0 &lt;= 0 goto return i2
-    [9 +2214.145] JIfStmt: if $i0 &lt;= 0 goto return i2
-  Copy
-  Copy
-  Copy
   Node return i2
-    [9 +2224.013] JReturnStmt: return i2
     Printing result LFG to dot
-      [9 +2225.080] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopDec.int_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopDec.int_0.dot
-  Copy
-  Copy
+      [9 +1867.947] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopDec.int_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopDec.int_0.dot
   Node i2 = i2 + i1
-    [9 +2278.555] JAssignStmt: i2 = i2 + i1
-    [9 +2278.736] lvalueNodesImpl(JimpleLocal i2)
-  Copy
-  Copy
-  Copy
   Node goto [?= $i0 = i1]
-    [9 +2279.160] JGotoStmt: goto [?= $i0 = i1]
-  Copy
-  Copy
-  Copy
   Merge
-  Copy
   Node $i0 = i1
-    [9 +2280.337] JAssignStmt: $i0 = i1
-    [9 +2280.449] lvalueNodesImpl(JimpleLocal $i0)
-  Copy
-  Copy
-  Copy
   Node i1 = i1 + -1
-    [9 +2280.844] JAssignStmt: i1 = i1 + -1
-    [9 +2280.949] lvalueNodesImpl(JimpleLocal i1)
-  Copy
-  Copy
-  Copy
-  Copy
   Node if $i0 &lt;= 0 goto return i2
-    [9 +2281.443] JIfStmt: if $i0 &lt;= 0 goto return i2
-  Copy
-  Copy
-  Copy
   Node return i2
-    [9 +2282.837] JReturnStmt: return i2
     Printing result LFG to dot
-      [9 +2287.853] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopDec.int_1.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopDec.int_1.dot
-  Copy
-  Copy
+      [9 +1914.040] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopDec.int_1.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopDec.int_1.dot
   Node i2 = i2 + i1
-    [9 +2319.988] JAssignStmt: i2 = i2 + i1
-    [9 +2320.150] lvalueNodesImpl(JimpleLocal i2)
-  Copy
-Contract of UNSPECIFIED int loopDec(int)
-  [9 +2320.641] 
-                digraph DiGraph1549451443 {
-                	0 [label = &quot;this&quot;,color = &quot;#def717&quot;];
-                	1 [label = &quot;static&quot;,color = &quot;#abac43&quot;];
-                	2 [label = &quot;return&quot;,color = &quot;#19071f&quot;];
-                	3 [label = &quot;throw&quot;,color = &quot;#8210d0&quot;];
-                	4 [label = &quot;&lt;source&gt;&quot;,color = &quot;#c520ad&quot;];
-                	5 [label = &quot;&lt;sink&gt;&quot;,color = &quot;#f9766c&quot;];
-                	6 [label = &quot;param0&quot;,color = &quot;#4800e4&quot;];
-                	7 [label = &quot;methodCall&quot;,color = &quot;#bb15d3&quot;];
-                	6 -&gt; 2 [style = &quot;solid&quot;,color = &quot;black&quot;];
-                	7 -&gt; 2 [style = &quot;solid&quot;,color = &quot;black&quot;];
-                }
-                
-[9 +2531.411]     public static int loopInc(int)
+[9 +2106.518]     public static int loopInc(int)
                   {
                       int i0, i1, i2;
               
@@ -333,89 +200,23 @@ Contract of UNSPECIFIED int loopDec(int)
                   }
               
 Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.LoopCase: int loopInc(int)&gt;
-  Copy
   Node i0 := @parameter0: int
-    [9 +2537.599] JIdentityStmt: i0 := @parameter0: int
-    [9 +2537.721] lvalueNodesImpl(JimpleLocal i0)
-  Copy
-  Copy
-  Copy
   Node i1 = 0
-    [9 +2538.034] JAssignStmt: i1 = 0
-    [9 +2538.130] lvalueNodesImpl(JimpleLocal i1)
-  Copy
-  Copy
-  Copy
   Node i2 = 0
-    [9 +2538.400] JAssignStmt: i2 = 0
-    [9 +2538.498] lvalueNodesImpl(JimpleLocal i2)
-  Copy
-  Copy
-  Copy
-  Copy
   Merge
-  Copy
   Node if i2 &gt;= i0 goto return i1
-    [9 +2538.972] JIfStmt: if i2 &gt;= i0 goto return i1
-  Copy
-  Copy
-  Copy
   Node return i1
-    [9 +2539.703] JReturnStmt: return i1
     Printing result LFG to dot
-      [9 +2540.922] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopInc.int_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopInc.int_0.dot
-  Copy
-  Copy
+      [9 +2134.322] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopInc.int_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopInc.int_0.dot
   Node i1 = i1 + i2
-    [9 +2584.504] JAssignStmt: i1 = i1 + i2
-    [9 +2584.679] lvalueNodesImpl(JimpleLocal i1)
-  Copy
-  Copy
-  Copy
   Node i2 = i2 + 1
-    [9 +2585.009] JAssignStmt: i2 = i2 + 1
-    [9 +2585.104] lvalueNodesImpl(JimpleLocal i2)
-  Copy
-  Copy
-  Copy
   Node goto [?= (branch)]
-    [9 +2585.409] JGotoStmt: goto [?= (branch)]
-  Copy
-  Copy
-  Copy
-  Copy
   Merge
-  Copy
   Node if i2 &gt;= i0 goto return i1
-    [9 +2586.008] JIfStmt: if i2 &gt;= i0 goto return i1
-  Copy
-  Copy
-  Copy
   Node return i1
-    [9 +2586.617] JReturnStmt: return i1
     Printing result LFG to dot
-      [9 +2590.213] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopInc.int_1.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopInc.int_1.dot
-  Copy
-  Copy
+      [9 +2200.098] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopInc.int_1.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopInc.int_1.dot
   Node i1 = i1 + i2
-    [9 +2623.994] JAssignStmt: i1 = i1 + i2
-    [9 +2624.163] lvalueNodesImpl(JimpleLocal i1)
-  Copy
-Contract of UNSPECIFIED int loopInc(int)
-  [9 +2624.556] 
-                digraph DiGraph74268207 {
-                	0 [label = &quot;this&quot;,color = &quot;#def717&quot;];
-                	1 [label = &quot;static&quot;,color = &quot;#abac43&quot;];
-                	2 [label = &quot;return&quot;,color = &quot;#19071f&quot;];
-                	3 [label = &quot;throw&quot;,color = &quot;#8210d0&quot;];
-                	4 [label = &quot;&lt;source&gt;&quot;,color = &quot;#c520ad&quot;];
-                	5 [label = &quot;&lt;sink&gt;&quot;,color = &quot;#f9766c&quot;];
-                	6 [label = &quot;param0&quot;,color = &quot;#4800e4&quot;];
-                	7 [label = &quot;methodCall&quot;,color = &quot;#bb15d3&quot;];
-                	6 -&gt; 2 [style = &quot;solid&quot;,color = &quot;black&quot;];
-                	7 -&gt; 2 [style = &quot;solid&quot;,color = &quot;black&quot;];
-                }
-                
 </pre>
 </span>
 </div>
@@ -427,7 +228,7 @@ Contract of UNSPECIFIED int loopInc(int)
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="http://www.gradle.org">Gradle 6.3</a> at Dec 30, 2020 4:13:01 AM</p>
+<a href="http://www.gradle.org">Gradle 6.3</a> at Dec 31, 2020 3:26:51 PM</p>
 </div>
 </div>
 </body>

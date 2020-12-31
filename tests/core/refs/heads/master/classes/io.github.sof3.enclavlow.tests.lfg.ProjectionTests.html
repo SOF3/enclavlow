@@ -41,7 +41,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">2.280s</div>
+<div class="counter">1.925s</div>
 <p>duration</p>
 </div>
 </td>
@@ -79,17 +79,17 @@
 </thead>
 <tr>
 <td class="success">paramToParam</td>
-<td class="success">1.481s</td>
+<td class="success">1.455s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">paramToThis</td>
-<td class="success">0.457s</td>
+<td class="success">0.276s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">thisToStatic</td>
-<td class="success">0.342s</td>
+<td class="success">0.194s</td>
 <td class="success">passed</td>
 </tr>
 </table>
@@ -97,7 +97,7 @@
 <div id="tab1" class="tab">
 <h2>Standard output</h2>
 <span class="code">
-<pre>[9 +0.045]     public static void paramToParam(java.lang.String, io.github.sof3.enclavlow.cases.Box)
+<pre>[9 +0.035]     public static void paramToParam(java.lang.String, io.github.sof3.enclavlow.cases.Box)
                {
                    io.github.sof3.enclavlow.cases.Box r0;
                    java.lang.String r1;
@@ -112,48 +112,13 @@
                }
            
 Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.ProjectionCase: void paramToParam(java.lang.String,io.github.sof3.enclavlow.cases.Box)&gt;
-  Copy
   Node r1 := @parameter0: java.lang.String
-    [9 +55.122] JIdentityStmt: r1 := @parameter0: java.lang.String
-    [9 +72.048] lvalueNodesImpl(JimpleLocal r1)
-  Copy
-  Copy
-  Copy
   Node r0 := @parameter1: io.github.sof3.enclavlow.cases.Box
-    [9 +137.523] JIdentityStmt: r0 := @parameter1: io.github.sof3.enclavlow.cases.Box
-    [9 +137.775] lvalueNodesImpl(JimpleLocal r0)
-  Copy
-  Copy
-  Copy
   Node r0.&lt;io.github.sof3.enclavlow.cases.Box: java.lang.Object inner&gt; = r1
-    [9 +139.513] JAssignStmt: r0.&lt;io.github.sof3.enclavlow.cases.Box: java.lang.Object inner&gt; = r1
-    [9 +139.738] lvalueNodesImpl(JInstanceFieldRef r0.&lt;io.github.sof3.enclavlow.cases.Box: java.lang.Object inner&gt;)
-  Copy
-  Copy
   Node return
-    [9 +154.762] JReturnVoidStmt: return
     Printing result LFG to dot
-      [9 +180.488] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ProjectionCase.void.paramToParam.java.lang.String.io.github.sof3.enclavlow.cases.Box_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ProjectionCase.void.paramToParam.java.lang.String.io.github.sof3.enclavlow.cases.Box_0.dot
-Contract of UNSPECIFIED void paramToParam(java.lang.String,io.github.sof3.enclavlow.cases.Box)
-  [9 +290.125] 
-               digraph DiGraph1602033704 {
-               	0 [label = &quot;this&quot;,color = &quot;#def717&quot;];
-               	1 [label = &quot;static&quot;,color = &quot;#abac43&quot;];
-               	2 [label = &quot;return&quot;,color = &quot;#19071f&quot;];
-               	3 [label = &quot;throw&quot;,color = &quot;#8210d0&quot;];
-               	4 [label = &quot;&lt;source&gt;&quot;,color = &quot;#c520ad&quot;];
-               	5 [label = &quot;&lt;sink&gt;&quot;,color = &quot;#f9766c&quot;];
-               	6 [label = &quot;param0&quot;,color = &quot;#4800e4&quot;];
-               	7 [label = &quot;param1&quot;,color = &quot;#4800e4&quot;];
-               	8 [label = &quot;methodCall&quot;,color = &quot;#bb15d3&quot;];
-               	9 [label = &quot;&lt;param1&gt;.public java.lang.Object inner&quot;,color = &quot;#36b16e&quot;];
-               	6 -&gt; 9 [style = &quot;solid&quot;,color = &quot;black&quot;];
-               	8 -&gt; 2 [style = &quot;solid&quot;,color = &quot;black&quot;];
-               	8 -&gt; 9 [style = &quot;solid&quot;,color = &quot;black&quot;];
-               	9 -&gt; 7 [style = &quot;solid&quot;,color = &quot;blue&quot;];
-               }
-               
-[9 +631.664]     public void paramToThis(int)
+      [9 +187.950] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ProjectionCase.void.paramToParam.java.lang.String.io.github.sof3.enclavlow.cases.Box_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ProjectionCase.void.paramToParam.java.lang.String.io.github.sof3.enclavlow.cases.Box_0.dot
+[9 +579.413]     public void paramToThis(int)
                  {
                      io.github.sof3.enclavlow.cases.lfg.ProjectionCase r0;
                      int i0;
@@ -168,100 +133,33 @@ Contract of UNSPECIFIED void paramToParam(java.lang.String,io.github.sof3.enclav
                  }
              
 Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.ProjectionCase: void paramToThis(int)&gt;
-  Copy
   Node r0 := @this: io.github.sof3.enclavlow.cases.lfg.ProjectionCase
-    [9 +662.838] JIdentityStmt: r0 := @this: io.github.sof3.enclavlow.cases.lfg.ProjectionCase
-    [9 +664.645] lvalueNodesImpl(JimpleLocal r0)
-  Copy
-  Copy
-  Copy
   Node i0 := @parameter0: int
-    [9 +674.387] JIdentityStmt: i0 := @parameter0: int
-    [9 +676.503] lvalueNodesImpl(JimpleLocal i0)
-  Copy
-  Copy
-  Copy
   Node r0.&lt;io.github.sof3.enclavlow.cases.lfg.ProjectionCase: int b&gt; = i0
-    [9 +688.471] JAssignStmt: r0.&lt;io.github.sof3.enclavlow.cases.lfg.ProjectionCase: int b&gt; = i0
-    [9 +693.457] lvalueNodesImpl(JInstanceFieldRef r0.&lt;io.github.sof3.enclavlow.cases.lfg.ProjectionCase: int b&gt;)
-  Copy
-  Copy
   Node return
-    [9 +695.422] JReturnVoidStmt: return
     Printing result LFG to dot
-      [9 +702.042] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ProjectionCase.void.paramToThis.int_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ProjectionCase.void.paramToThis.int_0.dot
-Contract of UNSPECIFIED void paramToThis(int)
-  [9 +753.942] 
-               digraph DiGraph1484612219 {
-               	0 [label = &quot;this&quot;,color = &quot;#def717&quot;];
-               	1 [label = &quot;static&quot;,color = &quot;#abac43&quot;];
-               	2 [label = &quot;return&quot;,color = &quot;#19071f&quot;];
-               	3 [label = &quot;throw&quot;,color = &quot;#8210d0&quot;];
-               	4 [label = &quot;&lt;source&gt;&quot;,color = &quot;#c520ad&quot;];
-               	5 [label = &quot;&lt;sink&gt;&quot;,color = &quot;#f9766c&quot;];
-               	6 [label = &quot;param0&quot;,color = &quot;#4800e4&quot;];
-               	7 [label = &quot;methodCall&quot;,color = &quot;#bb15d3&quot;];
-               	8 [label = &quot;&lt;this&gt;.int b&quot;,color = &quot;#36b16e&quot;];
-               	6 -&gt; 8 [style = &quot;solid&quot;,color = &quot;black&quot;];
-               	7 -&gt; 2 [style = &quot;solid&quot;,color = &quot;black&quot;];
-               	7 -&gt; 8 [style = &quot;solid&quot;,color = &quot;black&quot;];
-               	8 -&gt; 0 [style = &quot;solid&quot;,color = &quot;blue&quot;];
-               }
-               
-[9 +1022.322]     public void thisToStatic()
-                  {
-                      io.github.sof3.enclavlow.cases.lfg.ProjectionCase r0;
-                      int $i0;
-              
-                      r0 := @this: io.github.sof3.enclavlow.cases.lfg.ProjectionCase;
-              
-                      $i0 = r0.&lt;io.github.sof3.enclavlow.cases.lfg.ProjectionCase: int b&gt;;
-              
-                      &lt;io.github.sof3.enclavlow.cases.lfg.ProjectionCase: int a&gt; = $i0;
-              
-                      return;
-                  }
-              
+      [9 +609.254] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ProjectionCase.void.paramToThis.int_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ProjectionCase.void.paramToThis.int_0.dot
+[9 +776.904]     public void thisToStatic()
+                 {
+                     io.github.sof3.enclavlow.cases.lfg.ProjectionCase r0;
+                     int $i0;
+             
+                     r0 := @this: io.github.sof3.enclavlow.cases.lfg.ProjectionCase;
+             
+                     $i0 = r0.&lt;io.github.sof3.enclavlow.cases.lfg.ProjectionCase: int b&gt;;
+             
+                     &lt;io.github.sof3.enclavlow.cases.lfg.ProjectionCase: int a&gt; = $i0;
+             
+                     return;
+                 }
+             
 Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.ProjectionCase: void thisToStatic()&gt;
-  Copy
   Node r0 := @this: io.github.sof3.enclavlow.cases.lfg.ProjectionCase
-    [9 +1031.685] JIdentityStmt: r0 := @this: io.github.sof3.enclavlow.cases.lfg.ProjectionCase
-    [9 +1032.099] lvalueNodesImpl(JimpleLocal r0)
-  Copy
-  Copy
-  Copy
   Node $i0 = r0.&lt;io.github.sof3.enclavlow.cases.lfg.ProjectionCase: int b&gt;
-    [9 +1033.752] JAssignStmt: $i0 = r0.&lt;io.github.sof3.enclavlow.cases.lfg.ProjectionCase: int b&gt;
-    [9 +1034.166] lvalueNodesImpl(JimpleLocal $i0)
-  Copy
-  Copy
-  Copy
   Node &lt;io.github.sof3.enclavlow.cases.lfg.ProjectionCase: int a&gt; = $i0
-    [9 +1045.278] JAssignStmt: &lt;io.github.sof3.enclavlow.cases.lfg.ProjectionCase: int a&gt; = $i0
-    [9 +1045.715] lvalueNodesImpl(StaticFieldRef &lt;io.github.sof3.enclavlow.cases.lfg.ProjectionCase: int a&gt;)
-  Copy
-  Copy
   Node return
-    [9 +1047.180] JReturnVoidStmt: return
     Printing result LFG to dot
-      [9 +1048.975] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ProjectionCase.void.thisToStatic_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ProjectionCase.void.thisToStatic_0.dot
-Contract of UNSPECIFIED void thisToStatic()
-  [9 +1095.875] 
-                digraph DiGraph167614601 {
-                	0 [label = &quot;this&quot;,color = &quot;#def717&quot;];
-                	1 [label = &quot;static&quot;,color = &quot;#abac43&quot;];
-                	2 [label = &quot;return&quot;,color = &quot;#19071f&quot;];
-                	3 [label = &quot;throw&quot;,color = &quot;#8210d0&quot;];
-                	4 [label = &quot;&lt;source&gt;&quot;,color = &quot;#c520ad&quot;];
-                	5 [label = &quot;&lt;sink&gt;&quot;,color = &quot;#f9766c&quot;];
-                	6 [label = &quot;methodCall&quot;,color = &quot;#bb15d3&quot;];
-                	7 [label = &quot;&lt;this&gt;.int b&quot;,color = &quot;#36b16e&quot;];
-                	6 -&gt; 1 [style = &quot;solid&quot;,color = &quot;black&quot;];
-                	6 -&gt; 2 [style = &quot;solid&quot;,color = &quot;black&quot;];
-                	7 -&gt; 0 [style = &quot;solid&quot;,color = &quot;blue&quot;];
-                	7 -&gt; 1 [style = &quot;solid&quot;,color = &quot;black&quot;];
-                }
-                
+      [9 +802.324] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ProjectionCase.void.thisToStatic_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ProjectionCase.void.thisToStatic_0.dot
 </pre>
 </span>
 </div>
@@ -273,7 +171,7 @@ Contract of UNSPECIFIED void thisToStatic()
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="http://www.gradle.org">Gradle 6.3</a> at Dec 30, 2020 4:13:01 AM</p>
+<a href="http://www.gradle.org">Gradle 6.3</a> at Dec 31, 2020 3:26:51 PM</p>
 </div>
 </div>
 </body>

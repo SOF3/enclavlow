@@ -41,7 +41,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">1.292s</div>
+<div class="counter">1.237s</div>
 <p>duration</p>
 </div>
 </td>
@@ -79,27 +79,27 @@
 </thead>
 <tr>
 <td class="success">assignParam</td>
-<td class="success">0.247s</td>
+<td class="success">0.195s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">paramToReturn</td>
-<td class="success">0.256s</td>
+<td class="success">0.232s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">paramToStatic</td>
-<td class="success">0.294s</td>
+<td class="success">0.245s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">paramToThrow</td>
-<td class="success">0.219s</td>
+<td class="success">0.247s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">zeroizeAssign</td>
-<td class="success">0.276s</td>
+<td class="success">0.318s</td>
 <td class="success">passed</td>
 </tr>
 </table>
@@ -107,7 +107,7 @@
 <div id="tab1" class="tab">
 <h2>Standard output</h2>
 <span class="code">
-<pre>[9 +1289.522]     public static int zeroizeAssign(int)
+<pre>[9 +1084.464]     public static int zeroizeAssign(int)
                   {
                       int i0, i1;
                       byte b2;
@@ -122,43 +122,13 @@
                   }
               
 Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.AssignCase: int zeroizeAssign(int)&gt;
-  Copy
   Node i0 := @parameter0: int
-    [9 +1301.974] JIdentityStmt: i0 := @parameter0: int
-    [9 +1302.808] lvalueNodesImpl(JimpleLocal i0)
-  Copy
-  Copy
-  Copy
   Node i1 = i0
-    [9 +1307.455] JAssignStmt: i1 = i0
-    [9 +1308.464] lvalueNodesImpl(JimpleLocal i1)
-  Copy
-  Copy
-  Copy
   Node b2 = 0
-    [9 +1311.656] JAssignStmt: b2 = 0
-    [9 +1312.253] lvalueNodesImpl(JimpleLocal b2)
-  Copy
-  Copy
   Node return b2
-    [9 +1317.668] JReturnStmt: return b2
     Printing result LFG to dot
-      [9 +1319.260] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.AssignCase.int.zeroizeAssign.int_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.AssignCase.int.zeroizeAssign.int_0.dot
-Contract of UNSPECIFIED int zeroizeAssign(int)
-  [9 +1377.147] 
-                digraph DiGraph1381021301 {
-                	0 [label = &quot;this&quot;,color = &quot;#def717&quot;];
-                	1 [label = &quot;static&quot;,color = &quot;#abac43&quot;];
-                	2 [label = &quot;return&quot;,color = &quot;#19071f&quot;];
-                	3 [label = &quot;throw&quot;,color = &quot;#8210d0&quot;];
-                	4 [label = &quot;&lt;source&gt;&quot;,color = &quot;#c520ad&quot;];
-                	5 [label = &quot;&lt;sink&gt;&quot;,color = &quot;#f9766c&quot;];
-                	6 [label = &quot;param0&quot;,color = &quot;#4800e4&quot;];
-                	7 [label = &quot;methodCall&quot;,color = &quot;#bb15d3&quot;];
-                	7 -&gt; 2 [style = &quot;solid&quot;,color = &quot;black&quot;];
-                }
-                
-[9 +1580.016]     public static int paramToReturn(int)
+      [9 +1114.892] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.AssignCase.int.zeroizeAssign.int_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.AssignCase.int.zeroizeAssign.int_0.dot
+[9 +1332.367]     public static int paramToReturn(int)
                   {
                       int i0;
               
@@ -168,32 +138,11 @@ Contract of UNSPECIFIED int zeroizeAssign(int)
                   }
               
 Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.AssignCase: int paramToReturn(int)&gt;
-  Copy
   Node i0 := @parameter0: int
-    [9 +1585.064] JIdentityStmt: i0 := @parameter0: int
-    [9 +1585.844] lvalueNodesImpl(JimpleLocal i0)
-  Copy
-  Copy
   Node return i0
-    [9 +1587.185] JReturnStmt: return i0
     Printing result LFG to dot
-      [9 +1592.994] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.AssignCase.int.paramToReturn.int_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.AssignCase.int.paramToReturn.int_0.dot
-Contract of UNSPECIFIED int paramToReturn(int)
-  [9 +1633.828] 
-                digraph DiGraph1524803983 {
-                	0 [label = &quot;this&quot;,color = &quot;#def717&quot;];
-                	1 [label = &quot;static&quot;,color = &quot;#abac43&quot;];
-                	2 [label = &quot;return&quot;,color = &quot;#19071f&quot;];
-                	3 [label = &quot;throw&quot;,color = &quot;#8210d0&quot;];
-                	4 [label = &quot;&lt;source&gt;&quot;,color = &quot;#c520ad&quot;];
-                	5 [label = &quot;&lt;sink&gt;&quot;,color = &quot;#f9766c&quot;];
-                	6 [label = &quot;param0&quot;,color = &quot;#4800e4&quot;];
-                	7 [label = &quot;methodCall&quot;,color = &quot;#bb15d3&quot;];
-                	6 -&gt; 2 [style = &quot;solid&quot;,color = &quot;black&quot;];
-                	7 -&gt; 2 [style = &quot;solid&quot;,color = &quot;black&quot;];
-                }
-                
-[9 +1848.053]     public static void paramToStatic(int)
+      [9 +1344.257] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.AssignCase.int.paramToReturn.int_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.AssignCase.int.paramToReturn.int_0.dot
+[9 +1567.237]     public static void paramToStatic(int)
                   {
                       int i0;
               
@@ -205,39 +154,12 @@ Contract of UNSPECIFIED int paramToReturn(int)
                   }
               
 Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.AssignCase: void paramToStatic(int)&gt;
-  Copy
   Node i0 := @parameter0: int
-    [9 +1883.540] JIdentityStmt: i0 := @parameter0: int
-    [9 +1883.963] lvalueNodesImpl(JimpleLocal i0)
-  Copy
-  Copy
-  Copy
   Node &lt;io.github.sof3.enclavlow.cases.lfg.AssignCase: int a&gt; = i0
-    [9 +1886.551] JAssignStmt: &lt;io.github.sof3.enclavlow.cases.lfg.AssignCase: int a&gt; = i0
-    [9 +1886.905] lvalueNodesImpl(StaticFieldRef &lt;io.github.sof3.enclavlow.cases.lfg.AssignCase: int a&gt;)
-  Copy
-  Copy
   Node return
-    [9 +1891.366] JReturnVoidStmt: return
     Printing result LFG to dot
-      [9 +1893.052] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.AssignCase.void.paramToStatic.int_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.AssignCase.void.paramToStatic.int_0.dot
-Contract of UNSPECIFIED void paramToStatic(int)
-  [9 +1927.823] 
-                digraph DiGraph2020428128 {
-                	0 [label = &quot;this&quot;,color = &quot;#def717&quot;];
-                	1 [label = &quot;static&quot;,color = &quot;#abac43&quot;];
-                	2 [label = &quot;return&quot;,color = &quot;#19071f&quot;];
-                	3 [label = &quot;throw&quot;,color = &quot;#8210d0&quot;];
-                	4 [label = &quot;&lt;source&gt;&quot;,color = &quot;#c520ad&quot;];
-                	5 [label = &quot;&lt;sink&gt;&quot;,color = &quot;#f9766c&quot;];
-                	6 [label = &quot;param0&quot;,color = &quot;#4800e4&quot;];
-                	7 [label = &quot;methodCall&quot;,color = &quot;#bb15d3&quot;];
-                	6 -&gt; 1 [style = &quot;solid&quot;,color = &quot;black&quot;];
-                	7 -&gt; 1 [style = &quot;solid&quot;,color = &quot;black&quot;];
-                	7 -&gt; 2 [style = &quot;solid&quot;,color = &quot;black&quot;];
-                }
-                
-[9 +2072.282]     public static int paramToThrow(java.lang.RuntimeException)
+      [9 +1580.225] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.AssignCase.void.paramToStatic.int_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.AssignCase.void.paramToStatic.int_0.dot
+[9 +1812.460]     public static int paramToThrow(java.lang.RuntimeException)
                   {
                       java.lang.RuntimeException r0;
               
@@ -247,32 +169,11 @@ Contract of UNSPECIFIED void paramToStatic(int)
                   }
               
 Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.AssignCase: int paramToThrow(java.lang.RuntimeException)&gt;
-  Copy
   Node r0 := @parameter0: java.lang.RuntimeException
-    [9 +2083.983] JIdentityStmt: r0 := @parameter0: java.lang.RuntimeException
-    [9 +2084.624] lvalueNodesImpl(JimpleLocal r0)
-  Copy
-  Copy
   Node throw r0
-    [9 +2085.933] JThrowStmt: throw r0
     Printing result LFG to dot
-      [9 +2092.429] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.AssignCase.int.paramToThrow.java.lang.RuntimeException_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.AssignCase.int.paramToThrow.java.lang.RuntimeException_0.dot
-Contract of UNSPECIFIED int paramToThrow(java.lang.RuntimeException)
-  [9 +2146.723] 
-                digraph DiGraph2119525565 {
-                	0 [label = &quot;this&quot;,color = &quot;#def717&quot;];
-                	1 [label = &quot;static&quot;,color = &quot;#abac43&quot;];
-                	2 [label = &quot;return&quot;,color = &quot;#19071f&quot;];
-                	3 [label = &quot;throw&quot;,color = &quot;#8210d0&quot;];
-                	4 [label = &quot;&lt;source&gt;&quot;,color = &quot;#c520ad&quot;];
-                	5 [label = &quot;&lt;sink&gt;&quot;,color = &quot;#f9766c&quot;];
-                	6 [label = &quot;param0&quot;,color = &quot;#4800e4&quot;];
-                	7 [label = &quot;methodCall&quot;,color = &quot;#bb15d3&quot;];
-                	6 -&gt; 3 [style = &quot;solid&quot;,color = &quot;black&quot;];
-                	7 -&gt; 3 [style = &quot;solid&quot;,color = &quot;black&quot;];
-                }
-                
-[9 +2340.559]     public static void assignParam(int)
+      [9 +1833.777] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.AssignCase.int.paramToThrow.java.lang.RuntimeException_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.AssignCase.int.paramToThrow.java.lang.RuntimeException_0.dot
+[9 +2021.654]     public static void assignParam(int)
                   {
                       int i0;
                       boolean z0;
@@ -285,36 +186,11 @@ Contract of UNSPECIFIED int paramToThrow(java.lang.RuntimeException)
                   }
               
 Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.AssignCase: void assignParam(int)&gt;
-  Copy
   Node i0 := @parameter0: int
-    [9 +2348.037] JIdentityStmt: i0 := @parameter0: int
-    [9 +2348.637] lvalueNodesImpl(JimpleLocal i0)
-  Copy
-  Copy
-  Copy
   Node z0 = 1
-    [9 +2350.473] JAssignStmt: z0 = 1
-    [9 +2350.813] lvalueNodesImpl(JimpleLocal z0)
-  Copy
-  Copy
   Node return
-    [9 +2353.361] JReturnVoidStmt: return
     Printing result LFG to dot
-      [9 +2359.699] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.AssignCase.void.assignParam.int_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.AssignCase.void.assignParam.int_0.dot
-Contract of UNSPECIFIED void assignParam(int)
-  [9 +2393.545] 
-                digraph DiGraph2104496856 {
-                	0 [label = &quot;this&quot;,color = &quot;#def717&quot;];
-                	1 [label = &quot;static&quot;,color = &quot;#abac43&quot;];
-                	2 [label = &quot;return&quot;,color = &quot;#19071f&quot;];
-                	3 [label = &quot;throw&quot;,color = &quot;#8210d0&quot;];
-                	4 [label = &quot;&lt;source&gt;&quot;,color = &quot;#c520ad&quot;];
-                	5 [label = &quot;&lt;sink&gt;&quot;,color = &quot;#f9766c&quot;];
-                	6 [label = &quot;param0&quot;,color = &quot;#4800e4&quot;];
-                	7 [label = &quot;methodCall&quot;,color = &quot;#bb15d3&quot;];
-                	7 -&gt; 2 [style = &quot;solid&quot;,color = &quot;black&quot;];
-                }
-                
+      [9 +2023.479] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.AssignCase.void.assignParam.int_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.AssignCase.void.assignParam.int_0.dot
 </pre>
 </span>
 </div>
@@ -326,7 +202,7 @@ Contract of UNSPECIFIED void assignParam(int)
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="http://www.gradle.org">Gradle 6.3</a> at Dec 30, 2020 4:13:01 AM</p>
+<a href="http://www.gradle.org">Gradle 6.3</a> at Dec 31, 2020 3:26:51 PM</p>
 </div>
 </div>
 </body>

@@ -41,7 +41,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">0.626s</div>
+<div class="counter">0.444s</div>
 <p>duration</p>
 </div>
 </td>
@@ -79,12 +79,12 @@
 </thead>
 <tr>
 <td class="success">assignElement</td>
-<td class="success">0.326s</td>
+<td class="success">0.240s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">returnElement</td>
-<td class="success">0.300s</td>
+<td class="success">0.204s</td>
 <td class="success">passed</td>
 </tr>
 </table>
@@ -92,7 +92,7 @@
 <div id="tab1" class="tab">
 <h2>Standard output</h2>
 <span class="code">
-<pre>[9 +2838.584]     int returnElement(int[], int)
+<pre>[9 +2376.188]     int returnElement(int[], int)
                   {
                       int[] r0;
                       int i0, $i1;
@@ -110,54 +110,14 @@
                   }
               
 Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.ArrayCase: int returnElement(int[],int)&gt;
-  Copy
   Node r1 := @this: io.github.sof3.enclavlow.cases.lfg.ArrayCase
-    [9 +2839.441] JIdentityStmt: r1 := @this: io.github.sof3.enclavlow.cases.lfg.ArrayCase
-    [9 +2839.555] lvalueNodesImpl(JimpleLocal r1)
-  Copy
-  Copy
-  Copy
   Node r0 := @parameter0: int[]
-    [9 +2839.883] JIdentityStmt: r0 := @parameter0: int[]
-    [9 +2839.977] lvalueNodesImpl(JimpleLocal r0)
-  Copy
-  Copy
-  Copy
   Node i0 := @parameter1: int
-    [9 +2840.307] JIdentityStmt: i0 := @parameter1: int
-    [9 +2840.396] lvalueNodesImpl(JimpleLocal i0)
-  Copy
-  Copy
-  Copy
   Node $i1 = r0[i0]
-    [9 +2840.695] JAssignStmt: $i1 = r0[i0]
-    [9 +2840.789] lvalueNodesImpl(JimpleLocal $i1)
-  Copy
-  Copy
   Node return $i1
-    [9 +2842.831] JReturnStmt: return $i1
     Printing result LFG to dot
-      [9 +2879.605] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ArrayCase.int.returnElement.int.int_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ArrayCase.int.returnElement.int.int_0.dot
-Contract of UNSPECIFIED int returnElement(int[],int)
-  [9 +2924.490] 
-                digraph DiGraph1011641569 {
-                	0 [label = &quot;this&quot;,color = &quot;#def717&quot;];
-                	1 [label = &quot;static&quot;,color = &quot;#abac43&quot;];
-                	2 [label = &quot;return&quot;,color = &quot;#19071f&quot;];
-                	3 [label = &quot;throw&quot;,color = &quot;#8210d0&quot;];
-                	4 [label = &quot;&lt;source&gt;&quot;,color = &quot;#c520ad&quot;];
-                	5 [label = &quot;&lt;sink&gt;&quot;,color = &quot;#f9766c&quot;];
-                	6 [label = &quot;param0&quot;,color = &quot;#4800e4&quot;];
-                	7 [label = &quot;param1&quot;,color = &quot;#4800e4&quot;];
-                	8 [label = &quot;methodCall&quot;,color = &quot;#bb15d3&quot;];
-                	9 [label = &quot;&lt;param0&gt;.&lt;unknown offset&gt;&quot;,color = &quot;#36b16e&quot;];
-                	7 -&gt; 2 [style = &quot;solid&quot;,color = &quot;black&quot;];
-                	8 -&gt; 2 [style = &quot;solid&quot;,color = &quot;black&quot;];
-                	9 -&gt; 2 [style = &quot;solid&quot;,color = &quot;black&quot;];
-                	9 -&gt; 6 [style = &quot;solid&quot;,color = &quot;blue&quot;];
-                }
-                
-[9 +3181.583]     void assignElement(int[], int, int)
+      [9 +2400.187] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ArrayCase.int.returnElement.int.int_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ArrayCase.int.returnElement.int.int_0.dot
+[9 +2614.775]     void assignElement(int[], int, int)
                   {
                       int[] r0;
                       int i0, i1;
@@ -177,61 +137,14 @@ Contract of UNSPECIFIED int returnElement(int[],int)
                   }
               
 Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.ArrayCase: void assignElement(int[],int,int)&gt;
-  Copy
   Node r1 := @this: io.github.sof3.enclavlow.cases.lfg.ArrayCase
-    [9 +3182.337] JIdentityStmt: r1 := @this: io.github.sof3.enclavlow.cases.lfg.ArrayCase
-    [9 +3182.458] lvalueNodesImpl(JimpleLocal r1)
-  Copy
-  Copy
-  Copy
   Node r0 := @parameter0: int[]
-    [9 +3182.788] JIdentityStmt: r0 := @parameter0: int[]
-    [9 +3182.911] lvalueNodesImpl(JimpleLocal r0)
-  Copy
-  Copy
-  Copy
   Node i0 := @parameter1: int
-    [9 +3183.183] JIdentityStmt: i0 := @parameter1: int
-    [9 +3194.585] lvalueNodesImpl(JimpleLocal i0)
-  Copy
-  Copy
-  Copy
   Node i1 := @parameter2: int
-    [9 +3195.290] JIdentityStmt: i1 := @parameter2: int
-    [9 +3195.390] lvalueNodesImpl(JimpleLocal i1)
-  Copy
-  Copy
-  Copy
   Node r0[i0] = i1
-    [9 +3195.677] JAssignStmt: r0[i0] = i1
-    [9 +3195.770] lvalueNodesImpl(JArrayRef r0[i0])
-  Copy
-  Copy
   Node return
-    [9 +3198.231] JReturnVoidStmt: return
     Printing result LFG to dot
-      [9 +3200.072] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ArrayCase.void.assignElement.int.int.int_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ArrayCase.void.assignElement.int.int.int_0.dot
-Contract of UNSPECIFIED void assignElement(int[],int,int)
-  [9 +3250.779] 
-                digraph DiGraph2145759873 {
-                	0 [label = &quot;this&quot;,color = &quot;#def717&quot;];
-                	1 [label = &quot;static&quot;,color = &quot;#abac43&quot;];
-                	2 [label = &quot;return&quot;,color = &quot;#19071f&quot;];
-                	3 [label = &quot;throw&quot;,color = &quot;#8210d0&quot;];
-                	4 [label = &quot;&lt;source&gt;&quot;,color = &quot;#c520ad&quot;];
-                	5 [label = &quot;&lt;sink&gt;&quot;,color = &quot;#f9766c&quot;];
-                	6 [label = &quot;param0&quot;,color = &quot;#4800e4&quot;];
-                	7 [label = &quot;param1&quot;,color = &quot;#4800e4&quot;];
-                	8 [label = &quot;param2&quot;,color = &quot;#4800e4&quot;];
-                	9 [label = &quot;methodCall&quot;,color = &quot;#bb15d3&quot;];
-                	10 [label = &quot;&lt;param0&gt;.&lt;unknown offset&gt;&quot;,color = &quot;#36b16e&quot;];
-                	7 -&gt; 10 [style = &quot;solid&quot;,color = &quot;black&quot;];
-                	8 -&gt; 10 [style = &quot;solid&quot;,color = &quot;black&quot;];
-                	9 -&gt; 2 [style = &quot;solid&quot;,color = &quot;black&quot;];
-                	9 -&gt; 10 [style = &quot;solid&quot;,color = &quot;black&quot;];
-                	10 -&gt; 6 [style = &quot;solid&quot;,color = &quot;blue&quot;];
-                }
-                
+      [9 +2642.851] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ArrayCase.void.assignElement.int.int.int_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ArrayCase.void.assignElement.int.int.int_0.dot
 </pre>
 </span>
 </div>
@@ -243,7 +156,7 @@ Contract of UNSPECIFIED void assignElement(int[],int,int)
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="http://www.gradle.org">Gradle 6.3</a> at Dec 30, 2020 4:13:01 AM</p>
+<a href="http://www.gradle.org">Gradle 6.3</a> at Dec 31, 2020 3:26:51 PM</p>
 </div>
 </div>
 </body>
