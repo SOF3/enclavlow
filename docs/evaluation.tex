@@ -104,7 +104,9 @@ Soot issues aside,
 a large amount of CPU time is spent
 on repacking the \ac{LFG} due to node removal.
 A more efficient graph representation structure (such as layered views)
-may be helpful in improving performance in this part.
+may be helpful in improving performance of this part.
+Nonetheless, since this part only contributes a small proportion to the overall CPU time,
+insignificant improvement is expected.
 
 A full profiler report can be found at \code{docs/profiler-results.jfr} on the GitHub repository.
 Figures \ref{fig:flame-graph-full} and \ref{fig:flame-graph-analysis}

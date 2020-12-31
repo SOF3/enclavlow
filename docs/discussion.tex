@@ -98,11 +98,13 @@ While the mechanism of \pname{} does not discover any bugs,
 the method throws an ArrayIndexOutOfBoundsException
 if and only if \code{a >= index},
 so an adversary could pass varying values for \code{a}
-to binary-search the value of \code{index}.
+to binary-search the value of \code{index} in just 32 calls.
 
 \IncludeCode{implicit-exceiption}{./ImplicitException.java}
 {Implicit exception}{.4}{3}
 
+Similar errors include \code{NullPointerException}
+and other subclasses of \code{RuntimeException}.
 This is difficult to notice even for an alert developer.
 Solutions are unfortunately usually achieved at the source code level,
 such as using annotations like \code{@NotNull} and \code{@Size}.
@@ -112,6 +114,9 @@ In fact, such exceptions tend to cause other security issues in addition to encl
 well known as the "billion dollar problem" \cite{nullbillion}.
 It is likely more efficient to try to avoid such unexpected behaviour
 by fusing the source code before it gets compiled.
+As a good practice, it is recommended that
+developers always catch the exception
+and sanitize it at the enclave boundary.
 
 \subsubsection{Readability}
 For the sake of consistency with Uranus,
