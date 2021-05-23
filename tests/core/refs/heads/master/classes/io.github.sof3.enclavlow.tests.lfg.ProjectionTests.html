@@ -41,7 +41,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">2.528s</div>
+<div class="counter">0.936s</div>
 <p>duration</p>
 </div>
 </td>
@@ -79,17 +79,17 @@
 </thead>
 <tr>
 <td class="success">paramToParam</td>
-<td class="success">1.600s</td>
+<td class="success">0.325s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">paramToThis</td>
-<td class="success">0.613s</td>
+<td class="success">0.320s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">thisToStatic</td>
-<td class="success">0.315s</td>
+<td class="success">0.291s</td>
 <td class="success">passed</td>
 </tr>
 </table>
@@ -97,69 +97,69 @@
 <div id="tab1" class="tab">
 <h2>Standard output</h2>
 <span class="code">
-<pre>[9 +0.043]     public static void paramToParam(java.lang.String, io.github.sof3.enclavlow.cases.Box)
-               {
-                   io.github.sof3.enclavlow.cases.Box r0;
-                   java.lang.String r1;
-           
-                   r1 := @parameter0: java.lang.String;
-           
-                   r0 := @parameter1: io.github.sof3.enclavlow.cases.Box;
-           
-                   r0.&lt;io.github.sof3.enclavlow.cases.Box: java.lang.Object inner&gt; = r1;
-           
-                   return;
-               }
-           
+<pre>[11 +825.662]     public static void paramToParam(java.lang.String, io.github.sof3.enclavlow.cases.Box)
+                  {
+                      io.github.sof3.enclavlow.cases.Box r0;
+                      java.lang.String r1;
+              
+                      r1 := @parameter0: java.lang.String;
+              
+                      r0 := @parameter1: io.github.sof3.enclavlow.cases.Box;
+              
+                      r0.&lt;io.github.sof3.enclavlow.cases.Box: java.lang.Object inner&gt; = r1;
+              
+                      return;
+                  }
+              
 Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.ProjectionCase: void paramToParam(java.lang.String,io.github.sof3.enclavlow.cases.Box)&gt;
   Node r1 := @parameter0: java.lang.String
   Node r0 := @parameter1: io.github.sof3.enclavlow.cases.Box
   Node r0.&lt;io.github.sof3.enclavlow.cases.Box: java.lang.Object inner&gt; = r1
   Node return
     Printing result LFG to dot
-      [9 +203.758] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ProjectionCase.void.paramToParam.java.lang.String.io.github.sof3.enclavlow.cases.Box_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ProjectionCase.void.paramToParam.java.lang.String.io.github.sof3.enclavlow.cases.Box_0.dot
-[9 +825.658]     public void paramToThis(int)
-                 {
-                     io.github.sof3.enclavlow.cases.lfg.ProjectionCase r0;
-                     int i0;
-             
-                     r0 := @this: io.github.sof3.enclavlow.cases.lfg.ProjectionCase;
-             
-                     i0 := @parameter0: int;
-             
-                     r0.&lt;io.github.sof3.enclavlow.cases.lfg.ProjectionCase: int b&gt; = i0;
-             
-                     return;
-                 }
-             
+      [11 +860.870] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ProjectionCase.void.paramToParam.java.lang.String.io.github.sof3.enclavlow.cases.Box_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ProjectionCase.void.paramToParam.java.lang.String.io.github.sof3.enclavlow.cases.Box_0.dot
+[11 +1182.017]     public void paramToThis(int)
+                   {
+                       io.github.sof3.enclavlow.cases.lfg.ProjectionCase r0;
+                       int i0;
+               
+                       r0 := @this: io.github.sof3.enclavlow.cases.lfg.ProjectionCase;
+               
+                       i0 := @parameter0: int;
+               
+                       r0.&lt;io.github.sof3.enclavlow.cases.lfg.ProjectionCase: int b&gt; = i0;
+               
+                       return;
+                   }
+               
 Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.ProjectionCase: void paramToThis(int)&gt;
   Node r0 := @this: io.github.sof3.enclavlow.cases.lfg.ProjectionCase
   Node i0 := @parameter0: int
   Node r0.&lt;io.github.sof3.enclavlow.cases.lfg.ProjectionCase: int b&gt; = i0
   Node return
     Printing result LFG to dot
-      [9 +846.666] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ProjectionCase.void.paramToThis.int_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ProjectionCase.void.paramToThis.int_0.dot
-[9 +1153.311]     public void thisToStatic()
-                  {
-                      io.github.sof3.enclavlow.cases.lfg.ProjectionCase r0;
-                      int $i0;
-              
-                      r0 := @this: io.github.sof3.enclavlow.cases.lfg.ProjectionCase;
-              
-                      $i0 = r0.&lt;io.github.sof3.enclavlow.cases.lfg.ProjectionCase: int b&gt;;
-              
-                      &lt;io.github.sof3.enclavlow.cases.lfg.ProjectionCase: int a&gt; = $i0;
-              
-                      return;
-                  }
-              
+      [11 +1205.542] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ProjectionCase.void.paramToThis.int_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ProjectionCase.void.paramToThis.int_0.dot
+[11 +1438.733]     public void thisToStatic()
+                   {
+                       io.github.sof3.enclavlow.cases.lfg.ProjectionCase r0;
+                       int $i0;
+               
+                       r0 := @this: io.github.sof3.enclavlow.cases.lfg.ProjectionCase;
+               
+                       $i0 = r0.&lt;io.github.sof3.enclavlow.cases.lfg.ProjectionCase: int b&gt;;
+               
+                       &lt;io.github.sof3.enclavlow.cases.lfg.ProjectionCase: int a&gt; = $i0;
+               
+                       return;
+                   }
+               
 Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.ProjectionCase: void thisToStatic()&gt;
   Node r0 := @this: io.github.sof3.enclavlow.cases.lfg.ProjectionCase
   Node $i0 = r0.&lt;io.github.sof3.enclavlow.cases.lfg.ProjectionCase: int b&gt;
   Node &lt;io.github.sof3.enclavlow.cases.lfg.ProjectionCase: int a&gt; = $i0
   Node return
     Printing result LFG to dot
-      [9 +1163.490] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ProjectionCase.void.thisToStatic_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ProjectionCase.void.thisToStatic_0.dot
+      [11 +1461.333] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ProjectionCase.void.thisToStatic_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.ProjectionCase.void.thisToStatic_0.dot
 </pre>
 </span>
 </div>
@@ -171,7 +171,7 @@ Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.ProjectionCase: void thisToStat
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="http://www.gradle.org">Gradle 6.3</a> at Dec 31, 2020 3:45:09 PM</p>
+<a href="http://www.gradle.org">Gradle 6.3</a> at May 23, 2021, 5:54:46 AM</p>
 </div>
 </div>
 </body>

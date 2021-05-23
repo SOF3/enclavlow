@@ -41,7 +41,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">0.980s</div>
+<div class="counter">0.850s</div>
 <p>duration</p>
 </div>
 </td>
@@ -79,17 +79,17 @@
 </thead>
 <tr>
 <td class="success">loopDec</td>
-<td class="success">0.337s</td>
+<td class="success">0.265s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">loopInc</td>
-<td class="success">0.289s</td>
+<td class="success">0.292s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">whileCall</td>
-<td class="success">0.354s</td>
+<td class="success">0.293s</td>
 <td class="success">passed</td>
 </tr>
 </table>
@@ -97,29 +97,29 @@
 <div id="tab1" class="tab">
 <h2>Standard output</h2>
 <span class="code">
-<pre>[9 +1733.332]     public static int whileCall(java.util.function.BooleanSupplier)
-                  {
-                      java.util.function.BooleanSupplier r0;
-                      boolean $z0;
-                      int i0;
-              
-                      r0 := @parameter0: java.util.function.BooleanSupplier;
-              
-                      i0 = 0;
-              
-                   label1:
-                      $z0 = interfaceinvoke r0.&lt;java.util.function.BooleanSupplier: boolean getAsBoolean()&gt;();
-              
-                      if $z0 == 0 goto label2;
-              
-                      i0 = i0 + 1;
-              
-                      goto label1;
-              
-                   label2:
-                      return i0;
-                  }
-              
+<pre>[11 +1794.199]     public static int whileCall(java.util.function.BooleanSupplier)
+                   {
+                       java.util.function.BooleanSupplier r0;
+                       boolean $z0;
+                       int i0;
+               
+                       r0 := @parameter0: java.util.function.BooleanSupplier;
+               
+                       i0 = 0;
+               
+                    label1:
+                       $z0 = interfaceinvoke r0.&lt;java.util.function.BooleanSupplier: boolean getAsBoolean()&gt;();
+               
+                       if $z0 == 0 goto label2;
+               
+                       i0 = i0 + 1;
+               
+                       goto label1;
+               
+                    label2:
+                       return i0;
+                   }
+               
 Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.LoopCase: int whileCall(java.util.function.BooleanSupplier)&gt;
   Node r0 := @parameter0: java.util.function.BooleanSupplier
   Node i0 = 0
@@ -128,34 +128,34 @@ Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.LoopCase: int whileCall(java.ut
   Node if $z0 == 0 goto return i0
   Node return i0
     Printing result LFG to dot
-      [9 +1794.209] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.whileCall.java.util.function.BooleanSupplier_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.whileCall.java.util.function.BooleanSupplier_0.dot
+      [11 +1828.418] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.whileCall.java.util.function.BooleanSupplier_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.whileCall.java.util.function.BooleanSupplier_0.dot
   Node i0 = i0 + 1
   Node goto [?= $z0 = interfaceinvoke r0.&lt;java.util.function.BooleanSupplier: boolean getAsBoolean()&gt;()]
   Merge
   Node $z0 = interfaceinvoke r0.&lt;java.util.function.BooleanSupplier: boolean getAsBoolean()&gt;()
-[9 +2080.525]     public static int loopDec(int)
-                  {
-                      int $i0, i1, i2;
-              
-                      i1 := @parameter0: int;
-              
-                      i2 = 0;
-              
-                   label1:
-                      $i0 = i1;
-              
-                      i1 = i1 + -1;
-              
-                      if $i0 &lt;= 0 goto label2;
-              
-                      i2 = i2 + i1;
-              
-                      goto label1;
-              
-                   label2:
-                      return i2;
-                  }
-              
+[11 +2019.969]     public static int loopDec(int)
+                   {
+                       int $i0, i1, i2;
+               
+                       i1 := @parameter0: int;
+               
+                       i2 = 0;
+               
+                    label1:
+                       $i0 = i1;
+               
+                       i1 = i1 + -1;
+               
+                       if $i0 &lt;= 0 goto label2;
+               
+                       i2 = i2 + i1;
+               
+                       goto label1;
+               
+                    label2:
+                       return i2;
+                   }
+               
 Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.LoopCase: int loopDec(int)&gt;
   Node i1 := @parameter0: int
   Node i2 = 0
@@ -165,7 +165,7 @@ Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.LoopCase: int loopDec(int)&gt;
   Node if $i0 &lt;= 0 goto return i2
   Node return i2
     Printing result LFG to dot
-      [9 +2103.054] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopDec.int_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopDec.int_0.dot
+      [11 +2041.806] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopDec.int_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopDec.int_0.dot
   Node i2 = i2 + i1
   Node goto [?= $i0 = i1]
   Merge
@@ -174,31 +174,31 @@ Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.LoopCase: int loopDec(int)&gt;
   Node if $i0 &lt;= 0 goto return i2
   Node return i2
     Printing result LFG to dot
-      [9 +2146.357] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopDec.int_1.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopDec.int_1.dot
+      [11 +2101.348] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopDec.int_1.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopDec.int_1.dot
   Node i2 = i2 + i1
-[9 +2346.317]     public static int loopInc(int)
-                  {
-                      int i0, i1, i2;
-              
-                      i0 := @parameter0: int;
-              
-                      i1 = 0;
-              
-                      i2 = 0;
-              
-                   label1:
-                      if i2 &gt;= i0 goto label2;
-              
-                      i1 = i1 + i2;
-              
-                      i2 = i2 + 1;
-              
-                      goto label1;
-              
-                   label2:
-                      return i1;
-                  }
-              
+[11 +2330.785]     public static int loopInc(int)
+                   {
+                       int i0, i1, i2;
+               
+                       i0 := @parameter0: int;
+               
+                       i1 = 0;
+               
+                       i2 = 0;
+               
+                    label1:
+                       if i2 &gt;= i0 goto label2;
+               
+                       i1 = i1 + i2;
+               
+                       i2 = i2 + 1;
+               
+                       goto label1;
+               
+                    label2:
+                       return i1;
+                   }
+               
 Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.LoopCase: int loopInc(int)&gt;
   Node i0 := @parameter0: int
   Node i1 = 0
@@ -207,7 +207,7 @@ Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.LoopCase: int loopInc(int)&gt;
   Node if i2 &gt;= i0 goto return i1
   Node return i1
     Printing result LFG to dot
-      [9 +2374.219] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopInc.int_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopInc.int_0.dot
+      [11 +2355.246] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopInc.int_0.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopInc.int_0.dot
   Node i1 = i1 + i2
   Node i2 = i2 + 1
   Node goto [?= (branch)]
@@ -215,7 +215,7 @@ Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.LoopCase: int loopInc(int)&gt;
   Node if i2 &gt;= i0 goto return i1
   Node return i1
     Printing result LFG to dot
-      [9 +2424.976] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopInc.int_1.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopInc.int_1.dot
+      [11 +2392.281] Rendering graph: dot -T svg -o build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopInc.int_1.dot.svg build/lfgOutput/io.github.sof3.enclavlow.cases.lfg.LoopCase.int.loopInc.int_1.dot
   Node i1 = i1 + i2
 </pre>
 </span>
@@ -228,7 +228,7 @@ Analyzing &lt;io.github.sof3.enclavlow.cases.lfg.LoopCase: int loopInc(int)&gt;
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="http://www.gradle.org">Gradle 6.3</a> at Dec 31, 2020 3:45:09 PM</p>
+<a href="http://www.gradle.org">Gradle 6.3</a> at May 23, 2021, 5:54:46 AM</p>
 </div>
 </div>
 </body>
