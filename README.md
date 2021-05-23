@@ -20,7 +20,7 @@ and presents the information flow throughout the method.
 To run the test cases in the `enclavlow-core` module, use the gradle task:
 
 ```
-./gradlew core:tests
+./gradlew core:test
 ```
 
 This command requires the graphviz `dot` command to be in PATH.
